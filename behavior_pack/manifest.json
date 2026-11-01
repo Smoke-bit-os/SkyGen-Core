@@ -1,0 +1,58 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "SkyGen Core BP v0.2.4",
+    "description": "SkyGen foundation alpha",
+    "uuid": "050d268d-d873-4b6c-ad88-71da14ecb845",
+    "version": [
+      0,
+      2,
+      4
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "e705fd12-8036-4c67-8f69-2c2c96bd1b44",
+      "version": [
+        0,
+        2,
+        4
+      ]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "8e08db45-42bd-41bf-a81f-bfa0c30f1eb7",
+      "version": [
+        0,
+        2,
+        4
+      ],
+      "entry": "scripts/main.js"
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.0.0"
+    },
+    {
+      "module_name": "@minecraft/server-ui",
+      "version": "2.0.0"
+    },
+    {
+      "uuid": "f0cdfa8d-0d91-43b0-a5bd-ea7ae461c98d",
+      "version": [
+        0,
+        2,
+        4
+      ]
+    }
+  ]
+}
