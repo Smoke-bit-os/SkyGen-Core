@@ -99,7 +99,7 @@ test('preinstall build retains original menu and credits conversion',()=>{
  const t=setup({noBeforePlace:true});assert(!t.loadError);
  assert.strictEqual(t.call('C.exchange'),18000000);
  assert(src.includes('How many Orbits do you want?'));
- assert(src.includes("['My Plot','Visit Other Plots','Generators','Server Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Skill Tree','Daily Quests','Help']"));
+ assert(src.includes("['My Plot','Visit Other Plots','Generators','Server Shop','Food Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Skill Tree','Daily Quests','Help']"));
 });
 test('shop prevents nonintegral unit pricing',()=>{
  const t=setup();assert.throws(()=>t.call('shopUnitPrice({buy:1,sell:1,count:8},true)'),/whole Credit/);

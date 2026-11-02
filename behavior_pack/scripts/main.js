@@ -70,6 +70,10 @@ function migrateGeneratorCore(g,base){
 }
 function validTokenItemType(type,name){return type==='minecraft:goat_horn'||type===GENERATOR_ITEM_BY_NAME.get(name)}
 const SHOP=[{name:'Cobblestone × 16',id:'minecraft:cobblestone',count:16,buy:80,sell:16},{name:'Oak Logs × 16',id:'minecraft:oak_log',count:16,buy:160,sell:32},{name:'Iron Ingots × 8',id:'minecraft:iron_ingot',count:8,buy:400,sell:80},{name:'Diamond × 1',id:'minecraft:diamond',count:1,buy:500,sell:100},{"name":"Stone","id":"minecraft:stone","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Dirt","id":"minecraft:dirt","count":16,"buy":64,"sell":16,"category":"Starter"},{"name":"Gravel","id":"minecraft:gravel","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Sand","id":"minecraft:sand","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Clay","id":"minecraft:clay_ball","count":16,"buy":160,"sell":32,"category":"Starter"},{"name":"Spruce Logs","id":"minecraft:spruce_log","count":16,"buy":192,"sell":48,"category":"Starter"},{"name":"Birch Logs","id":"minecraft:birch_log","count":16,"buy":192,"sell":48,"category":"Starter"},{"name":"Cherry Logs","id":"minecraft:cherry_log","count":16,"buy":320,"sell":80,"category":"Starter"},{"name":"Copper Ingots","id":"minecraft:copper_ingot","count":8,"buy":280,"sell":64,"category":"Ores"},{"name":"Coal","id":"minecraft:coal","count":16,"buy":240,"sell":48,"category":"Ores"},{"name":"Gold Ingots","id":"minecraft:gold_ingot","count":8,"buy":800,"sell":160,"category":"Ores"},{"name":"Redstone Dust","id":"minecraft:redstone","count":16,"buy":240,"sell":64,"category":"Ores"},{"name":"Lapis Lazuli","id":"minecraft:lapis_lazuli","count":16,"buy":288,"sell":64,"category":"Ores"},{"name":"Emerald","id":"minecraft:emerald","count":1,"buy":1500,"sell":300,"category":"Ores"},{"name":"Nether Quartz","id":"minecraft:quartz","count":16,"buy":320,"sell":64,"category":"Nether"},{"name":"Netherrack","id":"minecraft:netherrack","count":16,"buy":128,"sell":32,"category":"Nether"},{"name":"Soul Sand","id":"minecraft:soul_sand","count":8,"buy":160,"sell":40,"category":"Nether"},{"name":"Blackstone","id":"minecraft:blackstone","count":16,"buy":480,"sell":128,"category":"Nether"},{"name":"Glowstone Dust","id":"minecraft:glowstone_dust","count":16,"buy":640,"sell":160,"category":"Nether"},{"name":"Magma Cream","id":"minecraft:magma_cream","count":8,"buy":800,"sell":200,"category":"Nether"},{"name":"Obsidian","id":"minecraft:obsidian","count":4,"buy":1200,"sell":320,"category":"Endgame"},{"name":"Prismarine","id":"minecraft:prismarine","count":8,"buy":1600,"sell":400,"category":"Endgame"},{"name":"End Stone","id":"minecraft:end_stone","count":8,"buy":1600,"sell":400,"category":"Endgame"},{"name":"Sculk","id":"minecraft:sculk","count":8,"buy":2400,"sell":640,"category":"Endgame"}];
+// Simple vanilla food, no special NBT/dynamic properties: reuse the Server Shop transaction safeguards.
+const FOOD_SHOP=[{"name":"Apple","id":"minecraft:apple","count":1,"buy":30,"sell":8,"category":"Basics"},{"name":"Bread","id":"minecraft:bread","count":1,"buy":40,"sell":10,"category":"Basics"},{"name":"Baked Potato","id":"minecraft:baked_potato","count":1,"buy":40,"sell":10,"category":"Basics"},{"name":"Carrot","id":"minecraft:carrot","count":1,"buy":18,"sell":4,"category":"Basics"},{"name":"Potato","id":"minecraft:potato","count":1,"buy":15,"sell":3,"category":"Basics"},{"name":"Beetroot","id":"minecraft:beetroot","count":1,"buy":18,"sell":4,"category":"Basics"},{"name":"Steak","id":"minecraft:cooked_beef","count":1,"buy":95,"sell":24,"category":"Cooked Meats"},{"name":"Porkchop","id":"minecraft:cooked_porkchop","count":1,"buy":85,"sell":20,"category":"Cooked Meats"},{"name":"Chicken","id":"minecraft:cooked_chicken","count":1,"buy":75,"sell":18,"category":"Cooked Meats"},{"name":"Mutton","id":"minecraft:cooked_mutton","count":1,"buy":75,"sell":18,"category":"Cooked Meats"},{"name":"Rabbit","id":"minecraft:cooked_rabbit","count":1,"buy":95,"sell":23,"category":"Cooked Meats"},{"name":"Cooked Cod","id":"minecraft:cooked_cod","count":1,"buy":65,"sell":15,"category":"Seafood"},{"name":"Cooked Salmon","id":"minecraft:cooked_salmon","count":1,"buy":85,"sell":20,"category":"Seafood"},{"name":"Dried Kelp","id":"minecraft:dried_kelp","count":1,"buy":15,"sell":3,"category":"Seafood"},{"name":"Melon Slice","id":"minecraft:melon_slice","count":1,"buy":20,"sell":4,"category":"Snacks"},{"name":"Sweet Berries","id":"minecraft:sweet_berries","count":1,"buy":20,"sell":4,"category":"Snacks"},{"name":"Glow Berries","id":"minecraft:glow_berries","count":1,"buy":28,"sell":6,"category":"Snacks"},{"name":"Cookie","id":"minecraft:cookie","count":1,"buy":24,"sell":5,"category":"Snacks"},{"name":"Pumpkin Pie","id":"minecraft:pumpkin_pie","count":1,"buy":70,"sell":15,"category":"Snacks"},{"name":"Golden Carrot","id":"minecraft:golden_carrot","count":1,"buy":180,"sell":45,"category":"Premium"},{"name":"Golden Apple","id":"minecraft:golden_apple","count":1,"buy":1400,"sell":350,"category":"Premium"},{"name":"Honey Bottle","id":"minecraft:honey_bottle","count":1,"buy":85,"sell":20,"category":"Premium"},{"name":"Mushroom Stew","id":"minecraft:mushroom_stew","count":1,"buy":90,"sell":20,"category":"Premium"},{"name":"Rabbit Stew","id":"minecraft:rabbit_stew","count":1,"buy":140,"sell":35,"category":"Premium"},{"name":"Beetroot Soup","id":"minecraft:beetroot_soup","count":1,"buy":75,"sell":18,"category":"Premium"}];
+const FOOD_CATEGORIES=['Basics','Cooked Meats','Seafood','Snacks','Premium'];
+
 const pending=new Map(),cooldowns=new Map(),generators=new Map(),trades=new Map(),visitRequests=new Map();
 const genEmptySeconds=new Map();
 let genWatchdogRuns=0, genLastTick=-1, genLastError="none", genStartupTick=system.currentTick;
@@ -1019,7 +1023,7 @@ function adminAccess(p,target){
  });
 }
 function back(p){menu(p)}
-function menu(p){const d=profile(p);form(p,'§l§bSKYGEN CORE',`§eCredits: ${d.credits}  §bOrbits: ${d.orbits}\n§dRank: ${d.rank}/50  XP: ${d.xp}  §eSP: ${skillAvailable(d)}\n§aPlot: ${d.plot+1}`,['My Plot','Visit Other Plots','Generators','Server Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Skill Tree','Daily Quests','Help'],i=>[()=>plotMenu(p),()=>visitMenu(p),()=>genMenu(p),()=>shop(p),()=>market(p),()=>trade(p),()=>ranks(p),()=>wallet(p),()=>teleports(p),()=>skillTree(p),()=>dailyQuests(p),()=>form(p,'Help','SkyGen v0.9.4. 42 generators, six-branch Skill Tree, Daily Quests, marketplace, trades, and 50 ranks. Test on a world copy first.',['Back'],()=>back(p))][i]())}
+function menu(p){const d=profile(p);form(p,'§l§bSKYGEN CORE',`§eCredits: ${d.credits}  §bOrbits: ${d.orbits}\n§dRank: ${d.rank}/50  XP: ${d.xp}  §eSP: ${skillAvailable(d)}\n§aPlot: ${d.plot+1}`,['My Plot','Visit Other Plots','Generators','Server Shop','Food Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Skill Tree','Daily Quests','Help'],i=>[()=>plotMenu(p),()=>visitMenu(p),()=>genMenu(p),()=>shop(p),()=>foodShop(p),()=>market(p),()=>trade(p),()=>ranks(p),()=>wallet(p),()=>teleports(p),()=>skillTree(p),()=>dailyQuests(p),()=>form(p,'Help','SkyGen v0.9.6. 42 custom generators, Food Shop, Skill Tree, quests, marketplace, trades, and 50 ranks.',['Back'],()=>back(p))][i]())}
 function plotMenu(p){
  const d=profile(p);
  if(d.plot<0)return p.sendMessage('§cYour plot is not assigned. Rejoin to retry.');
@@ -1143,7 +1147,7 @@ function manageGenerator(p,key,g){
    try{base=dim.getBlock({x:g.x,y:g.y,z:g.z})?.typeId||'unloaded';output=dim.getBlock({x:g.x,y:g.y+1,z:g.z})?.typeId||'unloaded'}catch(e){genError('inspect '+e)}
    const interval=Math.max(1,Math.ceil((Number(g.period)||spec?.period||200)/20));
    const age=genLastTick<0?'never':String(system.currentTick-genLastTick)+' ticks ago';
-   const lines=[`§bSkyGen Generator Deep Diagnostics v0.9.4`,`Generator: ${g.type} level ${lv} at ${g.x},${g.y},${g.z}`,`Registered: ${generators.get(key)===g} | Registry size: ${generators.size}`,`Base: ${base} | Output: ${output} | Expected: ${spec?.block||g.block}`,`Interval: ${interval}s | Empty: ${genEmptySeconds.get(key)||0}s`,`Watchdog runs: ${genWatchdogRuns} | Last heartbeat: ${age}`,`Script uptime: ${system.currentTick-genStartupTick} ticks | Current tick: ${system.currentTick}`,`Last error: ${genLastError}`,`Recent errors: ${genErrors.slice(-3).join(' ; ')||'none'}`];
+   const lines=[`§bSkyGen Generator Deep Diagnostics v0.9.6`,`Generator: ${g.type} level ${lv} at ${g.x},${g.y},${g.z}`,`Registered: ${generators.get(key)===g} | Registry size: ${generators.size}`,`Base: ${base} | Output: ${output} | Expected: ${spec?.block||g.block}`,`Interval: ${interval}s | Empty: ${genEmptySeconds.get(key)||0}s`,`Watchdog runs: ${genWatchdogRuns} | Last heartbeat: ${age}`,`Script uptime: ${system.currentTick-genStartupTick} ticks | Current tick: ${system.currentTick}`,`Last error: ${genLastError}`,`Recent errors: ${genErrors.slice(-3).join(' ; ')||'none'}`];
    for(const line of lines)p.sendMessage(line);
    return;
   }
@@ -1221,7 +1225,13 @@ function shopUnitPrice(item,buying){
 function safeShopSell(p,s){const inv=inventory(p);if(!inv)return false;const slots=[];let remaining=s.count;for(let i=0;i<inv.size&&remaining>0;i++){const it=inv.getItem(i);if(!eligibleShopItem(it,s.id))continue;const n=Math.min(remaining,it.amount);slots.push([i,n,it]);remaining-=n}if(remaining)return p.sendMessage('§cNot enough ordinary unlocked items.'),false;
  const d=profile(p);if(!Number.isSafeInteger(d.credits+s.sell))return false;
  const changes=[];try{for(const [slot,n,it] of slots){changes.push([slot,it.clone()]);if(n===it.amount)inv.setItem(slot,undefined);else{const reduced=it.clone();reduced.amount-=n;inv.setItem(slot,reduced)}}d.credits+=s.sell;save(p,d);return true}catch(e){for(const [slot,original] of changes){try{inv.setItem(slot,original)}catch{}}p.sendMessage('§cSale failed; inventory restoration attempted.');return false}}
-function shop(p){
+function foodShop(p){return shop(p,true)}
+function shop(p,foodMode=false){
+ const food=foodMode===true;
+ const returnShop=()=>food?foodShop(p):shop(p);
+ const categories=food?FOOD_CATEGORIES:['Starter','Ores','Nether','Endgame'];
+ const groupMap=food?Object.fromEntries(FOOD_CATEGORIES.map(c=>[c,FOOD_SHOP.filter(s=>s.category===c)])):
+  {Starter:[...SHOP.slice(0,2),...SHOP.filter(s=>s.category==='Starter')],Ores:[...SHOP.slice(2,4),...SHOP.filter(s=>s.category==='Ores')],Nether:SHOP.filter(s=>s.category==='Nether'),Endgame:SHOP.filter(s=>s.category==='Endgame')};
  const showShop=(ui,step,cb)=>{
   const attempt=(n)=>system.runTimeout(()=>{
    ui.show(p).then(r=>{
@@ -1231,22 +1241,20 @@ function shop(p){
   },n?20*(n+1):8);
   attempt(0);
  };
- const first=new ActionFormData().title('§6SERVER SHOP').body('Credits only. Choose Buy or Sell.').button('Buy').button('Sell').button('Back');
+ const first=new ActionFormData().title(food?'§aFOOD SHOP':'§6SERVER SHOP').body(food?'§eCredits only. Buy food or sell plain food items.':'Credits only. Choose Buy or Sell.').button('Buy').button('Sell').button('Back');
  showShop(first,'main',r=>{
   if(r.selection===2)return back(p);
   const buying=r.selection===0;
-  const categories=['Starter','Ores','Nether','Endgame'];
-  const groupMap={Starter:[...SHOP.slice(0,2),...SHOP.filter(s=>s.category==='Starter')],Ores:[...SHOP.slice(2,4),...SHOP.filter(s=>s.category==='Ores')],Nether:SHOP.filter(s=>s.category==='Nether'),Endgame:SHOP.filter(s=>s.category==='Endgame')};
   const chooseCategory=new ActionFormData().title(buying?'BUY — CATEGORY':'SELL — CATEGORY').body('Choose a category.');
   for(const c of categories)chooseCategory.button(`${c} (${groupMap[c].length})`);
   chooseCategory.button('Back');
   showShop(chooseCategory,'shop category',c=>{
-   if(c.selection>=categories.length)return shop(p);
+   if(c.selection>=categories.length)return returnShop();
    const items=groupMap[categories[c.selection]];
    const choosePage=(page)=>{
     const pageSize=8,slice=items.slice(page*pageSize,page*pageSize+pageSize);
     const select=new ActionFormData().title(buying?'BUY ITEMS':'SELL ITEMS').body(`${categories[c.selection]} — Page ${page+1}/${Math.ceil(items.length/pageSize)}`);
-    for(const item of slice)select.button(`${item.id} (${buying?item.buy:item.sell} / ${item.count})`);
+    for(const item of slice)select.button(`${food?item.name:item.id} (${buying?item.buy:item.sell} / ${item.count})`);
     if(page>0)select.button('Previous Page');
     if((page+1)*pageSize<items.length)select.button('Next Page');
     select.button('Back');
@@ -1254,7 +1262,7 @@ function shop(p){
      if(chosen.selection>=slice.length){let offset=slice.length;
       if(page>0){if(chosen.selection===offset)return choosePage(page-1);offset++}
       if((page+1)*pageSize<items.length){if(chosen.selection===offset)return choosePage(page+1)}
-      return shop(p);
+      return returnShop();
      }
      const item=slice[chosen.selection];
    const amountForm=new ModalFormData().title(buying?'Buy Quantity':'Sell Quantity').textField('How many items? (1–2304)','16',{defaultValue:'16'});
@@ -1957,9 +1965,10 @@ system.runInterval(()=>{for(const p of world.getAllPlayers())ensure(p)},200);
 function helpCommand(actor,message){
  const topic=String(message||'').trim().toLowerCase(),operator=isOperator(actor);
  const common=[
-  '§b§lSKYGEN COMMAND HELP §r§7(v0.9.5)',
+  '§b§lSKYGEN COMMAND HELP §r§7(v0.9.6)',
   '§f/scriptevent skygen:help §7— commands you can use',
   '§f/scriptevent skygen:help generators §7— generator menu tips',
+  '§f/scriptevent skygen:help food §7— Food Shop usage',
   '§f/scriptevent skygen:menu §7— open SkyGen menu',
   '§f/scriptevent skygen:debug §7— check command/permission status',
   '§f/scriptevent skygen:adminaxe §7— get Admin Axe (granted admins only)',
@@ -1967,7 +1976,7 @@ function helpCommand(actor,message){
   '§7Operator commands: /scriptevent skygen:help admin'
  ];
  const admin=[
-  '§6§lSKYGEN OPERATOR COMMANDS §r§7(v0.9.5)',
+  '§6§lSKYGEN OPERATOR COMMANDS §r§7(v0.9.6)',
   '§f/scriptevent skygen:admin grant PlayerName §7— grant SkyGen admin',
   '§f/scriptevent skygen:admin revoke PlayerName §7— revoke SkyGen admin',
   '§f/scriptevent skygen:security §7— flagged tokens/trades',
@@ -1990,13 +1999,21 @@ function helpCommand(actor,message){
   return;
  }
  if(topic==='generators'){for(const line of generatorHelp)actor.sendMessage(line);return}
+ if(topic==='food'){
+  actor.sendMessage('§a§lSKYGEN FOOD SHOP §r§7(v0.9.6)');
+  actor.sendMessage('§7Compass (slot 7) → Food Shop → Buy or Sell.');
+  actor.sendMessage('§7Categories: Basics, Cooked Meats, Seafood, Snacks, Premium.');
+  actor.sendMessage('§7Choose a food, enter quantity 1–2304, then confirm Credits.');
+  actor.sendMessage('§7Inventory capacity and plain-item restrictions apply; no auto-restock or free items.');
+  return;
+ }
  if(topic==='admin'||topic==='security'){
   if(!operator)return actor.sendMessage('§cOperator permission required for this help page.');
   for(const line of admin)actor.sendMessage(line);
   return;
  }
  actor.sendMessage('§eUnknown help topic: '+topic.slice(0,30));
- actor.sendMessage('§7Usage: /scriptevent skygen:help [player|generators|admin|all]');
+ actor.sendMessage('§7Usage: /scriptevent skygen:help [player|generators|food|admin|all]');
 }
 function adminCommand(actor,message){
  if(!isOperator(actor))return actor.sendMessage('§cOnly Realm operators may grant or revoke SkyGen admin access.');
@@ -2015,4 +2032,4 @@ function adminCommand(actor,message){
 }
 
 system.runTimeout(()=>{try{ensureSpawn()}catch(e){console.warn('SkyGen spawn init: '+e)}},40);
-console.warn('[SkyGen] v0.9.5 custom generator cores and in-game help loaded');
+console.warn('[SkyGen] v0.9.6 custom generator cores, food shop, and in-game help loaded');

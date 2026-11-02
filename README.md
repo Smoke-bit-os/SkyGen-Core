@@ -1,9 +1,5 @@
-# SkyGen Core v0.9.5 — In-Game Command Help
+# SkyGen Core v0.9.6 — Food Shop Edition
 
-Adds `/scriptevent skygen:help` with player, generators, and operator/admin topics to the tested v0.9.4 custom-generator-base release. No game logic, world data, save keys, block/item IDs, textures or pack UUIDs change.
+Adds **Food Shop** as a separate main-menu button next to Server Shop, preserving all other menu options and saved world IDs. 25 vanilla edible items in five categories. Buy/sell with Credits, quantity selection and confirmation; the original Server Shop purchase/sale engine is reused. Existing player Credits, Orbits, ranks, plots, 42 generator blocks, custom items, skill tree, quests, marketplace, trading, and permission handling are unchanged.
 
-**Command reference**: `docs/COMMAND_HELP_v0.9.5.md`  
-**Release notes**: `docs/RELEASE_NOTES_v0.9.5.md`  
-**Xbox test checklist**: `docs/XBOX_HELP_TEST_v0.9.5.md`
-
-Install both v0.9.5 packs on a **backup test world**. Existing generators and player records are retained. Stable GitHub `main` stays unchanged until the user approves. Minimum Bedrock 1.21.100.
+Run `/scriptevent skygen:help food` (if you have permission to use slash commands) or open the Food Shop through hotbar slot 7 compass. Install **both** BP and RP in a backed-up test world before using the live Realm.

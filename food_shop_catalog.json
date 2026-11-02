@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Apple",
+    "id": "minecraft:apple",
+    "count": 1,
+    "buy": 30,
+    "sell": 8,
+    "category": "Basics"
+  },
+  {
+    "name": "Bread",
+    "id": "minecraft:bread",
+    "count": 1,
+    "buy": 40,
+    "sell": 10,
+    "category": "Basics"
+  },
+  {
+    "name": "Baked Potato",
+    "id": "minecraft:baked_potato",
+    "count": 1,
+    "buy": 40,
+    "sell": 10,
+    "category": "Basics"
+  },
+  {
+    "name": "Carrot",
+    "id": "minecraft:carrot",
+    "count": 1,
+    "buy": 18,
+    "sell": 4,
+    "category": "Basics"
+  },
+  {
+    "name": "Potato",
+    "id": "minecraft:potato",
+    "count": 1,
+    "buy": 15,
+    "sell": 3,
+    "category": "Basics"
+  },
+  {
+    "name": "Beetroot",
+    "id": "minecraft:beetroot",
+    "count": 1,
+    "buy": 18,
+    "sell": 4,
+    "category": "Basics"
+  },
+  {
+    "name": "Steak",
+    "id": "minecraft:cooked_beef",
+    "count": 1,
+    "buy": 95,
+    "sell": 24,
+    "category": "Cooked Meats"
+  },
+  {
+    "name": "Porkchop",
+    "id": "minecraft:cooked_porkchop",
+    "count": 1,
+    "buy": 85,
+    "sell": 20,
+    "category": "Cooked Meats"
+  },
+  {
+    "name": "Chicken",
+    "id": "minecraft:cooked_chicken",
+    "count": 1,
+    "buy": 75,
+    "sell": 18,
+    "category": "Cooked Meats"
+  },
+  {
+    "name": "Mutton",
+    "id": "minecraft:cooked_mutton",
+    "count": 1,
+    "buy": 75,
+    "sell": 18,
+    "category": "Cooked Meats"
+  },
+  {
+    "name": "Rabbit",
+    "id": "minecraft:cooked_rabbit",
+    "count": 1,
+    "buy": 95,
+    "sell": 23,
+    "category": "Cooked Meats"
+  },
+  {
+    "name": "Cooked Cod",
+    "id": "minecraft:cooked_cod",
+    "count": 1,
+    "buy": 65,
+    "sell": 15,
+    "category": "Seafood"
+  },
+  {
+    "name": "Cooked Salmon",
+    "id": "minecraft:cooked_salmon",
+    "count": 1,
+    "buy": 85,
+    "sell": 20,
+    "category": "Seafood"
+  },
+  {
+    "name": "Dried Kelp",
+    "id": "minecraft:dried_kelp",
+    "count": 1,
+    "buy": 15,
+    "sell": 3,
+    "category": "Seafood"
+  },
+  {
+    "name": "Melon Slice",
+    "id": "minecraft:melon_slice",
+    "count": 1,
+    "buy": 20,
+    "sell": 4,
+    "category": "Snacks"
+  },
+  {
+    "name": "Sweet Berries",
+    "id": "minecraft:sweet_berries",
+    "count": 1,
+    "buy": 20,
+    "sell": 4,
+    "category": "Snacks"
+  },
+  {
+    "name": "Glow Berries",
+    "id": "minecraft:glow_berries",
+    "count": 1,
+    "buy": 28,
+    "sell": 6,
+    "category": "Snacks"
+  },
+  {
+    "name": "Cookie",
+    "id": "minecraft:cookie",
+    "count": 1,
+    "buy": 24,
+    "sell": 5,
+    "category": "Snacks"
+  },
+  {
+    "name": "Pumpkin Pie",
+    "id": "minecraft:pumpkin_pie",
+    "count": 1,
+    "buy": 70,
+    "sell": 15,
+    "category": "Snacks"
+  },
+  {
+    "name": "Golden Carrot",
+    "id": "minecraft:golden_carrot",
+    "count": 1,
+    "buy": 180,
+    "sell": 45,
+    "category": "Premium"
+  },
+  {
+    "name": "Golden Apple",
+    "id": "minecraft:golden_apple",
+    "count": 1,
+    "buy": 1400,
+    "sell": 350,
+    "category": "Premium"
+  },
+  {
+    "name": "Honey Bottle",
+    "id": "minecraft:honey_bottle",
+    "count": 1,
+    "buy": 85,
+    "sell": 20,
+    "category": "Premium"
+  },
+  {
+    "name": "Mushroom Stew",
+    "id": "minecraft:mushroom_stew",
+    "count": 1,
+    "buy": 90,
+    "sell": 20,
+    "category": "Premium"
+  },
+  {
+    "name": "Rabbit Stew",
+    "id": "minecraft:rabbit_stew",
+    "count": 1,
+    "buy": 140,
+    "sell": 35,
+    "category": "Premium"
+  },
+  {
+    "name": "Beetroot Soup",
+    "id": "minecraft:beetroot_soup",
+    "count": 1,
+    "buy": 75,
+    "sell": 18,
+    "category": "Premium"
+  }
+]
