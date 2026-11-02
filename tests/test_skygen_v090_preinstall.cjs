@@ -72,17 +72,17 @@ test('nonmultiple 1, 16, 64, max purchases are allowed',()=>{
  assert(!src.includes('quantity in multiples of'));
  assert(src.includes('const total=count*unitPrice'));
 });
-test('generator failure preserves an existing bedrock block',()=>{
+test('new generator refuses to overwrite existing bedrock',()=>{
  const t=setup();const loc=t.at(513,107,513);t.blocks.set(loc,'minecraft:bedrock');
  const original=t.dim.getBlock;
  t.dim.getBlock=function(pos){const b=original(pos);if(pos.x===513&&pos.y===108&&pos.z===513){b.setType=()=>{throw Error('failed setType')}}return b};
- assert.throws(()=>t.call('buildGenerator({x:513,y:107,z:513,block:"minecraft:coal_ore"})'),/failed setType/);
+ assert.strictEqual(t.call('buildGenerator({x:513,y:107,z:513,type:"Coal",block:"minecraft:coal_ore"})'),false);
  assert.strictEqual(t.blocks.get(loc),'minecraft:bedrock');
 });
 test('generator failure rolls back a newly created base',()=>{
  const t=setup();const loc=t.at(514,107,513);const original=t.dim.getBlock;
  t.dim.getBlock=function(pos){const b=original(pos);if(pos.x===514&&pos.y===108&&pos.z===513){b.setType=()=>{throw Error('failed setType')}}return b};
- assert.throws(()=>t.call('buildGenerator({x:514,y:107,z:513,block:"minecraft:coal_ore"})'),/failed setType/);
+ assert.throws(()=>t.call('buildGenerator({x:514,y:107,z:513,type:"Coal",block:"minecraft:coal_ore"})'),/failed setType/);
  assert.strictEqual(t.blocks.get(loc),'minecraft:air');
 });
 test('new Plot Horn can assign plot without forcing a rejoin',()=>{

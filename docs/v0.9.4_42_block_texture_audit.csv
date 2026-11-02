@@ -1,0 +1,43 @@
+generator,block_id,top,side,bottom,block_identifier_matches,format,geometry,opaque,immovable,unbreakable,explosion_resistant,collision,visual,item_unchanged
+Cobblestone,skygen:cobblestone_generator_core,cobblestone_generator_core_top.png,cobblestone_generator_core_side.png,cobblestone_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Coal,skygen:coal_generator_core,coal_generator_core_top.png,coal_generator_core_side.png,coal_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Iron,skygen:iron_generator_core,iron_generator_core_top.png,iron_generator_core_side.png,iron_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Gold,skygen:gold_generator_core,gold_generator_core_top.png,gold_generator_core_side.png,gold_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Diamond,skygen:diamond_generator_core,diamond_generator_core_top.png,diamond_generator_core_side.png,diamond_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Emerald,skygen:emerald_generator_core,emerald_generator_core_top.png,emerald_generator_core_side.png,emerald_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Stone,skygen:stone_generator_core,stone_generator_core_top.png,stone_generator_core_side.png,stone_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Deepslate,skygen:deepslate_generator_core,deepslate_generator_core_top.png,deepslate_generator_core_side.png,deepslate_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Dirt,skygen:dirt_generator_core,dirt_generator_core_top.png,dirt_generator_core_side.png,dirt_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Gravel,skygen:gravel_generator_core,gravel_generator_core_top.png,gravel_generator_core_side.png,gravel_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Sand,skygen:sand_generator_core,sand_generator_core_top.png,sand_generator_core_side.png,sand_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Clay,skygen:clay_generator_core,clay_generator_core_top.png,clay_generator_core_side.png,clay_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Oak Logs,skygen:oak_logs_generator_core,oak_logs_generator_core_top.png,oak_logs_generator_core_side.png,oak_logs_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Spruce Logs,skygen:spruce_logs_generator_core,spruce_logs_generator_core_top.png,spruce_logs_generator_core_side.png,spruce_logs_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Birch Logs,skygen:birch_logs_generator_core,birch_logs_generator_core_top.png,birch_logs_generator_core_side.png,birch_logs_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Cherry Logs,skygen:cherry_logs_generator_core,cherry_logs_generator_core_top.png,cherry_logs_generator_core_side.png,cherry_logs_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Mangrove Logs,skygen:mangrove_logs_generator_core,mangrove_logs_generator_core_top.png,mangrove_logs_generator_core_side.png,mangrove_logs_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Copper,skygen:copper_generator_core,copper_generator_core_top.png,copper_generator_core_side.png,copper_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Redstone,skygen:redstone_generator_core,redstone_generator_core_top.png,redstone_generator_core_side.png,redstone_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Lapis Lazuli,skygen:lapis_lazuli_generator_core,lapis_lazuli_generator_core_top.png,lapis_lazuli_generator_core_side.png,lapis_lazuli_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Nether Quartz,skygen:nether_quartz_generator_core,nether_quartz_generator_core_top.png,nether_quartz_generator_core_side.png,nether_quartz_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Nether Gold,skygen:nether_gold_generator_core,nether_gold_generator_core_top.png,nether_gold_generator_core_side.png,nether_gold_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Moss,skygen:moss_generator_core,moss_generator_core_top.png,moss_generator_core_side.png,moss_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Netherrack,skygen:netherrack_generator_core,netherrack_generator_core_top.png,netherrack_generator_core_side.png,netherrack_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Soul Sand,skygen:soul_sand_generator_core,soul_sand_generator_core_top.png,soul_sand_generator_core_side.png,soul_sand_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Basalt,skygen:basalt_generator_core,basalt_generator_core_top.png,basalt_generator_core_side.png,basalt_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Blackstone,skygen:blackstone_generator_core,blackstone_generator_core_top.png,blackstone_generator_core_side.png,blackstone_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Glowstone,skygen:glowstone_generator_core,glowstone_generator_core_top.png,glowstone_generator_core_side.png,glowstone_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Magma,skygen:magma_generator_core,magma_generator_core_top.png,magma_generator_core_side.png,magma_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Calcite,skygen:calcite_generator_core,calcite_generator_core_top.png,calcite_generator_core_side.png,calcite_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Tuff,skygen:tuff_generator_core,tuff_generator_core_top.png,tuff_generator_core_side.png,tuff_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Amethyst Block,skygen:amethyst_block_generator_core,amethyst_block_generator_core_top.png,amethyst_block_generator_core_side.png,amethyst_block_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Obsidian,skygen:obsidian_generator_core,obsidian_generator_core_top.png,obsidian_generator_core_side.png,obsidian_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Prismarine,skygen:prismarine_generator_core,prismarine_generator_core_top.png,prismarine_generator_core_side.png,prismarine_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Sea Lantern,skygen:sea_lantern_generator_core,sea_lantern_generator_core_top.png,sea_lantern_generator_core_side.png,sea_lantern_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+End Stone,skygen:end_stone_generator_core,end_stone_generator_core_top.png,end_stone_generator_core_side.png,end_stone_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Purpur Block,skygen:purpur_block_generator_core,purpur_block_generator_core_top.png,purpur_block_generator_core_side.png,purpur_block_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Sculk,skygen:sculk_generator_core,sculk_generator_core_top.png,sculk_generator_core_side.png,sculk_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Crying Obsidian,skygen:crying_obsidian_generator_core,crying_obsidian_generator_core_top.png,crying_obsidian_generator_core_side.png,crying_obsidian_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Gilded Blackstone,skygen:gilded_blackstone_generator_core,gilded_blackstone_generator_core_top.png,gilded_blackstone_generator_core_side.png,gilded_blackstone_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Shroomlight,skygen:shroomlight_generator_core,shroomlight_generator_core_top.png,shroomlight_generator_core_side.png,shroomlight_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Ancient Debris,skygen:ancient_debris_generator_core,ancient_debris_generator_core_top.png,ancient_debris_generator_core_side.png,ancient_debris_generator_core_bottom.png,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS

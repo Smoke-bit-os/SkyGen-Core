@@ -1,0 +1,37 @@
+{
+  "format_version": "1.21.100",
+  "minecraft:block": {
+    "description": {
+      "identifier": "skygen:nether_quartz_generator_core",
+      "menu_category": {
+        "category": "none"
+      }
+    },
+    "components": {
+      "minecraft:display_name": "SkyGen Nether Quartz Generator Core",
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "skygen_nether_quartz_generator_core_side",
+          "render_method": "opaque"
+        },
+        "up": {
+          "texture": "skygen_nether_quartz_generator_core_top",
+          "render_method": "opaque"
+        },
+        "down": {
+          "texture": "skygen_nether_quartz_generator_core_bottom",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:destructible_by_mining": false,
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:movable": {
+        "movement_type": "immovable"
+      },
+      "minecraft:collision_box": true,
+      "minecraft:selection_box": true,
+      "minecraft:light_emission": 8
+    }
+  }
+}

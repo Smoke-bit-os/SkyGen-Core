@@ -1,11 +1,12 @@
-# SkyGen Core v0.9.3 — Custom Generator Items (Xbox Test Build)
+# SkyGen Core v0.9.4 — Custom Generator Bases
 
-All **42** generators now have individually named, non-stackable Bedrock custom items and distinct **64×64 transparent PNG** item icons. Players receive named custom generator cores instead of goat horns when purchasing. The existing secure per-token dynamic property ID and server-side issuance/redeem ledger remain mandatory.
+42 unique generator inventory items (v0.9.3) + 42 matching full-cube in-world custom generator blocks.
+Each block uses an original 64×64 top, side and bottom texture: 126 block-face textures, plus the preserved 42 inventory icons.
 
-**Previously issued v0.9.2 generator goat horns still work** through their existing verified-use handler. The original locked Spawn Horn and Plot Horn are unchanged. Old unverifiable name-only eggs remain blocked and require operator verification.
+**Install the .mcaddon on a copied world with matching behavior and resource packs. Minimum Minecraft Bedrock 1.21.100.**
 
-Using these new items relies on a Bedrock 2.0 custom item component (`skygen:generator_token_use`) registered via `system.beforeEvents.startup`. It handles `onUse` and `onUseOn` and routes both into the original token validation and placement path. If registration fails, new purchases fail closed rather than charge players for unusable items. Actual Xbox testing is essential.
+The registered generator base at Y is now `skygen:<name>_generator_core`, generated material remains at Y+1. Previously registered bedrock bases convert only in loaded chunks via the normal heartbeat. User data, pack UUIDs and generator prices remain untouched. Never downgrade without a pre-upgrade world backup.
 
-See `docs/RELEASE_NOTES_v0.9.3.md` and `docs/REALM_CUSTOM_ITEM_TEST_v0.9.3.md`.
+See `docs/XBOX_REALM_TEST_CHECKLIST_v0.9.4.md`, `docs/RELEASE_NOTES_v0.9.4.md`, and `docs/v0.9.4_42_block_texture_audit.csv`.
 
-Do not install in the live Realm or merge the stable GitHub branch before the Xbox test-world checklist passes. Back up world data first. Downgrading v0.9.x to v0.8.3 requires a pre-upgrade world backup because generator storage is banked.
+141 simulated regression checks passed; Xbox/Realm verification still required.

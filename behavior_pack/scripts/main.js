@@ -52,6 +52,22 @@ const GENS=[
 const GENERATOR_ITEM_BY_NAME=new Map(GENS.map(g=>[g.name,'skygen:generator_'+g.name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')]));
 const GENERATOR_ITEM_TYPE_IDS=new Set(GENERATOR_ITEM_BY_NAME.values());
 function generatorItemId(g){return GENERATOR_ITEM_BY_NAME.get(g.name)}
+// Names of the 42 registered in-world cores are stable; changing IDs would
+// orphan already-placed custom blocks in saved Realm chunks.
+const GENERATOR_CORE_BY_NAME=new Map(GENS.map(g=>[g.name,'skygen:'+g.name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')+'_generator_core']));
+function generatorCoreType(g){return GENERATOR_CORE_BY_NAME.get(g.type||g.name)||''}
+function isGeneratorBase(g,base){return !!base&&(base.typeId===generatorCoreType(g)||base.typeId==='minecraft:bedrock')}
+// Only migrate a bedrock block directly backed by an authenticated registry
+// record; no chunk force-loading, scanning, or replacement of player builds.
+function migrateGeneratorCore(g,base){
+ const expected=generatorCoreType(g);
+ if(!expected||!base)return false;
+ if(base.typeId===expected)return true;
+ if(base.typeId!=='minecraft:bedrock')return false;
+ base.setType(expected);
+ if(world.getDimension('overworld').getBlock({x:g.x,y:g.y,z:g.z})?.typeId!==expected)throw Error('Generator core migration not verified at '+g.x+','+g.y+','+g.z);
+ return true;
+}
 function validTokenItemType(type,name){return type==='minecraft:goat_horn'||type===GENERATOR_ITEM_BY_NAME.get(name)}
 const SHOP=[{name:'Cobblestone × 16',id:'minecraft:cobblestone',count:16,buy:80,sell:16},{name:'Oak Logs × 16',id:'minecraft:oak_log',count:16,buy:160,sell:32},{name:'Iron Ingots × 8',id:'minecraft:iron_ingot',count:8,buy:400,sell:80},{name:'Diamond × 1',id:'minecraft:diamond',count:1,buy:500,sell:100},{"name":"Stone","id":"minecraft:stone","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Dirt","id":"minecraft:dirt","count":16,"buy":64,"sell":16,"category":"Starter"},{"name":"Gravel","id":"minecraft:gravel","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Sand","id":"minecraft:sand","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Clay","id":"minecraft:clay_ball","count":16,"buy":160,"sell":32,"category":"Starter"},{"name":"Spruce Logs","id":"minecraft:spruce_log","count":16,"buy":192,"sell":48,"category":"Starter"},{"name":"Birch Logs","id":"minecraft:birch_log","count":16,"buy":192,"sell":48,"category":"Starter"},{"name":"Cherry Logs","id":"minecraft:cherry_log","count":16,"buy":320,"sell":80,"category":"Starter"},{"name":"Copper Ingots","id":"minecraft:copper_ingot","count":8,"buy":280,"sell":64,"category":"Ores"},{"name":"Coal","id":"minecraft:coal","count":16,"buy":240,"sell":48,"category":"Ores"},{"name":"Gold Ingots","id":"minecraft:gold_ingot","count":8,"buy":800,"sell":160,"category":"Ores"},{"name":"Redstone Dust","id":"minecraft:redstone","count":16,"buy":240,"sell":64,"category":"Ores"},{"name":"Lapis Lazuli","id":"minecraft:lapis_lazuli","count":16,"buy":288,"sell":64,"category":"Ores"},{"name":"Emerald","id":"minecraft:emerald","count":1,"buy":1500,"sell":300,"category":"Ores"},{"name":"Nether Quartz","id":"minecraft:quartz","count":16,"buy":320,"sell":64,"category":"Nether"},{"name":"Netherrack","id":"minecraft:netherrack","count":16,"buy":128,"sell":32,"category":"Nether"},{"name":"Soul Sand","id":"minecraft:soul_sand","count":8,"buy":160,"sell":40,"category":"Nether"},{"name":"Blackstone","id":"minecraft:blackstone","count":16,"buy":480,"sell":128,"category":"Nether"},{"name":"Glowstone Dust","id":"minecraft:glowstone_dust","count":16,"buy":640,"sell":160,"category":"Nether"},{"name":"Magma Cream","id":"minecraft:magma_cream","count":8,"buy":800,"sell":200,"category":"Nether"},{"name":"Obsidian","id":"minecraft:obsidian","count":4,"buy":1200,"sell":320,"category":"Endgame"},{"name":"Prismarine","id":"minecraft:prismarine","count":8,"buy":1600,"sell":400,"category":"Endgame"},{"name":"End Stone","id":"minecraft:end_stone","count":8,"buy":1600,"sell":400,"category":"Endgame"},{"name":"Sculk","id":"minecraft:sculk","count":8,"buy":2400,"sell":640,"category":"Endgame"}];
 const pending=new Map(),cooldowns=new Map(),generators=new Map(),trades=new Map(),visitRequests=new Map();
@@ -144,17 +160,42 @@ function buildGenerator(g){
  const base=dim.getBlock({x:g.x,y:g.y,z:g.z});
  const output=dim.getBlock({x:g.x,y:g.y+1,z:g.z});
  if(!base||!output)return false;
- if(!base.isAir&&base.typeId!=='minecraft:bedrock')return false;
- if(!output.isAir)return false;
- const baseWasAir=base.isAir;
+ // New placements may NEVER overwrite player blocks or preexisting bedrock.
+ // Registered legacy bedrock is migrated only in the watchdog below.
+ if(!base.isAir||!output.isAir)return false;
+ const core=generatorCoreType(g);
+ if(!core)throw Error('Unknown generator core for '+g.type);
  try{
-  if(baseWasAir)base.setType('minecraft:bedrock');
+  base.setType(core);
+  if(dim.getBlock({x:g.x,y:g.y,z:g.z})?.typeId!==core)throw Error('Generator base placement not verified');
   output.setType(g.block);
+  if(dim.getBlock({x:g.x,y:g.y+1,z:g.z})?.typeId!==g.block)throw Error('Generator output placement not verified');
   return true;
  }catch(err){
-  // Do not strand an unregistered bedrock base when output creation fails.
-  try{if(output.typeId===g.block)output.setType('minecraft:air')}catch{}
-  try{if(baseWasAir)base.setType('minecraft:air')}catch{}
+  // Scope rollback to blocks this invocation created, never unrelated blocks.
+  try{if(dim.getBlock({x:g.x,y:g.y+1,z:g.z})?.typeId===g.block)output.setType('minecraft:air')}catch{}
+  try{if(dim.getBlock({x:g.x,y:g.y,z:g.z})?.typeId===core)base.setType('minecraft:air')}catch{}
+  throw err;
+ }
+}
+// Delete only the registered core and its expected output. On a failed block
+// write, restore the previous state before the management UI restores registry.
+function eraseGeneratorWorldBlocks(dim,g){
+ const loc={x:g.x,y:g.y,z:g.z},above={x:g.x,y:g.y+1,z:g.z};
+ const base=dim.getBlock(loc),output=dim.getBlock(above);
+ if(!base||!output||!isGeneratorBase(g,base))throw Error('Registered generator base unavailable/mismatched');
+ const oldBase=base.typeId,oldOutput=output.typeId;
+ try{
+  if(oldOutput===g.block){
+   output.setType('minecraft:air');
+   if(dim.getBlock(above)?.typeId!=='minecraft:air')throw Error('Output erase not verified');
+  }
+  base.setType('minecraft:air');
+  if(dim.getBlock(loc)?.typeId!=='minecraft:air')throw Error('Core erase not verified');
+ }catch(err){
+  // Restore only if the current block is air; never overwrite player changes.
+  try{if(dim.getBlock(loc)?.typeId==='minecraft:air')base.setType(oldBase)}catch(e){genError('CRITICAL core delete rollback '+e,'rollback')}
+  try{if(oldOutput===g.block&&dim.getBlock(above)?.typeId==='minecraft:air')output.setType(oldOutput)}catch(e){genError('CRITICAL output delete rollback '+e,'rollback')}
   throw err;
  }
 }
@@ -977,7 +1018,7 @@ function adminAccess(p,target){
  });
 }
 function back(p){menu(p)}
-function menu(p){const d=profile(p);form(p,'§l§bSKYGEN CORE',`§eCredits: ${d.credits}  §bOrbits: ${d.orbits}\n§dRank: ${d.rank}/50  XP: ${d.xp}  §eSP: ${skillAvailable(d)}\n§aPlot: ${d.plot+1}`,['My Plot','Visit Other Plots','Generators','Server Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Skill Tree','Daily Quests','Help'],i=>[()=>plotMenu(p),()=>visitMenu(p),()=>genMenu(p),()=>shop(p),()=>market(p),()=>trade(p),()=>ranks(p),()=>wallet(p),()=>teleports(p),()=>skillTree(p),()=>dailyQuests(p),()=>form(p,'Help','SkyGen v0.9.0. 42 generators, six-branch Skill Tree, Daily Quests, marketplace, trades, and 50 ranks. Test on a world copy first.',['Back'],()=>back(p))][i]())}
+function menu(p){const d=profile(p);form(p,'§l§bSKYGEN CORE',`§eCredits: ${d.credits}  §bOrbits: ${d.orbits}\n§dRank: ${d.rank}/50  XP: ${d.xp}  §eSP: ${skillAvailable(d)}\n§aPlot: ${d.plot+1}`,['My Plot','Visit Other Plots','Generators','Server Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Skill Tree','Daily Quests','Help'],i=>[()=>plotMenu(p),()=>visitMenu(p),()=>genMenu(p),()=>shop(p),()=>market(p),()=>trade(p),()=>ranks(p),()=>wallet(p),()=>teleports(p),()=>skillTree(p),()=>dailyQuests(p),()=>form(p,'Help','SkyGen v0.9.4. 42 generators, six-branch Skill Tree, Daily Quests, marketplace, trades, and 50 ranks. Test on a world copy first.',['Back'],()=>back(p))][i]())}
 function plotMenu(p){
  const d=profile(p);
  if(d.plot<0)return p.sendMessage('§cYour plot is not assigned. Rejoin to retry.');
@@ -1064,7 +1105,7 @@ You can revoke access any time.`).button1('Deny').button2('Allow')).then(res=>{
 
 function genMenu(p){
  const count=generatorOwnerCount(p),cap=generatorSlots(p);
- form(p,'§bGENERATORS',`42 generator types across four categories.\nOwned: ${count}/${cap} slots. Upgrade production to Level 5.\n§7Aim the purchased egg at an open plot floor block to place it.`,
+ form(p,'§bGENERATORS',`42 generator types across four categories.\nOwned: ${count}/${cap} slots. Upgrade production to Level 5.\n§7Use the custom generator token while looking at an open plot floor block.`,
  ['Buy Generator','My Generators / Upgrade','Back'],i=>{if(i===0)return genCategories(p);if(i===1)return myGenerators(p);back(p)});
 }
 function genCategories(p){
@@ -1101,7 +1142,7 @@ function manageGenerator(p,key,g){
    try{base=dim.getBlock({x:g.x,y:g.y,z:g.z})?.typeId||'unloaded';output=dim.getBlock({x:g.x,y:g.y+1,z:g.z})?.typeId||'unloaded'}catch(e){genError('inspect '+e)}
    const interval=Math.max(1,Math.ceil((Number(g.period)||spec?.period||200)/20));
    const age=genLastTick<0?'never':String(system.currentTick-genLastTick)+' ticks ago';
-   const lines=[`§bSkyGen Generator Deep Diagnostics v0.9.0`,`Generator: ${g.type} level ${lv} at ${g.x},${g.y},${g.z}`,`Registered: ${generators.get(key)===g} | Registry size: ${generators.size}`,`Base: ${base} | Output: ${output} | Expected: ${spec?.block||g.block}`,`Interval: ${interval}s | Empty: ${genEmptySeconds.get(key)||0}s`,`Watchdog runs: ${genWatchdogRuns} | Last heartbeat: ${age}`,`Script uptime: ${system.currentTick-genStartupTick} ticks | Current tick: ${system.currentTick}`,`Last error: ${genLastError}`,`Recent errors: ${genErrors.slice(-3).join(' ; ')||'none'}`];
+   const lines=[`§bSkyGen Generator Deep Diagnostics v0.9.4`,`Generator: ${g.type} level ${lv} at ${g.x},${g.y},${g.z}`,`Registered: ${generators.get(key)===g} | Registry size: ${generators.size}`,`Base: ${base} | Output: ${output} | Expected: ${spec?.block||g.block}`,`Interval: ${interval}s | Empty: ${genEmptySeconds.get(key)||0}s`,`Watchdog runs: ${genWatchdogRuns} | Last heartbeat: ${age}`,`Script uptime: ${system.currentTick-genStartupTick} ticks | Current tick: ${system.currentTick}`,`Last error: ${genLastError}`,`Recent errors: ${genErrors.slice(-3).join(' ; ')||'none'}`];
    for(const line of lines)p.sendMessage(line);
    return;
   }
@@ -1109,7 +1150,7 @@ function manageGenerator(p,key,g){
    if(!isOperator(p))return p.sendMessage('§cOperator only.');
    try{
     const dim=world.getDimension('overworld');const base=dim.getBlock({x:g.x,y:g.y,z:g.z}),out=dim.getBlock({x:g.x,y:g.y+1,z:g.z});
-    if(!base||!out||base.typeId!=='minecraft:bedrock'||out.typeId!=='minecraft:air')return p.sendMessage('§cForce test requires bedrock base and empty output.');
+    if(!base||!out||!isGeneratorBase(g,base)||out.typeId!=='minecraft:air')return p.sendMessage('§cForce test requires registered generator base and empty output.');
     out.setType(spec?.block||g.block);genEmptySeconds.delete(key);p.sendMessage('§aForce output succeeded. Block write works; if automatic regeneration fails, heartbeat scheduling is the issue.');
    }catch(e){genError('force test '+e);p.sendMessage('§cForce test failed: '+e)}return;
   }
@@ -1134,13 +1175,12 @@ function manageGenerator(p,key,g){
      const base=dim.getBlock({x:g.x,y:g.y,z:g.z});
      const output=dim.getBlock({x:g.x,y:g.y+1,z:g.z});
      if(!base||!output)return p.sendMessage('§cGenerator chunk is not loaded. Stand near it and try again.');
-     if(base.typeId!=='minecraft:bedrock')return p.sendMessage('§cGenerator base missing. Deletion cancelled to protect nearby blocks.');
+     if(!isGeneratorBase(g,base))return p.sendMessage('§cGenerator base missing/mismatched. Deletion cancelled to protect nearby blocks.');
      // Remove the registry first and verify. If block removal fails, restore registry.
      generators.delete(key);genEmptySeconds.delete(key);generatorOutputReady.delete(key);
      if(!genSave()){generators.set(key,g);return p.sendMessage('§cCannot save registry; nothing deleted.')}
      try{
-      if(output.typeId===g.block)output.setType('minecraft:air');
-      base.setType('minecraft:air');
+      eraseGeneratorWorldBlocks(dim,g);
      }catch(err){generators.set(key,g);if(!genSave())genError('CRITICAL: generator rollback save failed '+key,'rollback');throw err}
      p.sendMessage(`§a${g.type} generator deleted. No refund issued.`);
     }catch(e){p.sendMessage('§cCould not delete generator. Stand near it and retry.');console.warn('SkyGen delete generator '+e)}
@@ -1674,7 +1714,7 @@ function adminTokenRestore(actor,message){
 }
 function rollbackGeneratorBlocks(dim,loc,spec,baseWasAir){
  try{const out=dim.getBlock({x:loc.x,y:loc.y+1,z:loc.z});if(out?.typeId===spec.block)out.setType('minecraft:air')}catch(e){genError('Generator output rollback '+e,'rollback')}
- if(baseWasAir)try{const base=dim.getBlock(loc);if(base?.typeId==='minecraft:bedrock')base.setType('minecraft:air')}catch(e){genError('Generator base rollback '+e,'rollback')}
+ if(baseWasAir)try{const base=dim.getBlock(loc),core=GENERATOR_CORE_BY_NAME.get(spec.name);if(base?.typeId===core)base.setType('minecraft:air')}catch(e){genError('Generator base rollback '+e,'rollback')}
 }
 function placeGeneratorToken(p,selected,id){
  let record;
@@ -1698,7 +1738,7 @@ function placeGeneratorToken(p,selected,id){
   const key=`${loc.x},${loc.y},${loc.z}`;
   if(generators.has(key))return p.sendMessage('§cGenerator already registered at that location.');
   const dim=world.getDimension('overworld'),base=dim.getBlock(loc),out=dim.getBlock({x:loc.x,y:loc.y+1,z:loc.z});
-  if(!base||!out||(!base.isAir&&base.typeId!=='minecraft:bedrock')||!out.isAir)return p.sendMessage('§cTwo free spaces required; token retained.');
+  if(!base||!out||!base.isAir||!out.isAir)return p.sendMessage('§cTwo free spaces required; existing blocks are never replaced. Token retained.');
   const baseWasAir=base.isAir;
   // Reserve first, then debit the exact event slot before granting anything.
   tokenWrite(id,{...record,status:'redeeming'});
@@ -1732,7 +1772,7 @@ function placeGeneratorToken(p,selected,id){
    generatorOutputReady.add(key);
    try{tokenWrite(id,{...record,status:'spent'})}catch(err){genError('Token spent marker unavailable #'+id+' '+err,'token')}
    try{const pd=profile(p);recordDaily(pd,'placements');save(p,pd)}catch(err){console.warn('[SkyGen DAILY] generator placement '+err)}
-   p.sendMessage(`§aPlaced ${g.name} generator at ${loc.x},${loc.y},${loc.z}.`);
+   p.sendMessage(`§aPlaced ${g.name} custom-core generator at ${loc.x},${loc.y},${loc.z}.`);
   }
  }catch(err){
   genError('CRITICAL generator token redemption #'+id+' '+err,'redemption');
@@ -1806,6 +1846,11 @@ try{
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
  const {x,y,z}=e.block.location;
  if(e.player.dimension?.id!=='minecraft:overworld')return;
+ const registered=generators.get(`${x},${y},${z}`);
+ if(registered&&isGeneratorBase(registered,e.block)){
+  e.cancel=true;
+  return;
+ }
  const id=plotAt(x,z);
  // Starter island floor is permanent. The owner may build ABOVE it but cannot mine its layers.
  if(id>=0){const c=coords(id);if(Math.abs(x-c.x)<=8&&Math.abs(z-c.z)<=8&&y>=c.y-3&&y<=c.y-1){e.cancel=true;return;}}
@@ -1880,7 +1925,7 @@ function genWatchdog(){
    const [key,g]=records[(genRotation+n)%records.length];
    try{
     const base=dim.getBlock({x:g.x,y:g.y,z:g.z}),output=dim.getBlock({x:g.x,y:g.y+1,z:g.z});
-    if(!base||!output||base.typeId!=='minecraft:bedrock'){genEmptySeconds.delete(key);continue}
+    if(!base||!output||!migrateGeneratorCore(g,base)){genEmptySeconds.delete(key);continue}
     const spec=GENS.find(x=>x.name===g.type),expected=spec?.block||g.block;
     if(!expected){genEmptySeconds.delete(key);continue}
     if(output.typeId!=='minecraft:air'){genEmptySeconds.delete(key);continue}
@@ -1923,4 +1968,4 @@ function adminCommand(actor,message){
 }
 
 system.runTimeout(()=>{try{ensureSpawn()}catch(e){console.warn('SkyGen spawn init: '+e)}},40);
-console.warn('[SkyGen] v0.9.3 custom generator items loaded');
+console.warn('[SkyGen] v0.9.4 custom generator core blocks loaded');

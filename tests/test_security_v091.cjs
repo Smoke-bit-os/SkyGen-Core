@@ -82,7 +82,7 @@ test('server issuance decrements wallet and attaches unique identity',()=>{
 test('valid generator token is consumed before generator and record are granted',()=>{
  const t=setup(),{item,id}=purchase(t);const e={source:t.p,itemStack:item};t.events.customItems['skygen:generator_token_use'].onUse(e);t.advance(1);
 assert.equal(t.p.inv.getItem(0),undefined);assert.equal(t.call('generators.size'),1);assert.equal(t.call(`tokenRead('${id}').status`),'spent');
- assert.equal(t.blocks.get(t.at(512,107,512)),'minecraft:bedrock');
+ assert.equal(t.blocks.get(t.at(512,107,512)),'skygen:cobblestone_generator_core');
 });
 test('a spent or duplicated token cannot register a second generator',()=>{
  const t=setup(),{item,id}=purchase(t);t.call(`placeGeneratorToken(p,0,'${id}')`);assert.equal(t.call('generators.size'),1);
@@ -96,8 +96,8 @@ test('failed registry commit never deletes preexisting bedrock base',()=>{
  const t=setup(),{id}=purchase(t);t.blocks.set(t.at(512,107,512),'minecraft:bedrock');
  const old=t.world.setDynamicProperty;t.world.setDynamicProperty=(k,v)=>{if(k==='sg_generators_v2_commit')throw Error('registry failure');return old(k,v)};
  t.call(`placeGeneratorToken(p,0,'${id}')`);
- assert.equal(t.blocks.get(t.at(512,107,512)),'minecraft:bedrock');assert.equal(t.blocks.get(t.at(512,108,512)),'minecraft:air');
- assert.equal(t.call('generators.size'),0);assert.equal(t.call(`tokenRead('${id}').status`),'review');
+ assert.equal(t.blocks.get(t.at(512,107,512)),'minecraft:bedrock');assert.equal(t.blocks.get(t.at(512,108,512))||'minecraft:air','minecraft:air');
+ assert.equal(t.call('generators.size'),0);assert.equal(t.call(`tokenRead('${id}').status`),'issued');
 });
 test('failed registry commit removes only newly created bedrock',()=>{
  const t=setup(),{id}=purchase(t);const old=t.world.setDynamicProperty;t.world.setDynamicProperty=(k,v)=>{if(k==='sg_generators_v2_commit')throw Error('registry failure');return old(k,v)};
