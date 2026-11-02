@@ -3,10 +3,10 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const src=fs.readFileSync(process.argv[2]||'/mnt/data/skygen_v091_work/behavior_pack/scripts/main.js','utf8').replace(/^import .*?;\n/gm,'');
 class Stack{
- constructor(type,amount=1){this.typeId=type;this.amount=amount;this.maxAmount=64;this.lockMode=0;this.nameTag='';this.keepOnDeath=false;this.lore=[];this.props={}}
+ constructor(type,amount=1){this.typeId=type;this.amount=amount;this.maxAmount=type==='minecraft:goat_horn'?1:type==='minecraft:egg'?16:64;this.lockMode=0;this.nameTag='';this.keepOnDeath=false;this.lore=[];this.props={}}
  getLore(){return this.lore}
  setLore(l){this.lore=l}
- setDynamicProperty(k,v){this.props[k]=v}
+ setDynamicProperty(k,v){if(this.maxAmount!==1)throw Error('UnsupportedFunctionalityError: item dynamic properties require non-stackable items');this.props[k]=v}
  getDynamicProperty(k){return this.props[k]}
  getDynamicPropertyIds(){return Object.keys(this.props)}
  clone(){const x=new Stack(this.typeId,this.amount);Object.assign(x,structuredClone({...this}));return x}
@@ -221,4 +221,28 @@ test('a stronger existing potion effect is never reduced by a skill pulse',()=>{
  t.p.getEffect=()=>({amplifier:2,duration:300});t.p.addEffect=()=>{throw Error('Should not overwrite higher amplifier')};
  t.call('skillPulse()');assert(!t.logs.some(x=>x.includes('Should not overwrite')));
 });
-console.log(`SkyGen v0.9.1 focused security tests: ${n-failed} passed, ${failed} failed`);if(failed)process.exitCode=1;
+
+test('Bedrock stackable eggs reject item identity and the new non-stackable token succeeds',()=>{
+ const t=setup();owned(t);
+ const egg=new Stack('minecraft:egg');assert.throws(()=>egg.setDynamicProperty('sg_token_id','123'),/UnsupportedFunctionalityError/);
+ t.call("issueGeneratorToken(p,GENS.find(g=>g.name==='Cobblestone'),500)");
+ const token=t.p.inv.getItem(0);assert(token);assert.equal(token.typeId,'minecraft:goat_horn');assert.equal(token.maxAmount,1);
+ assert(/^[1-9]\d*$/.test(token.getDynamicProperty('sg_token_id')));
+ assert.equal(JSON.parse(t.p.data.get('sg_profile')).credits,49500);
+});
+test('ordinary teleport horns are ignored by the generator redemption guard',()=>{
+ const t=setup();const horn=new Stack('minecraft:goat_horn');horn.nameTag='§6Go to Spawn';
+ const e={source:t.p,itemStack:horn,cancel:false};t.events.itemUseBefore(e);assert.equal(e.cancel,false);
+});
+test('forged generator horn name without a server ID is cancelled, not redeemed',()=>{
+ const t=setup();owned(t);const horn=new Stack('minecraft:goat_horn');horn.nameTag='§bSkyGen Cobblestone Generator';t.p.inv.setItem(0,horn);
+ const e={source:t.p,itemStack:horn,cancel:false};t.events.itemUseBefore(e);t.advance(1);
+ assert.equal(e.cancel,true);assert.equal(t.call('generators.size'),0);assert.equal(t.p.inv.getItem(0),horn);
+});
+test('old name-only generator eggs are blocked with operator recovery guidance',()=>{
+ const t=setup();owned(t);const egg=new Stack('minecraft:egg');egg.nameTag='§bSkyGen Cobblestone Generator';
+ const e={source:t.p,itemStack:egg,cancel:false};t.events.itemUseBefore(e);t.advance(1);
+ assert.equal(e.cancel,true);assert(t.p.messages.some(s=>s.includes('Old generator egg')));
+});
+
+console.log(`SkyGen v0.9.2 focused security tests: ${n-failed} passed, ${failed} failed`);if(failed)process.exitCode=1;

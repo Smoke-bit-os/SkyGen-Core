@@ -1593,6 +1593,9 @@ world.afterEvents.itemUse.subscribe(e=>{
 });
 // Generator tokens must be issued, uniquely identified, and redeemed by the server.
 // The token record is authoritative, not the egg's display name or its lore.
+// ItemStack dynamic properties require non-stackable items in Bedrock stable.
+// Goat horns are non-stackable and reliably fire the existing itemUse event on Xbox.
+const GENERATOR_TOKEN_ITEM='minecraft:goat_horn';
 const TOKEN_SEQ_KEY='sg_token_seq';
 const generatorOutputReady=new Set();
 function tokenKey(id){return 'sg_token_'+id}
@@ -1613,13 +1616,14 @@ function issueGeneratorToken(p,g,price){
  if(!generatorTokenUseGuardReady)return p.sendMessage('§cGenerator token use guard is not active; cannot issue tokens.');
  const latest=profile(p),inv=inventory(p);
  if(!inv||latest.rank<g.unlock||latest.credits<price)return p.sendMessage('§cNot eligible or Credits changed.');
- const egg=new ItemStack('minecraft:egg',1);
+ const egg=new ItemStack(GENERATOR_TOKEN_ITEM,1);
+ if(egg.maxAmount!==1)return p.sendMessage('§cSecure generator token item is not non-stackable; purchase blocked without charge.');
  egg.nameTag=`§bSkyGen ${g.name} Generator`;
  egg.setLore([`Generator type: ${g.name}`,'Server-verified token. Use on your plot.']);
  const seq=Number(world.getDynamicProperty(TOKEN_SEQ_KEY)||0);
  if(!Number.isSafeInteger(seq)||seq<0||seq>=2000000000)return p.sendMessage('§cGenerator issuance registry limit.');
  const id=String(seq+1);
- try{egg.setDynamicProperty('sg_token_id',id)}catch(err){return p.sendMessage('§cItem token identity unavailable; purchase disabled. '+String(err).slice(0,90))}
+ try{egg.setDynamicProperty('sg_token_id',id);if(tokenId(egg)!==id)throw Error('Token identity did not survive an item read')}catch(err){return p.sendMessage('§cItem token identity unavailable; purchase disabled. '+String(err).slice(0,90))}
  if(!inventoryCapacity(p,egg))return p.sendMessage('§cInventory full. No charge.');
  try{
   world.setDynamicProperty(TOKEN_SEQ_KEY,seq+1);
@@ -1668,7 +1672,7 @@ function placeGeneratorToken(p,selected,id){
  try{
   if(!p?.isValid)return;
   const inv=inventory(p),stack=inv?.getItem(selected);record=tokenRead(id);
-  if(!record||record.status!=='issued'||record.owner!==p.id||!stack||stack.typeId!=='minecraft:egg'||stack.amount!==1||tokenId(stack)!==id){
+  if(!record||record.status!=='issued'||record.owner!==p.id||!stack||stack.typeId!==GENERATOR_TOKEN_ITEM||stack.amount!==1||tokenId(stack)!==id){
    return p.sendMessage('§cInvalid, already used, or unissued generator token. Ask an operator for help.');
   }
   const g=GENS.find(x=>x.name===record.type);
@@ -1731,8 +1735,14 @@ try{
  if(!world.beforeEvents.itemUse?.subscribe)throw Error('beforeEvents.itemUse is unavailable');
  world.beforeEvents.itemUse.subscribe(e=>{
   const i=e.itemStack;
-  if(i?.typeId!=='minecraft:egg'||(!i.nameTag?.startsWith('§bSkyGen ')&&!tokenId(i)))return;
-  e.cancel=true; // Prevent vanilla egg consumption/throw before our validated debit.
+  // Block legacy name-only eggs but never accept them as authenticated tokens.
+  if(i?.typeId==='minecraft:egg'&&i.nameTag?.startsWith('§bSkyGen ')){
+   e.cancel=true;
+   system.run(()=>e.source?.sendMessage?.('§cOld generator egg cannot be verified. Ask an operator to inspect and replace it.'));
+   return;
+  }
+  if(i?.typeId!==GENERATOR_TOKEN_ITEM||(!i.nameTag?.startsWith('§bSkyGen ')&&!tokenId(i)))return;
+  e.cancel=true; // Stop vanilla horn use; the token is consumed only after validation.
   const player=e.source,selected=player?.selectedSlotIndex,id=tokenId(i);
   system.run(()=>placeGeneratorToken(player,selected,id));
  });
@@ -1868,4 +1878,4 @@ function adminCommand(actor,message){
 }
 
 system.runTimeout(()=>{try{ensureSpawn()}catch(e){console.warn('SkyGen spawn init: '+e)}},40);
-console.warn('[SkyGen] 0.9.1 security hardening loaded');
+console.warn('[SkyGen] 0.9.2 generator token compatibility fix loaded');
