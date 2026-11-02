@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "SkyGen Core RP v0.8.2",
-    "description": "SkyGen Core 0.8.2 - plot, spawn, market, trade and generator stability fixes",
+    "name": "SkyGen Core RP v0.8.3",
+    "description": "SkyGen Core 0.8.3 - plot, spawn, market, trade and generator stability fixes",
     "uuid": "f0cdfa8d-0d91-43b0-a5bd-ea7ae461c98d",
     "version": [
       0,
       8,
-      2
+      3
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         8,
-        2
+        3
       ]
     }
   ]

@@ -92,14 +92,15 @@ function buildGenerator(g){
  if(!base||!output)return false;
  if(!base.isAir&&base.typeId!=='minecraft:bedrock')return false;
  if(!output.isAir)return false;
+ const baseWasAir=base.isAir;
  try{
-  base.setType('minecraft:bedrock');
+  if(baseWasAir)base.setType('minecraft:bedrock');
   output.setType(g.block);
   return true;
  }catch(err){
   // Do not strand an unregistered bedrock base when output creation fails.
   try{if(output.typeId===g.block)output.setType('minecraft:air')}catch{}
-  try{if(base.typeId==='minecraft:bedrock')base.setType('minecraft:air')}catch{}
+  try{if(baseWasAir)base.setType('minecraft:air')}catch{}
   throw err;
  }
 }
@@ -212,7 +213,7 @@ function safeSpawnTravel(p,immediate=false){
   if(system.currentTick-begin>240){p.sendMessage('§cSpawn could not be verified. No unsafe teleport attempted.');release();return}
   system.runTimeout(check,10);
  }
- system.runTimeout(check,10);
+ system.runTimeout(check,immediate?1:10);
 }
 function profile(p){
  const defaults={credits:1000,orbits:0,rank:1,xp:0,plot:-1};
@@ -467,7 +468,9 @@ function tpRequest(p,target,label,visitPlot,onFinish,safeSpawn=false){
  return true;
 }
 function tpPlot(p){
- const d=profile(p);if(d.plot<0)return p.sendMessage('§cYou have no plot. Rejoin to retry assignment.');
+ let d=profile(p);
+ // The Horn can recover a first-join plot assignment without forcing a rejoin.
+ if(d.plot<0){try{d=claim(p)}catch(e){return p.sendMessage('§cPlot assignment needs operator review: '+String(e).slice(0,120))}}
  stageAndBuildPlot(p,d.plot,true);
 }
 function rank(p,d){
@@ -681,7 +684,7 @@ function adminAccess(p,target){
  });
 }
 function back(p){menu(p)}
-function menu(p){const d=profile(p);form(p,'§l§bSKYGEN CORE',`§eCredits: ${d.credits}  §bOrbits: ${d.orbits}\n§dRank: ${d.rank}/50  XP: ${d.xp}\n§aPlot: ${d.plot+1}`,['My Plot','Visit Other Plots','Generators','Server Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Help'],i=>[()=>plotMenu(p),()=>visitMenu(p),()=>genMenu(p),()=>shop(p),()=>market(p),()=>trade(p),()=>ranks(p),()=>wallet(p),()=>teleports(p),()=>form(p,'Help','SkyGen v0.8.2. Marketplace, direct trades, 50 ranks and generator upgrades. Test on a world copy first.',['Back'],()=>back(p))][i]())}
+function menu(p){const d=profile(p);form(p,'§l§bSKYGEN CORE',`§eCredits: ${d.credits}  §bOrbits: ${d.orbits}\n§dRank: ${d.rank}/50  XP: ${d.xp}\n§aPlot: ${d.plot+1}`,['My Plot','Visit Other Plots','Generators','Server Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Help'],i=>[()=>plotMenu(p),()=>visitMenu(p),()=>genMenu(p),()=>shop(p),()=>market(p),()=>trade(p),()=>ranks(p),()=>wallet(p),()=>teleports(p),()=>form(p,'Help','SkyGen v0.8.3. Marketplace, direct trades, 50 ranks and generator upgrades. Test on a world copy first.',['Back'],()=>back(p))][i]())}
 function plotMenu(p){
  const d=profile(p);
  if(d.plot<0)return p.sendMessage('§cYour plot is not assigned. Rejoin to retry.');
@@ -786,7 +789,7 @@ function manageGenerator(p,key,g){
    try{base=dim.getBlock({x:g.x,y:g.y,z:g.z})?.typeId||'unloaded';output=dim.getBlock({x:g.x,y:g.y+1,z:g.z})?.typeId||'unloaded'}catch(e){genError('inspect '+e)}
    const interval=Math.max(1,Math.ceil((Number(g.period)||spec?.period||200)/20));
    const age=genLastTick<0?'never':String(system.currentTick-genLastTick)+' ticks ago';
-   const lines=[`§bSkyGen Generator Deep Diagnostics v0.8.2`,`Generator: ${g.type} level ${lv} at ${g.x},${g.y},${g.z}`,`Registered: ${generators.get(key)===g} | Registry size: ${generators.size}`,`Base: ${base} | Output: ${output} | Expected: ${spec?.block||g.block}`,`Interval: ${interval}s | Empty: ${genEmptySeconds.get(key)||0}s`,`Watchdog runs: ${genWatchdogRuns} | Last heartbeat: ${age}`,`Script uptime: ${system.currentTick-genStartupTick} ticks | Current tick: ${system.currentTick}`,`Last error: ${genLastError}`,`Recent errors: ${genErrors.slice(-3).join(' ; ')||'none'}`];
+   const lines=[`§bSkyGen Generator Deep Diagnostics v0.8.3`,`Generator: ${g.type} level ${lv} at ${g.x},${g.y},${g.z}`,`Registered: ${generators.get(key)===g} | Registry size: ${generators.size}`,`Base: ${base} | Output: ${output} | Expected: ${spec?.block||g.block}`,`Interval: ${interval}s | Empty: ${genEmptySeconds.get(key)||0}s`,`Watchdog runs: ${genWatchdogRuns} | Last heartbeat: ${age}`,`Script uptime: ${system.currentTick-genStartupTick} ticks | Current tick: ${system.currentTick}`,`Last error: ${genLastError}`,`Recent errors: ${genErrors.slice(-3).join(' ; ')||'none'}`];
    for(const line of lines)p.sendMessage(line);
    return;
   }
@@ -852,6 +855,12 @@ function buyGen(p){
 }
 function eligibleShopItem(it,id){return !!it&&it.typeId===id&&!it.nameTag&&it.lockMode===ItemLockMode.none&&!isTool(it)&&(!it.getLore||it.getLore().length===0)}
 function inventoryCapacity(p,stack){const inv=inventory(p);if(!inv)return false;let free=0;for(let i=0;i<inv.size;i++){const it=inv.getItem(i);if(!it){free+=stack.maxAmount;continue}if(it.typeId===stack.typeId&&!it.nameTag&&it.lockMode===ItemLockMode.none&&(!it.getLore||it.getLore().length===0))free+=Math.max(0,it.maxAmount-it.amount)}return free>=stack.amount}
+function shopUnitPrice(item,buying){
+ const bundlePrice=buying?item.buy:item.sell;
+ const unit=bundlePrice/item.count;
+ if(!Number.isSafeInteger(unit)||unit<=0)throw Error('Shop pricing is not a whole Credit per item');
+ return unit;
+}
 function safeShopSell(p,s){const inv=inventory(p);if(!inv)return false;const slots=[];let remaining=s.count;for(let i=0;i<inv.size&&remaining>0;i++){const it=inv.getItem(i);if(!eligibleShopItem(it,s.id))continue;const n=Math.min(remaining,it.amount);slots.push([i,n,it]);remaining-=n}if(remaining)return p.sendMessage('§cNot enough ordinary unlocked items.'),false;
  const d=profile(p);if(!Number.isSafeInteger(d.credits+s.sell))return false;
  const changes=[];try{for(const [slot,n,it] of slots){changes.push([slot,it.clone()]);if(n===it.amount)inv.setItem(slot,undefined);else{const reduced=it.clone();reduced.amount-=n;inv.setItem(slot,reduced)}}d.credits+=s.sell;save(p,d);return true}catch(e){for(const [slot,original] of changes){try{inv.setItem(slot,original)}catch{}}p.sendMessage('§cSale failed; inventory restoration attempted.');return false}}
@@ -880,9 +889,10 @@ function shop(p){
     const raw=String(r.formValues?.[0]??'').trim();
     const count=/^[1-9][0-9]*$/.test(raw)?Number(raw):NaN;
     if(!Number.isSafeInteger(count)||count>2304)return p.sendMessage('§cEnter a whole number from 1 to 2304.');
-    const totalNumerator=count*(buying?item.buy:item.sell);
-    if(!Number.isSafeInteger(totalNumerator)||totalNumerator%item.count!==0)return p.sendMessage('§cThis item requires a quantity in multiples of '+item.count+' for exact Credit pricing.');
-    const total=totalNumerator/item.count;
+    // All shop bundles have integral per-item prices. Do not force buyers
+    // to purchase in bundle multiples (1, 16, 64, max must all work).
+    const unitPrice=shopUnitPrice(item,buying);
+    const total=count*unitPrice;
     if(!Number.isSafeInteger(total)||total<=0)return p.sendMessage('§cInvalid price calculation.');
     const confirmation=new MessageFormData().title('Confirm Shop Transaction').body((buying?'Buy ':'Sell ')+count+' × '+item.id+'\n'+(buying?'Cost: ':'Payment: ')+total+' Credits').button1('Cancel').button2('Confirm');
     showShop(confirmation,'confirmation',c=>{
@@ -983,8 +993,16 @@ function marketLock(id,fn){
 }
 function validListing(l){return l&&typeof l.id==='string'&&typeof l.seller==='string'&&typeof l.type==='string'&&Number.isSafeInteger(l.count)&&l.count>=1&&l.count<=64&&Number.isSafeInteger(l.price)&&l.price>0}
 function marketPlain(it){
- return !!it&&MARKET_COMMODITIES.has(it.typeId)&&it.amount>=1&&it.amount<=64&&
-  !it.nameTag&&it.lockMode===ItemLockMode.none&&(!it.getLore||it.getLore().length===0);
+ try{
+  // Marketplace reconstructs by type+quantity only. Reject all optional item
+  // metadata that would otherwise disappear on purchase or cancellation.
+  return !!it&&MARKET_COMMODITIES.has(it.typeId)&&it.amount>=1&&it.amount<=64&&
+   !it.nameTag&&!it.keepOnDeath&&it.lockMode===ItemLockMode.none&&
+   (!it.getLore||it.getLore().length===0)&&
+   (!it.getCanPlaceOn||it.getCanPlaceOn().length===0)&&
+   (!it.getCanDestroy||it.getCanDestroy().length===0)&&
+   (!it.getDynamicPropertyIds||it.getDynamicPropertyIds().length===0);
+ }catch(e){return false}
 }
 function marketReviewCommand(actor){
  if(!isOperator(actor))return actor.sendMessage('§cOperator permission required.');
@@ -1154,10 +1172,14 @@ function tradeExecute(p,q,t){
  }catch(e){return tradeClose(t,'Trade canceled safely: '+e)}
 }
 function removeItemType(p,type,count){const inv=inventory(p);for(let i=0;i<inv.size&&count>0;i++){const it=inv.getItem(i);if(it?.typeId!==type||it.nameTag)continue;const n=Math.min(count,it.amount);removeExact(p,i,type,n);count-=n}}
-world.afterEvents.playerSpawn.subscribe(e=>system.runTimeout(()=>{try{
- const p=e.player;
+world.afterEvents.playerSpawn.subscribe(e=>{
+ const p=e.player,initial=!!e.initialSpawn;
+ // Schedule rescue as soon as possible, before plot claims or menus.
+ // The later handler is a fallback if the player was not yet valid at tick 1.
+ if(initial)system.runTimeout(()=>{try{if(p.isValid)safeSpawnTravel(p,true)}catch(err){console.warn('SkyGen early spawn rescue '+err)}},1);
+ system.runTimeout(()=>{try{
  // Rescue scheduling MUST happen even if a damaged plot/profile prevents claiming.
- if(e.initialSpawn||p.location.y < -50)safeSpawnTravel(p,true);
+ if((initial&&!spawnStages.has(p.id)&&!cooldowns.has(p.id))||(p.location.y < -50&&!spawnStages.has(p.id)))safeSpawnTravel(p,true);
  const d=claim(p);const due=Number(world.getDynamicProperty('sg_proceeds_'+p.id)||0);
  if(due>0){
   try{
@@ -1172,7 +1194,8 @@ world.afterEvents.playerSpawn.subscribe(e=>system.runTimeout(()=>{try{
  // Initial join rescue is immediate; subsequent horn/menu teleports use warm-up.
  // Spawn rescue was already requested before assignment; never blindly teleport.
  p.sendMessage('§bSkyGen: menu compass slot 7, spawn horn slot 8, plot horn slot 9.');
- }catch(err){console.warn('SkyGen join '+err)}},30));
+ }catch(err){console.warn('SkyGen join '+err)}},30);
+});
 world.afterEvents.itemUse.subscribe(e=>{const p=e.source,i=e.itemStack;if(adminAxe(i)){system.run(()=>adminMenu(p));return;}if(toolmatch(i,TOOLS[0]))system.run(()=>menu(p));if(toolmatch(i,TOOLS[1]))system.run(()=>{if(p.location.y<-50){const t=pending.get(p.id);pending.delete(p.id);finishPendingTeleport(t);safeSpawnTravel(p,true)}else safeSpawnTravel(p)});if(toolmatch(i,TOOLS[2]))system.run(()=>tpPlot(p));if(i?.typeId==='minecraft:egg'&&i.nameTag?.startsWith('§bSkyGen ')&&i.nameTag.endsWith(' Generator')){const name=i.nameTag.replace('§bSkyGen ','').replace(' Generator',''),g=GENS.find(g=>g.name===name);if(!g)return;const pos=p.location;if(!belongs(p,pos.x,pos.z)||ownerId(profile(p).plot)!==p.id)return p.sendMessage('§cUse generator eggs only on your own plot.');// Target the block the player is looking at, never a fixed world-direction offset.
  const hit=p.getBlockFromViewDirection({maxDistance:6,includeLiquidBlocks:false,includePassableBlocks:false});
  if(!hit?.block)return p.sendMessage('§cLook directly at a block on your plot to place the generator.');
@@ -1286,4 +1309,4 @@ function adminCommand(actor,message){
 }
 
 system.runTimeout(()=>{try{ensureSpawn()}catch(e){console.warn('SkyGen spawn init: '+e)}},40);
-console.warn('[SkyGen] 0.8.2 stability and security repairs loaded');
+console.warn('[SkyGen] 0.8.3 pre-install checks and repairs loaded');
