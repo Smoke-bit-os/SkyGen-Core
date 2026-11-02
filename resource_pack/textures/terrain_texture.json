@@ -1,0 +1,384 @@
+{
+  "resource_pack_name": "SkyGen Core",
+  "texture_name": "atlas.terrain",
+  "texture_data": {
+    "skygen_cobblestone_generator_core_top": {
+      "textures": "textures/blocks/cobblestone_generator_core_top"
+    },
+    "skygen_cobblestone_generator_core_side": {
+      "textures": "textures/blocks/cobblestone_generator_core_side"
+    },
+    "skygen_cobblestone_generator_core_bottom": {
+      "textures": "textures/blocks/cobblestone_generator_core_bottom"
+    },
+    "skygen_coal_generator_core_top": {
+      "textures": "textures/blocks/coal_generator_core_top"
+    },
+    "skygen_coal_generator_core_side": {
+      "textures": "textures/blocks/coal_generator_core_side"
+    },
+    "skygen_coal_generator_core_bottom": {
+      "textures": "textures/blocks/coal_generator_core_bottom"
+    },
+    "skygen_iron_generator_core_top": {
+      "textures": "textures/blocks/iron_generator_core_top"
+    },
+    "skygen_iron_generator_core_side": {
+      "textures": "textures/blocks/iron_generator_core_side"
+    },
+    "skygen_iron_generator_core_bottom": {
+      "textures": "textures/blocks/iron_generator_core_bottom"
+    },
+    "skygen_gold_generator_core_top": {
+      "textures": "textures/blocks/gold_generator_core_top"
+    },
+    "skygen_gold_generator_core_side": {
+      "textures": "textures/blocks/gold_generator_core_side"
+    },
+    "skygen_gold_generator_core_bottom": {
+      "textures": "textures/blocks/gold_generator_core_bottom"
+    },
+    "skygen_diamond_generator_core_top": {
+      "textures": "textures/blocks/diamond_generator_core_top"
+    },
+    "skygen_diamond_generator_core_side": {
+      "textures": "textures/blocks/diamond_generator_core_side"
+    },
+    "skygen_diamond_generator_core_bottom": {
+      "textures": "textures/blocks/diamond_generator_core_bottom"
+    },
+    "skygen_emerald_generator_core_top": {
+      "textures": "textures/blocks/emerald_generator_core_top"
+    },
+    "skygen_emerald_generator_core_side": {
+      "textures": "textures/blocks/emerald_generator_core_side"
+    },
+    "skygen_emerald_generator_core_bottom": {
+      "textures": "textures/blocks/emerald_generator_core_bottom"
+    },
+    "skygen_stone_generator_core_top": {
+      "textures": "textures/blocks/stone_generator_core_top"
+    },
+    "skygen_stone_generator_core_side": {
+      "textures": "textures/blocks/stone_generator_core_side"
+    },
+    "skygen_stone_generator_core_bottom": {
+      "textures": "textures/blocks/stone_generator_core_bottom"
+    },
+    "skygen_deepslate_generator_core_top": {
+      "textures": "textures/blocks/deepslate_generator_core_top"
+    },
+    "skygen_deepslate_generator_core_side": {
+      "textures": "textures/blocks/deepslate_generator_core_side"
+    },
+    "skygen_deepslate_generator_core_bottom": {
+      "textures": "textures/blocks/deepslate_generator_core_bottom"
+    },
+    "skygen_dirt_generator_core_top": {
+      "textures": "textures/blocks/dirt_generator_core_top"
+    },
+    "skygen_dirt_generator_core_side": {
+      "textures": "textures/blocks/dirt_generator_core_side"
+    },
+    "skygen_dirt_generator_core_bottom": {
+      "textures": "textures/blocks/dirt_generator_core_bottom"
+    },
+    "skygen_gravel_generator_core_top": {
+      "textures": "textures/blocks/gravel_generator_core_top"
+    },
+    "skygen_gravel_generator_core_side": {
+      "textures": "textures/blocks/gravel_generator_core_side"
+    },
+    "skygen_gravel_generator_core_bottom": {
+      "textures": "textures/blocks/gravel_generator_core_bottom"
+    },
+    "skygen_sand_generator_core_top": {
+      "textures": "textures/blocks/sand_generator_core_top"
+    },
+    "skygen_sand_generator_core_side": {
+      "textures": "textures/blocks/sand_generator_core_side"
+    },
+    "skygen_sand_generator_core_bottom": {
+      "textures": "textures/blocks/sand_generator_core_bottom"
+    },
+    "skygen_clay_generator_core_top": {
+      "textures": "textures/blocks/clay_generator_core_top"
+    },
+    "skygen_clay_generator_core_side": {
+      "textures": "textures/blocks/clay_generator_core_side"
+    },
+    "skygen_clay_generator_core_bottom": {
+      "textures": "textures/blocks/clay_generator_core_bottom"
+    },
+    "skygen_oak_logs_generator_core_top": {
+      "textures": "textures/blocks/oak_logs_generator_core_top"
+    },
+    "skygen_oak_logs_generator_core_side": {
+      "textures": "textures/blocks/oak_logs_generator_core_side"
+    },
+    "skygen_oak_logs_generator_core_bottom": {
+      "textures": "textures/blocks/oak_logs_generator_core_bottom"
+    },
+    "skygen_spruce_logs_generator_core_top": {
+      "textures": "textures/blocks/spruce_logs_generator_core_top"
+    },
+    "skygen_spruce_logs_generator_core_side": {
+      "textures": "textures/blocks/spruce_logs_generator_core_side"
+    },
+    "skygen_spruce_logs_generator_core_bottom": {
+      "textures": "textures/blocks/spruce_logs_generator_core_bottom"
+    },
+    "skygen_birch_logs_generator_core_top": {
+      "textures": "textures/blocks/birch_logs_generator_core_top"
+    },
+    "skygen_birch_logs_generator_core_side": {
+      "textures": "textures/blocks/birch_logs_generator_core_side"
+    },
+    "skygen_birch_logs_generator_core_bottom": {
+      "textures": "textures/blocks/birch_logs_generator_core_bottom"
+    },
+    "skygen_cherry_logs_generator_core_top": {
+      "textures": "textures/blocks/cherry_logs_generator_core_top"
+    },
+    "skygen_cherry_logs_generator_core_side": {
+      "textures": "textures/blocks/cherry_logs_generator_core_side"
+    },
+    "skygen_cherry_logs_generator_core_bottom": {
+      "textures": "textures/blocks/cherry_logs_generator_core_bottom"
+    },
+    "skygen_mangrove_logs_generator_core_top": {
+      "textures": "textures/blocks/mangrove_logs_generator_core_top"
+    },
+    "skygen_mangrove_logs_generator_core_side": {
+      "textures": "textures/blocks/mangrove_logs_generator_core_side"
+    },
+    "skygen_mangrove_logs_generator_core_bottom": {
+      "textures": "textures/blocks/mangrove_logs_generator_core_bottom"
+    },
+    "skygen_copper_generator_core_top": {
+      "textures": "textures/blocks/copper_generator_core_top"
+    },
+    "skygen_copper_generator_core_side": {
+      "textures": "textures/blocks/copper_generator_core_side"
+    },
+    "skygen_copper_generator_core_bottom": {
+      "textures": "textures/blocks/copper_generator_core_bottom"
+    },
+    "skygen_redstone_generator_core_top": {
+      "textures": "textures/blocks/redstone_generator_core_top"
+    },
+    "skygen_redstone_generator_core_side": {
+      "textures": "textures/blocks/redstone_generator_core_side"
+    },
+    "skygen_redstone_generator_core_bottom": {
+      "textures": "textures/blocks/redstone_generator_core_bottom"
+    },
+    "skygen_lapis_lazuli_generator_core_top": {
+      "textures": "textures/blocks/lapis_lazuli_generator_core_top"
+    },
+    "skygen_lapis_lazuli_generator_core_side": {
+      "textures": "textures/blocks/lapis_lazuli_generator_core_side"
+    },
+    "skygen_lapis_lazuli_generator_core_bottom": {
+      "textures": "textures/blocks/lapis_lazuli_generator_core_bottom"
+    },
+    "skygen_nether_quartz_generator_core_top": {
+      "textures": "textures/blocks/nether_quartz_generator_core_top"
+    },
+    "skygen_nether_quartz_generator_core_side": {
+      "textures": "textures/blocks/nether_quartz_generator_core_side"
+    },
+    "skygen_nether_quartz_generator_core_bottom": {
+      "textures": "textures/blocks/nether_quartz_generator_core_bottom"
+    },
+    "skygen_nether_gold_generator_core_top": {
+      "textures": "textures/blocks/nether_gold_generator_core_top"
+    },
+    "skygen_nether_gold_generator_core_side": {
+      "textures": "textures/blocks/nether_gold_generator_core_side"
+    },
+    "skygen_nether_gold_generator_core_bottom": {
+      "textures": "textures/blocks/nether_gold_generator_core_bottom"
+    },
+    "skygen_moss_generator_core_top": {
+      "textures": "textures/blocks/moss_generator_core_top"
+    },
+    "skygen_moss_generator_core_side": {
+      "textures": "textures/blocks/moss_generator_core_side"
+    },
+    "skygen_moss_generator_core_bottom": {
+      "textures": "textures/blocks/moss_generator_core_bottom"
+    },
+    "skygen_netherrack_generator_core_top": {
+      "textures": "textures/blocks/netherrack_generator_core_top"
+    },
+    "skygen_netherrack_generator_core_side": {
+      "textures": "textures/blocks/netherrack_generator_core_side"
+    },
+    "skygen_netherrack_generator_core_bottom": {
+      "textures": "textures/blocks/netherrack_generator_core_bottom"
+    },
+    "skygen_soul_sand_generator_core_top": {
+      "textures": "textures/blocks/soul_sand_generator_core_top"
+    },
+    "skygen_soul_sand_generator_core_side": {
+      "textures": "textures/blocks/soul_sand_generator_core_side"
+    },
+    "skygen_soul_sand_generator_core_bottom": {
+      "textures": "textures/blocks/soul_sand_generator_core_bottom"
+    },
+    "skygen_basalt_generator_core_top": {
+      "textures": "textures/blocks/basalt_generator_core_top"
+    },
+    "skygen_basalt_generator_core_side": {
+      "textures": "textures/blocks/basalt_generator_core_side"
+    },
+    "skygen_basalt_generator_core_bottom": {
+      "textures": "textures/blocks/basalt_generator_core_bottom"
+    },
+    "skygen_blackstone_generator_core_top": {
+      "textures": "textures/blocks/blackstone_generator_core_top"
+    },
+    "skygen_blackstone_generator_core_side": {
+      "textures": "textures/blocks/blackstone_generator_core_side"
+    },
+    "skygen_blackstone_generator_core_bottom": {
+      "textures": "textures/blocks/blackstone_generator_core_bottom"
+    },
+    "skygen_glowstone_generator_core_top": {
+      "textures": "textures/blocks/glowstone_generator_core_top"
+    },
+    "skygen_glowstone_generator_core_side": {
+      "textures": "textures/blocks/glowstone_generator_core_side"
+    },
+    "skygen_glowstone_generator_core_bottom": {
+      "textures": "textures/blocks/glowstone_generator_core_bottom"
+    },
+    "skygen_magma_generator_core_top": {
+      "textures": "textures/blocks/magma_generator_core_top"
+    },
+    "skygen_magma_generator_core_side": {
+      "textures": "textures/blocks/magma_generator_core_side"
+    },
+    "skygen_magma_generator_core_bottom": {
+      "textures": "textures/blocks/magma_generator_core_bottom"
+    },
+    "skygen_calcite_generator_core_top": {
+      "textures": "textures/blocks/calcite_generator_core_top"
+    },
+    "skygen_calcite_generator_core_side": {
+      "textures": "textures/blocks/calcite_generator_core_side"
+    },
+    "skygen_calcite_generator_core_bottom": {
+      "textures": "textures/blocks/calcite_generator_core_bottom"
+    },
+    "skygen_tuff_generator_core_top": {
+      "textures": "textures/blocks/tuff_generator_core_top"
+    },
+    "skygen_tuff_generator_core_side": {
+      "textures": "textures/blocks/tuff_generator_core_side"
+    },
+    "skygen_tuff_generator_core_bottom": {
+      "textures": "textures/blocks/tuff_generator_core_bottom"
+    },
+    "skygen_amethyst_block_generator_core_top": {
+      "textures": "textures/blocks/amethyst_block_generator_core_top"
+    },
+    "skygen_amethyst_block_generator_core_side": {
+      "textures": "textures/blocks/amethyst_block_generator_core_side"
+    },
+    "skygen_amethyst_block_generator_core_bottom": {
+      "textures": "textures/blocks/amethyst_block_generator_core_bottom"
+    },
+    "skygen_obsidian_generator_core_top": {
+      "textures": "textures/blocks/obsidian_generator_core_top"
+    },
+    "skygen_obsidian_generator_core_side": {
+      "textures": "textures/blocks/obsidian_generator_core_side"
+    },
+    "skygen_obsidian_generator_core_bottom": {
+      "textures": "textures/blocks/obsidian_generator_core_bottom"
+    },
+    "skygen_prismarine_generator_core_top": {
+      "textures": "textures/blocks/prismarine_generator_core_top"
+    },
+    "skygen_prismarine_generator_core_side": {
+      "textures": "textures/blocks/prismarine_generator_core_side"
+    },
+    "skygen_prismarine_generator_core_bottom": {
+      "textures": "textures/blocks/prismarine_generator_core_bottom"
+    },
+    "skygen_sea_lantern_generator_core_top": {
+      "textures": "textures/blocks/sea_lantern_generator_core_top"
+    },
+    "skygen_sea_lantern_generator_core_side": {
+      "textures": "textures/blocks/sea_lantern_generator_core_side"
+    },
+    "skygen_sea_lantern_generator_core_bottom": {
+      "textures": "textures/blocks/sea_lantern_generator_core_bottom"
+    },
+    "skygen_end_stone_generator_core_top": {
+      "textures": "textures/blocks/end_stone_generator_core_top"
+    },
+    "skygen_end_stone_generator_core_side": {
+      "textures": "textures/blocks/end_stone_generator_core_side"
+    },
+    "skygen_end_stone_generator_core_bottom": {
+      "textures": "textures/blocks/end_stone_generator_core_bottom"
+    },
+    "skygen_purpur_block_generator_core_top": {
+      "textures": "textures/blocks/purpur_block_generator_core_top"
+    },
+    "skygen_purpur_block_generator_core_side": {
+      "textures": "textures/blocks/purpur_block_generator_core_side"
+    },
+    "skygen_purpur_block_generator_core_bottom": {
+      "textures": "textures/blocks/purpur_block_generator_core_bottom"
+    },
+    "skygen_sculk_generator_core_top": {
+      "textures": "textures/blocks/sculk_generator_core_top"
+    },
+    "skygen_sculk_generator_core_side": {
+      "textures": "textures/blocks/sculk_generator_core_side"
+    },
+    "skygen_sculk_generator_core_bottom": {
+      "textures": "textures/blocks/sculk_generator_core_bottom"
+    },
+    "skygen_crying_obsidian_generator_core_top": {
+      "textures": "textures/blocks/crying_obsidian_generator_core_top"
+    },
+    "skygen_crying_obsidian_generator_core_side": {
+      "textures": "textures/blocks/crying_obsidian_generator_core_side"
+    },
+    "skygen_crying_obsidian_generator_core_bottom": {
+      "textures": "textures/blocks/crying_obsidian_generator_core_bottom"
+    },
+    "skygen_gilded_blackstone_generator_core_top": {
+      "textures": "textures/blocks/gilded_blackstone_generator_core_top"
+    },
+    "skygen_gilded_blackstone_generator_core_side": {
+      "textures": "textures/blocks/gilded_blackstone_generator_core_side"
+    },
+    "skygen_gilded_blackstone_generator_core_bottom": {
+      "textures": "textures/blocks/gilded_blackstone_generator_core_bottom"
+    },
+    "skygen_shroomlight_generator_core_top": {
+      "textures": "textures/blocks/shroomlight_generator_core_top"
+    },
+    "skygen_shroomlight_generator_core_side": {
+      "textures": "textures/blocks/shroomlight_generator_core_side"
+    },
+    "skygen_shroomlight_generator_core_bottom": {
+      "textures": "textures/blocks/shroomlight_generator_core_bottom"
+    },
+    "skygen_ancient_debris_generator_core_top": {
+      "textures": "textures/blocks/ancient_debris_generator_core_top"
+    },
+    "skygen_ancient_debris_generator_core_side": {
+      "textures": "textures/blocks/ancient_debris_generator_core_side"
+    },
+    "skygen_ancient_debris_generator_core_bottom": {
+      "textures": "textures/blocks/ancient_debris_generator_core_bottom"
+    }
+  }
+}

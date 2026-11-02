@@ -1,0 +1,24 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:item": {
+    "description": {
+      "identifier": "skygen:generator_magma",
+      "menu_category": {
+        "category": "none"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "SkyGen Magma Generator"
+      },
+      "minecraft:icon": {
+        "textures": {
+          "default": "skygen_generator_magma"
+        }
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true,
+      "skygen:generator_token_use": {}
+    }
+  }
+}

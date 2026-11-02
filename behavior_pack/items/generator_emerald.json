@@ -1,0 +1,24 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:item": {
+    "description": {
+      "identifier": "skygen:generator_emerald",
+      "menu_category": {
+        "category": "none"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "SkyGen Emerald Generator"
+      },
+      "minecraft:icon": {
+        "textures": {
+          "default": "skygen_generator_emerald"
+        }
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true,
+      "skygen:generator_token_use": {}
+    }
+  }
+}

@@ -1,0 +1,43 @@
+generator,item_identifier,texture_filename,item_json,file,identifier,nonstackable,icon,component,atlas,unique,png,size,rgba,transparent
+Cobblestone,skygen:generator_cobblestone,cobblestone_generator.png,generator_cobblestone.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Coal,skygen:generator_coal,coal_generator.png,generator_coal.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Iron,skygen:generator_iron,iron_generator.png,generator_iron.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Gold,skygen:generator_gold,gold_generator.png,generator_gold.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Diamond,skygen:generator_diamond,diamond_generator.png,generator_diamond.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Emerald,skygen:generator_emerald,emerald_generator.png,generator_emerald.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Stone,skygen:generator_stone,stone_generator.png,generator_stone.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Deepslate,skygen:generator_deepslate,deepslate_generator.png,generator_deepslate.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Dirt,skygen:generator_dirt,dirt_generator.png,generator_dirt.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Gravel,skygen:generator_gravel,gravel_generator.png,generator_gravel.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Sand,skygen:generator_sand,sand_generator.png,generator_sand.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Clay,skygen:generator_clay,clay_generator.png,generator_clay.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Oak Logs,skygen:generator_oak_logs,oak_logs_generator.png,generator_oak_logs.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Spruce Logs,skygen:generator_spruce_logs,spruce_logs_generator.png,generator_spruce_logs.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Birch Logs,skygen:generator_birch_logs,birch_logs_generator.png,generator_birch_logs.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Cherry Logs,skygen:generator_cherry_logs,cherry_logs_generator.png,generator_cherry_logs.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Mangrove Logs,skygen:generator_mangrove_logs,mangrove_logs_generator.png,generator_mangrove_logs.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Copper,skygen:generator_copper,copper_generator.png,generator_copper.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Redstone,skygen:generator_redstone,redstone_generator.png,generator_redstone.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Lapis Lazuli,skygen:generator_lapis_lazuli,lapis_lazuli_generator.png,generator_lapis_lazuli.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Nether Quartz,skygen:generator_nether_quartz,nether_quartz_generator.png,generator_nether_quartz.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Nether Gold,skygen:generator_nether_gold,nether_gold_generator.png,generator_nether_gold.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Moss,skygen:generator_moss,moss_generator.png,generator_moss.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Netherrack,skygen:generator_netherrack,netherrack_generator.png,generator_netherrack.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Soul Sand,skygen:generator_soul_sand,soul_sand_generator.png,generator_soul_sand.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Basalt,skygen:generator_basalt,basalt_generator.png,generator_basalt.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Blackstone,skygen:generator_blackstone,blackstone_generator.png,generator_blackstone.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Glowstone,skygen:generator_glowstone,glowstone_generator.png,generator_glowstone.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Magma,skygen:generator_magma,magma_generator.png,generator_magma.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Calcite,skygen:generator_calcite,calcite_generator.png,generator_calcite.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Tuff,skygen:generator_tuff,tuff_generator.png,generator_tuff.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Amethyst Block,skygen:generator_amethyst_block,amethyst_block_generator.png,generator_amethyst_block.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Obsidian,skygen:generator_obsidian,obsidian_generator.png,generator_obsidian.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Prismarine,skygen:generator_prismarine,prismarine_generator.png,generator_prismarine.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Sea Lantern,skygen:generator_sea_lantern,sea_lantern_generator.png,generator_sea_lantern.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+End Stone,skygen:generator_end_stone,end_stone_generator.png,generator_end_stone.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Purpur Block,skygen:generator_purpur_block,purpur_block_generator.png,generator_purpur_block.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Sculk,skygen:generator_sculk,sculk_generator.png,generator_sculk.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Crying Obsidian,skygen:generator_crying_obsidian,crying_obsidian_generator.png,generator_crying_obsidian.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Gilded Blackstone,skygen:generator_gilded_blackstone,gilded_blackstone_generator.png,generator_gilded_blackstone.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Shroomlight,skygen:generator_shroomlight,shroomlight_generator.png,generator_shroomlight.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS
+Ancient Debris,skygen:generator_ancient_debris,ancient_debris_generator.png,generator_ancient_debris.json,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS,PASS

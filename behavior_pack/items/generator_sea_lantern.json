@@ -1,0 +1,24 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:item": {
+    "description": {
+      "identifier": "skygen:generator_sea_lantern",
+      "menu_category": {
+        "category": "none"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "SkyGen Sea Lantern Generator"
+      },
+      "minecraft:icon": {
+        "textures": {
+          "default": "skygen_generator_sea_lantern"
+        }
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true,
+      "skygen:generator_token_use": {}
+    }
+  }
+}

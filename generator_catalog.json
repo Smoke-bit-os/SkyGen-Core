@@ -1,0 +1,338 @@
+[
+  {
+    "name": "Cobblestone",
+    "block": "cobblestone",
+    "cost": 500,
+    "period": 200,
+    "category": "Starter",
+    "unlock": 1
+  },
+  {
+    "name": "Coal",
+    "block": "coal_ore",
+    "cost": 2500,
+    "period": 300,
+    "category": "Mining",
+    "unlock": 1
+  },
+  {
+    "name": "Iron",
+    "block": "iron_ore",
+    "cost": 10000,
+    "period": 400,
+    "category": "Mining",
+    "unlock": 1
+  },
+  {
+    "name": "Gold",
+    "block": "gold_ore",
+    "cost": 40000,
+    "period": 500,
+    "category": "Mining",
+    "unlock": 1
+  },
+  {
+    "name": "Diamond",
+    "block": "diamond_ore",
+    "cost": 200000,
+    "period": 600,
+    "category": "Mining",
+    "unlock": 1
+  },
+  {
+    "name": "Emerald",
+    "block": "emerald_ore",
+    "cost": 500000,
+    "period": 800,
+    "category": "Mining",
+    "unlock": 1
+  },
+  {
+    "name": "Stone",
+    "block": "stone",
+    "cost": 700,
+    "period": 220,
+    "category": "Starter",
+    "unlock": 2
+  },
+  {
+    "name": "Deepslate",
+    "block": "deepslate",
+    "cost": 1100,
+    "period": 220,
+    "category": "Starter",
+    "unlock": 3
+  },
+  {
+    "name": "Dirt",
+    "block": "dirt",
+    "cost": 500,
+    "period": 180,
+    "category": "Starter",
+    "unlock": 1
+  },
+  {
+    "name": "Gravel",
+    "block": "gravel",
+    "cost": 900,
+    "period": 220,
+    "category": "Starter",
+    "unlock": 3
+  },
+  {
+    "name": "Sand",
+    "block": "sand",
+    "cost": 950,
+    "period": 220,
+    "category": "Starter",
+    "unlock": 3
+  },
+  {
+    "name": "Clay",
+    "block": "clay",
+    "cost": 1200,
+    "period": 260,
+    "category": "Starter",
+    "unlock": 4
+  },
+  {
+    "name": "Oak Logs",
+    "block": "oak_log",
+    "cost": 1800,
+    "period": 240,
+    "category": "Starter",
+    "unlock": 4
+  },
+  {
+    "name": "Spruce Logs",
+    "block": "spruce_log",
+    "cost": 2200,
+    "period": 260,
+    "category": "Starter",
+    "unlock": 5
+  },
+  {
+    "name": "Birch Logs",
+    "block": "birch_log",
+    "cost": 2200,
+    "period": 260,
+    "category": "Starter",
+    "unlock": 5
+  },
+  {
+    "name": "Cherry Logs",
+    "block": "cherry_log",
+    "cost": 4500,
+    "period": 280,
+    "category": "Starter",
+    "unlock": 8
+  },
+  {
+    "name": "Mangrove Logs",
+    "block": "mangrove_log",
+    "cost": 5200,
+    "period": 300,
+    "category": "Starter",
+    "unlock": 10
+  },
+  {
+    "name": "Copper",
+    "block": "copper_ore",
+    "cost": 7500,
+    "period": 320,
+    "category": "Mining",
+    "unlock": 8
+  },
+  {
+    "name": "Redstone",
+    "block": "redstone_ore",
+    "cost": 18000,
+    "period": 380,
+    "category": "Mining",
+    "unlock": 12
+  },
+  {
+    "name": "Lapis Lazuli",
+    "block": "lapis_ore",
+    "cost": 24000,
+    "period": 440,
+    "category": "Mining",
+    "unlock": 16
+  },
+  {
+    "name": "Nether Quartz",
+    "block": "nether_quartz_ore",
+    "cost": 30000,
+    "period": 500,
+    "category": "Mining",
+    "unlock": 18
+  },
+  {
+    "name": "Nether Gold",
+    "block": "nether_gold_ore",
+    "cost": 60000,
+    "period": 560,
+    "category": "Mining",
+    "unlock": 20
+  },
+  {
+    "name": "Moss",
+    "block": "moss_block",
+    "cost": 15000,
+    "period": 300,
+    "category": "Nature",
+    "unlock": 15
+  },
+  {
+    "name": "Netherrack",
+    "block": "netherrack",
+    "cost": 17500,
+    "period": 300,
+    "category": "Nature",
+    "unlock": 16
+  },
+  {
+    "name": "Soul Sand",
+    "block": "soul_sand",
+    "cost": 21000,
+    "period": 360,
+    "category": "Nature",
+    "unlock": 18
+  },
+  {
+    "name": "Basalt",
+    "block": "basalt",
+    "cost": 26000,
+    "period": 380,
+    "category": "Nature",
+    "unlock": 20
+  },
+  {
+    "name": "Blackstone",
+    "block": "blackstone",
+    "cost": 32000,
+    "period": 400,
+    "category": "Nature",
+    "unlock": 22
+  },
+  {
+    "name": "Glowstone",
+    "block": "glowstone",
+    "cost": 55000,
+    "period": 480,
+    "category": "Nature",
+    "unlock": 25
+  },
+  {
+    "name": "Magma",
+    "block": "magma",
+    "cost": 65000,
+    "period": 500,
+    "category": "Nature",
+    "unlock": 27
+  },
+  {
+    "name": "Calcite",
+    "block": "calcite",
+    "cost": 72000,
+    "period": 520,
+    "category": "Nature",
+    "unlock": 30
+  },
+  {
+    "name": "Tuff",
+    "block": "tuff",
+    "cost": 76000,
+    "period": 520,
+    "category": "Nature",
+    "unlock": 30
+  },
+  {
+    "name": "Amethyst Block",
+    "block": "amethyst_block",
+    "cost": 100000,
+    "period": 560,
+    "category": "Nature",
+    "unlock": 35
+  },
+  {
+    "name": "Obsidian",
+    "block": "obsidian",
+    "cost": 150000,
+    "period": 650,
+    "category": "Endgame",
+    "unlock": 30
+  },
+  {
+    "name": "Prismarine",
+    "block": "prismarine",
+    "cost": 165000,
+    "period": 660,
+    "category": "Endgame",
+    "unlock": 32
+  },
+  {
+    "name": "Sea Lantern",
+    "block": "sea_lantern",
+    "cost": 190000,
+    "period": 700,
+    "category": "Endgame",
+    "unlock": 34
+  },
+  {
+    "name": "End Stone",
+    "block": "end_stone",
+    "cost": 220000,
+    "period": 720,
+    "category": "Endgame",
+    "unlock": 36
+  },
+  {
+    "name": "Purpur Block",
+    "block": "purpur_block",
+    "cost": 260000,
+    "period": 740,
+    "category": "Endgame",
+    "unlock": 38
+  },
+  {
+    "name": "Sculk",
+    "block": "sculk",
+    "cost": 330000,
+    "period": 760,
+    "category": "Endgame",
+    "unlock": 40
+  },
+  {
+    "name": "Crying Obsidian",
+    "block": "crying_obsidian",
+    "cost": 420000,
+    "period": 800,
+    "category": "Endgame",
+    "unlock": 42
+  },
+  {
+    "name": "Gilded Blackstone",
+    "block": "gilded_blackstone",
+    "cost": 520000,
+    "period": 840,
+    "category": "Endgame",
+    "unlock": 44
+  },
+  {
+    "name": "Shroomlight",
+    "block": "shroomlight",
+    "cost": 620000,
+    "period": 880,
+    "category": "Endgame",
+    "unlock": 46
+  },
+  {
+    "name": "Ancient Debris",
+    "block": "ancient_debris",
+    "cost": 1900000,
+    "period": 1600,
+    "category": "Endgame",
+    "unlock": 48
+  }
+]
