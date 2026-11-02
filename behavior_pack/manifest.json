@@ -1,18 +1,18 @@
 {
   "format_version": 2,
   "header": {
-    "name": "SkyGen Core BP v0.8.1",
-    "description": "SkyGen Core 0.8.1 - safe plot generation and teleporter",
+    "name": "SkyGen Core BP v0.8.2",
+    "description": "SkyGen Core 0.8.2 - plot, spawn, market, trade and generator stability fixes",
     "uuid": "050d268d-d873-4b6c-ad88-71da14ecb845",
     "version": [
       0,
       8,
-      1
+      2
     ],
     "min_engine_version": [
       1,
       21,
-      0
+      90
     ]
   },
   "modules": [
@@ -22,7 +22,7 @@
       "version": [
         0,
         8,
-        1
+        2
       ]
     },
     {
@@ -32,7 +32,7 @@
       "version": [
         0,
         8,
-        1
+        2
       ],
       "entry": "scripts/main.js"
     }
@@ -51,7 +51,7 @@
       "version": [
         0,
         8,
-        1
+        2
       ]
     }
   ]
