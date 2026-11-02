@@ -1,18 +1,18 @@
 {
   "format_version": 2,
   "header": {
-    "name": "SkyGen Core RP v0.7.6",
-    "description": "SkyGen resources alpha",
+    "name": "SkyGen Core RP v0.8.3",
+    "description": "SkyGen Core 0.8.3 - plot, spawn, market, trade and generator stability fixes",
     "uuid": "f0cdfa8d-0d91-43b0-a5bd-ea7ae461c98d",
     "version": [
       0,
-      7,
-      6
+      8,
+      3
     ],
     "min_engine_version": [
       1,
       21,
-      0
+      90
     ]
   },
   "modules": [
@@ -21,8 +21,8 @@
       "uuid": "8accbec2-a78d-4872-a7a6-8ad46a09e248",
       "version": [
         0,
-        7,
-        6
+        8,
+        3
       ]
     }
   ]
