@@ -187,7 +187,7 @@ test('generator break awards additional XP while non-generator breaks are rate l
  const t=setup();t.p.data.set('sg_profile',JSON.stringify({rank:1,xp:0,credits:1000,orbits:0,plot:0}));
  t.props.set('sg_plot_0','P');t.p.location={x:512.5,y:106,z:512.5};
  t.call('generators.set("512,107,512",{type:"Coal",owner:"P",x:512,y:107,z:512,block:"minecraft:coal_ore"})');
- t.system.currentTick=100;
+ t.call('generatorOutputReady.add("512,107,512")');t.system.currentTick=100;
  t.events.breakAfter({player:t.p,block:{location:{x:512,y:108,z:512}},brokenBlockPermutation:{type:{id:'minecraft:coal_ore'}}});
  assert.equal(JSON.parse(t.p.data.get('sg_profile')).xp,5);
  t.events.breakAfter({player:t.p,block:{location:{x:514,y:108,z:512}},brokenBlockPermutation:{type:{id:'minecraft:dirt'}}});

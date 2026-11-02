@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "SkyGen Core BP v0.9.0",
-    "description": "SkyGen Core 0.9.0 - 42 generators, six-branch skill tree, daily quests, safe registry migration",
+    "name": "SkyGen Core BP v0.9.1",
+    "description": "SkyGen Core 0.9.1 - security hardening, verified generator tokens, idempotent payouts, safe trading and plot guards",
     "uuid": "050d268d-d873-4b6c-ad88-71da14ecb845",
     "version": [
       0,
       9,
-      0
+      1
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         9,
-        0
+        1
       ]
     },
     {
@@ -32,7 +32,7 @@
       "version": [
         0,
         9,
-        0
+        1
       ],
       "entry": "scripts/main.js"
     }
@@ -51,7 +51,7 @@
       "version": [
         0,
         9,
-        0
+        1
       ]
     }
   ]

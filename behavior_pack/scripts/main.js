@@ -54,7 +54,7 @@ const genErrors=[];
 // Register commands early so a later optional event subscription cannot disable them.
 try{
  system.afterEvents.scriptEventReceive.subscribe(e=>{
-  if(!['skygen:menu','skygen:adminaxe','skygen:admin','skygen:debug','skygen:marketreview'].includes(e.id))return;
+  if(!['skygen:menu','skygen:adminaxe','skygen:admin','skygen:debug','skygen:marketreview','skygen:security','skygen:tokenrestore'].includes(e.id))return;
   const actor=e.sourceEntity;
   console.warn('[SkyGen CMD] received '+e.id+' source='+e.sourceType+' player='+(actor?.name||'none'));
   if(!actor||actor.typeId!=='minecraft:player'){console.warn('[SkyGen CMD] no player source; use command from player chat');return;}
@@ -65,6 +65,8 @@ try{
     else if(e.id==='skygen:adminaxe')issueAdminAxe(actor);
     else if(e.id==='skygen:admin')adminCommand(actor,e.message);
     else if(e.id==='skygen:marketreview')marketReviewCommand(actor);
+    else if(e.id==='skygen:security')securityReviewCommand(actor);
+    else if(e.id==='skygen:tokenrestore')adminTokenRestore(actor,e.message);
     else actor.sendMessage('§aSkyGen command handler active. OP='+isOperator(actor)+' Admin='+isAdmin(actor)+' PermissionLevel='+String(actor.playerPermissionLevel)+' isOpAPI='+String(typeof actor.isOp));
    }catch(err){console.warn('[SkyGen CMD] '+err);try{actor.sendMessage('§cSkyGen command error: '+err)}catch{}}
   });
@@ -316,7 +318,7 @@ function save(p,d){
  if(p.getDynamicProperty('sg_profile')!==json)throw Error('Player profile did not persist');
 }
 const SKILL_BRANCHES=["Mining", "Mobility", "Survival", "Exploration", "Economy", "Engineering"];
-const SKILLS=[{"id":"miner_haste_1","name":"Quick Hands I","desc":"Haste I on your plot","cost":1,"rank":2,"branch":"Mining","prev":null},{"id":"miner_haste_2","name":"Quick Hands II","desc":"Haste II on your plot","cost":2,"rank":10,"branch":"Mining","prev":"miner_haste_1"},{"id":"miner_xp_1","name":"Prospector I","desc":"+10% generator mining XP","cost":1,"rank":12,"branch":"Mining","prev":"miner_haste_2"},{"id":"miner_xp_2","name":"Prospector II","desc":"+25% generator mining XP","cost":2,"rank":20,"branch":"Mining","prev":"miner_xp_1"},{"id":"miner_luck_1","name":"Lucky Strikes I","desc":"2% chance of a bonus material","cost":2,"rank":25,"branch":"Mining","prev":"miner_xp_2"},{"id":"miner_luck_2","name":"Lucky Strikes II","desc":"4% chance of a bonus material","cost":3,"rank":35,"branch":"Mining","prev":"miner_luck_1"},{"id":"miner_master","name":"Master Miner","desc":"+50% generator mining XP total","cost":4,"rank":45,"branch":"Mining","prev":"miner_luck_2"},{"id":"move_speed_1","name":"Swift Steps I","desc":"Speed I on your plot","cost":1,"rank":2,"branch":"Mobility","prev":null},{"id":"move_speed_2","name":"Swift Steps II","desc":"Speed II on your plot","cost":2,"rank":12,"branch":"Mobility","prev":"move_speed_1"},{"id":"move_jump_1","name":"High Jumper I","desc":"Jump Boost I, toggleable","cost":1,"rank":8,"branch":"Mobility","prev":"move_speed_2"},{"id":"move_jump_2","name":"High Jumper II","desc":"Jump Boost II, toggleable","cost":2,"rank":18,"branch":"Mobility","prev":"move_jump_1"},{"id":"move_fall","name":"Feather Foot","desc":"Slow Falling, toggleable","cost":2,"rank":25,"branch":"Mobility","prev":"move_jump_2"},{"id":"move_tp_1","name":"Fast Traveler","desc":"Teleport cooldown 20% shorter","cost":3,"rank":35,"branch":"Mobility","prev":"move_fall"},{"id":"move_tp_2","name":"Wayfinder","desc":"Teleport cooldown 40% shorter","cost":4,"rank":45,"branch":"Mobility","prev":"move_tp_1"},{"id":"surv_resist","name":"Stone Skin","desc":"Resistance I on your plot","cost":1,"rank":5,"branch":"Survival","prev":null},{"id":"surv_regen","name":"Vitality","desc":"Regeneration I on your plot","cost":2,"rank":15,"branch":"Survival","prev":"surv_resist"},{"id":"surv_health","name":"Fortified","desc":"Health Boost I on your plot","cost":2,"rank":20,"branch":"Survival","prev":"surv_regen"},{"id":"surv_fire","name":"Flameproof","desc":"Fire Resistance on your plot","cost":2,"rank":25,"branch":"Survival","prev":"surv_health"},{"id":"surv_absorb","name":"Second Wind","desc":"Active Absorption, 2-minute cooldown","cost":2,"rank":30,"branch":"Survival","prev":"surv_fire"},{"id":"surv_regen2","name":"Greater Vitality","desc":"Regeneration II on your plot","cost":3,"rank":40,"branch":"Survival","prev":"surv_absorb"},{"id":"surv_saturate","name":"Survival Feast","desc":"Active Saturation, 5-minute cooldown","cost":4,"rank":48,"branch":"Survival","prev":"surv_regen2"},{"id":"explore_night","name":"Night Owl","desc":"Night Vision on your plot","cost":1,"rank":2,"branch":"Exploration","prev":null},{"id":"explore_water","name":"Deep Diver","desc":"Water Breathing on your plot","cost":1,"rank":10,"branch":"Exploration","prev":"explore_night"},{"id":"explore_conduit","name":"Tidal Power","desc":"Conduit Power while underwater","cost":2,"rank":18,"branch":"Exploration","prev":"explore_water"},{"id":"explore_dolphin","name":"Ocean Runner","desc":"Dolphin Grace while underwater","cost":2,"rank":25,"branch":"Exploration","prev":"explore_conduit"},{"id":"explore_invisible","name":"Shadow Step","desc":"Active invisibility, 4-minute cooldown","cost":2,"rank":30,"branch":"Exploration","prev":"explore_dolphin"},{"id":"explore_reward","name":"Expedition Rewards","desc":"+20% Daily Quest Credits","cost":2,"rank":35,"branch":"Exploration","prev":"explore_invisible"},{"id":"explore_master","name":"Expedition Master","desc":"All exploration passives work across your plot, even on land","cost":4,"rank":45,"branch":"Exploration","prev":"explore_reward"},{"id":"econ_sell_1","name":"Merchant I","desc":"+2% ordinary shop sale price","cost":1,"rank":2,"branch":"Economy","prev":null},{"id":"econ_buy_1","name":"Bargain Hunter I","desc":"2% off ordinary shop purchases","cost":1,"rank":8,"branch":"Economy","prev":"econ_sell_1"},{"id":"econ_sell_2","name":"Merchant II","desc":"+5% ordinary shop sale price","cost":2,"rank":15,"branch":"Economy","prev":"econ_buy_1"},{"id":"econ_buy_2","name":"Bargain Hunter II","desc":"5% off ordinary shop purchases","cost":2,"rank":22,"branch":"Economy","prev":"econ_sell_2"},{"id":"econ_rank","name":"Rank Rewards","desc":"+10% future rank Credits","cost":2,"rank":28,"branch":"Economy","prev":"econ_buy_2"},{"id":"econ_sell_3","name":"Master Merchant","desc":"+10% shop sale prices","cost":3,"rank":36,"branch":"Economy","prev":"econ_rank"},{"id":"econ_buy_3","name":"Master Negotiator","desc":"10% off shop purchases","cost":4,"rank":45,"branch":"Economy","prev":"econ_sell_3"},{"id":"eng_speed_1","name":"Tuned Pistons I","desc":"5% quicker generator recovery","cost":1,"rank":3,"branch":"Engineering","prev":null},{"id":"eng_speed_2","name":"Tuned Pistons II","desc":"10% quicker generator recovery","cost":2,"rank":12,"branch":"Engineering","prev":"eng_speed_1"},{"id":"eng_slots_1","name":"Builder Permit I","desc":"5 additional generator slots","cost":1,"rank":15,"branch":"Engineering","prev":"eng_speed_2"},{"id":"eng_speed_3","name":"Tuned Pistons III","desc":"15% quicker generator recovery","cost":2,"rank":25,"branch":"Engineering","prev":"eng_slots_1"},{"id":"eng_slots_2","name":"Builder Permit II","desc":"10 additional generator slots","cost":2,"rank":30,"branch":"Engineering","prev":"eng_speed_3"},{"id":"eng_price_1","name":"Factory Contracts I","desc":"5% off generator purchases and upgrades","cost":3,"rank":38,"branch":"Engineering","prev":"eng_slots_2"},{"id":"eng_price_2","name":"Factory Contracts II","desc":"10% off generator purchases and upgrades","cost":4,"rank":47,"branch":"Engineering","prev":"eng_price_1"}];
+const SKILLS=[{"id":"miner_haste_1","name":"Quick Hands I","desc":"Haste I on your plot","cost":1,"rank":2,"branch":"Mining","prev":null},{"id":"miner_haste_2","name":"Quick Hands II","desc":"Haste II on your plot","cost":2,"rank":10,"branch":"Mining","prev":"miner_haste_1"},{"id":"miner_xp_1","name":"Prospector I","desc":"+10% generator mining XP","cost":1,"rank":12,"branch":"Mining","prev":"miner_haste_2"},{"id":"miner_xp_2","name":"Prospector II","desc":"+25% generator mining XP","cost":2,"rank":20,"branch":"Mining","prev":"miner_xp_1"},{"id":"miner_luck_1","name":"Lucky Strikes I","desc":"2% chance of a bonus material","cost":2,"rank":25,"branch":"Mining","prev":"miner_xp_2"},{"id":"miner_luck_2","name":"Lucky Strikes II","desc":"4% chance of a bonus material","cost":3,"rank":35,"branch":"Mining","prev":"miner_luck_1"},{"id":"miner_master","name":"Master Miner","desc":"+50% generator mining XP total","cost":4,"rank":45,"branch":"Mining","prev":"miner_luck_2"},{"id":"move_speed_1","name":"Swift Steps I","desc":"Speed I on your plot","cost":1,"rank":2,"branch":"Mobility","prev":null},{"id":"move_speed_2","name":"Swift Steps II","desc":"Speed II on your plot","cost":2,"rank":12,"branch":"Mobility","prev":"move_speed_1"},{"id":"move_jump_1","name":"High Jumper I","desc":"Jump Boost I, toggleable","cost":1,"rank":8,"branch":"Mobility","prev":"move_speed_2"},{"id":"move_jump_2","name":"High Jumper II","desc":"Jump Boost II, toggleable","cost":2,"rank":18,"branch":"Mobility","prev":"move_jump_1"},{"id":"move_fall","name":"Feather Foot","desc":"Slow Falling, toggleable","cost":2,"rank":25,"branch":"Mobility","prev":"move_jump_2"},{"id":"move_tp_1","name":"Fast Traveler","desc":"Teleport cooldown 20% shorter","cost":3,"rank":35,"branch":"Mobility","prev":"move_fall"},{"id":"move_tp_2","name":"Wayfinder","desc":"Teleport cooldown 40% shorter","cost":4,"rank":45,"branch":"Mobility","prev":"move_tp_1"},{"id":"surv_resist","name":"Stone Skin","desc":"Resistance I on your plot","cost":1,"rank":5,"branch":"Survival","prev":null},{"id":"surv_regen","name":"Vitality","desc":"Regeneration I on your plot","cost":2,"rank":15,"branch":"Survival","prev":"surv_resist"},{"id":"surv_health","name":"Fortified","desc":"Health Boost I on your plot","cost":2,"rank":20,"branch":"Survival","prev":"surv_regen"},{"id":"surv_fire","name":"Flameproof","desc":"Fire Resistance on your plot","cost":2,"rank":25,"branch":"Survival","prev":"surv_health"},{"id":"surv_absorb","name":"Second Wind","desc":"Active Absorption, 2-minute cooldown","cost":2,"rank":30,"branch":"Survival","prev":"surv_fire"},{"id":"surv_regen2","name":"Greater Vitality","desc":"Regeneration II on your plot","cost":3,"rank":40,"branch":"Survival","prev":"surv_absorb"},{"id":"surv_saturate","name":"Survival Feast","desc":"Active Saturation, 5-minute cooldown","cost":4,"rank":48,"branch":"Survival","prev":"surv_regen2"},{"id":"explore_night","name":"Night Owl","desc":"Night Vision on your plot","cost":1,"rank":2,"branch":"Exploration","prev":null},{"id":"explore_water","name":"Deep Diver","desc":"Water Breathing on your plot","cost":1,"rank":10,"branch":"Exploration","prev":"explore_night"},{"id":"explore_conduit","name":"Tidal Power","desc":"Conduit Power while underwater","cost":2,"rank":18,"branch":"Exploration","prev":"explore_water"},{"id":"explore_dolphin","name":"Ocean Runner","desc":"Speed I while underwater","cost":2,"rank":25,"branch":"Exploration","prev":"explore_conduit"},{"id":"explore_invisible","name":"Shadow Step","desc":"Active invisibility, 4-minute cooldown","cost":2,"rank":30,"branch":"Exploration","prev":"explore_dolphin"},{"id":"explore_reward","name":"Expedition Rewards","desc":"+20% Daily Quest Credits","cost":2,"rank":35,"branch":"Exploration","prev":"explore_invisible"},{"id":"explore_master","name":"Expedition Master","desc":"All exploration passives work across your plot, even on land","cost":4,"rank":45,"branch":"Exploration","prev":"explore_reward"},{"id":"econ_sell_1","name":"Merchant I","desc":"+2% ordinary shop sale price","cost":1,"rank":2,"branch":"Economy","prev":null},{"id":"econ_buy_1","name":"Bargain Hunter I","desc":"2% off ordinary shop purchases","cost":1,"rank":8,"branch":"Economy","prev":"econ_sell_1"},{"id":"econ_sell_2","name":"Merchant II","desc":"+5% ordinary shop sale price","cost":2,"rank":15,"branch":"Economy","prev":"econ_buy_1"},{"id":"econ_buy_2","name":"Bargain Hunter II","desc":"5% off ordinary shop purchases","cost":2,"rank":22,"branch":"Economy","prev":"econ_sell_2"},{"id":"econ_rank","name":"Rank Rewards","desc":"+10% future rank Credits","cost":2,"rank":28,"branch":"Economy","prev":"econ_buy_2"},{"id":"econ_sell_3","name":"Master Merchant","desc":"+10% shop sale prices","cost":3,"rank":36,"branch":"Economy","prev":"econ_rank"},{"id":"econ_buy_3","name":"Master Negotiator","desc":"10% off shop purchases","cost":4,"rank":45,"branch":"Economy","prev":"econ_sell_3"},{"id":"eng_speed_1","name":"Tuned Pistons I","desc":"5% quicker generator recovery","cost":1,"rank":3,"branch":"Engineering","prev":null},{"id":"eng_speed_2","name":"Tuned Pistons II","desc":"10% quicker generator recovery","cost":2,"rank":12,"branch":"Engineering","prev":"eng_speed_1"},{"id":"eng_slots_1","name":"Builder Permit I","desc":"5 additional generator slots","cost":1,"rank":15,"branch":"Engineering","prev":"eng_speed_2"},{"id":"eng_speed_3","name":"Tuned Pistons III","desc":"15% quicker generator recovery","cost":2,"rank":25,"branch":"Engineering","prev":"eng_slots_1"},{"id":"eng_slots_2","name":"Builder Permit II","desc":"10 additional generator slots","cost":2,"rank":30,"branch":"Engineering","prev":"eng_speed_3"},{"id":"eng_price_1","name":"Factory Contracts I","desc":"5% off generator purchases and upgrades","cost":3,"rank":38,"branch":"Engineering","prev":"eng_slots_2"},{"id":"eng_price_2","name":"Factory Contracts II","desc":"10% off generator purchases and upgrades","cost":4,"rank":47,"branch":"Engineering","prev":"eng_price_1"}];
 
 // v0.9.0: skill point entitlement derives from rank: old players automatically
 // receive points without a one-time grant that could duplicate on reinstall.
@@ -433,7 +435,7 @@ const PASSIVE_SKILLS=[
  ['explore_night','minecraft:night_vision',0],
  ['explore_water','minecraft:water_breathing',0],
  ['explore_conduit','minecraft:conduit_power',0],
- ['explore_dolphin','minecraft:dolphins_grace',0]
+ ['explore_dolphin','minecraft:speed',0]
 ];
 function skillPulse(){
  for(const p of world.getAllPlayers()){
@@ -450,7 +452,8 @@ function skillPulse(){
      if((skill==='explore_conduit'||skill==='explore_dolphin')&&!p.isInWater&&!hasSkill(d,'explore_master'))continue;
      const strength=upgraded&&hasSkill(d,upgraded)?1:amp;
      try{const current=p.getEffect?.(effect);
-      if(!current||current.duration<35||current.amplifier!==strength)p.addEffect(effect,80,{amplifier:strength,showParticles:false});
+      if(current&&current.amplifier>strength&&current.duration>35)continue;
+      if(!current||current.duration<35||current.amplifier<strength){p.addEffect(effect,80,{amplifier:strength,showParticles:false});}
       desired.add(effect);
      }catch(e){if(!skillEffectWarnings.has(effect)){skillEffectWarnings.add(effect);console.warn('[SkyGen SKILLS] Effect '+effect+' unavailable: '+e)}}
     }
@@ -467,7 +470,7 @@ function skillPulse(){
    skillLastEffects.set(p.id,desired);
   }catch(e){console.warn('[SkyGen SKILLS] pulse '+e)}
  }
- system.runTimeout(skillPulse,40);
+ system.runTimeout(skillPulse,10);
 }
 const skillEffectWarnings=new Set();
 system.runTimeout(skillPulse,100);
@@ -646,13 +649,34 @@ function claim(p){
   if(!owner)world.setDynamicProperty(keyForPlot(d.plot),p.id);
   return d;
  }
- const id=Number(world.getDynamicProperty('sg_next_plot')??0);
- if(!Number.isSafeInteger(id)||id<0||id>64000)throw Error('Plot registry index invalid or limit reached');
- if(ownerId(id))throw Error('Plot registry conflict at #'+(id+1)+'; no duplicate assigned');
- // Reserve index first, so a crash cannot assign the same plot to another player.
- world.setDynamicProperty('sg_next_plot',id+1);
- if(world.getDynamicProperty('sg_next_plot')!==id+1)throw Error('Unable to reserve plot index');
- world.setDynamicProperty(keyForPlot(id),p.id);
+ const journalKey='sg_claim_reserve_'+p.id;
+ const reservation=world.getDynamicProperty(journalKey);
+ const next=Number(world.getDynamicProperty('sg_next_plot')??0);
+ if(!Number.isSafeInteger(next)||next<0||next>64000)throw Error('Plot registry index invalid or limit reached');
+ // First check our own durable reservation; repairing a partial claim must not allocate a second plot.
+ let id;
+ if(reservation!==undefined&&reservation!==null){
+  id=Number(reservation);
+  if(!Number.isSafeInteger(id)||id<0||id>next)throw Error('Plot reservation corrupt; operator review');
+  if(ownerId(id)&&ownerId(id)!==p.id)throw Error('Plot reservation ownership conflict');
+  if(id===next){
+   // Recover a crash after recording ownership/journal but before incrementing allocator.
+   if(ownerId(id)!==p.id)throw Error('Uncommitted plot reservation needs operator review');
+   world.setDynamicProperty('sg_next_plot',id+1);
+   if(world.getDynamicProperty('sg_next_plot')!==id+1)throw Error('Unable to finish plot index reservation');
+  }
+ }else{
+  id=next;
+  if(ownerId(id))throw Error('Plot registry conflict at #'+(id+1)+'; no duplicate assigned');
+  // Protect against concurrent claims: record the reserved owner before index moves.
+  world.setDynamicProperty(keyForPlot(id),p.id);
+  if(ownerId(id)!==p.id)throw Error('Unable to reserve plot owner');
+  world.setDynamicProperty(journalKey,id);
+  if(world.getDynamicProperty(journalKey)!==id)throw Error('Plot reservation incomplete; operator review required');
+  world.setDynamicProperty('sg_next_plot',id+1);
+  if(world.getDynamicProperty('sg_next_plot')!==id+1)throw Error('Unable to reserve plot index');
+ }
+ if(!ownerId(id))world.setDynamicProperty(keyForPlot(id),p.id);
  if(ownerId(id)!==p.id)throw Error('Unable to save plot ownership');
  d.plot=id;save(p,d);
  p.sendMessage('§aSkyGen: Plot #'+(id+1)+' assigned. Building starter island...');
@@ -1105,7 +1129,7 @@ function manageGenerator(p,key,g){
      if(!base||!output)return p.sendMessage('§cGenerator chunk is not loaded. Stand near it and try again.');
      if(base.typeId!=='minecraft:bedrock')return p.sendMessage('§cGenerator base missing. Deletion cancelled to protect nearby blocks.');
      // Remove the registry first and verify. If block removal fails, restore registry.
-     generators.delete(key);genEmptySeconds.delete(key);
+     generators.delete(key);genEmptySeconds.delete(key);generatorOutputReady.delete(key);
      if(!genSave()){generators.set(key,g);return p.sendMessage('§cCannot save registry; nothing deleted.')}
      try{
       if(output.typeId===g.block)output.setType('minecraft:air');
@@ -1134,16 +1158,8 @@ function buyGen(p,category='Starter',page=0){
   const g=slice[i],latest=profile(p),cost=discountedPrice(g.cost,perkValue(latest,'generatorPrice'));
   if(latest.rank<g.unlock)return p.sendMessage(`§c${g.name} requires Rank ${g.unlock}.`);
   if(latest.credits<cost)return p.sendMessage('§cNot enough Credits.');
-  const inv=inventory(p);if(!inv)return;
-  const egg=new ItemStack('minecraft:egg',1);egg.nameTag=`§bSkyGen ${g.name} Generator`;
-  egg.setLore([`Generator type: ${g.name}`,'Use on your plot to place']);
-  if(!inventoryCapacity(p,egg))return p.sendMessage('§cInventory full. No charge.');
-  try{latest.credits-=cost;save(p,latest)}catch(err){return p.sendMessage('§cWallet storage unavailable. No token delivered.')} 
-  try{if(inv.addItem(egg))throw Error('Inventory changed');p.sendMessage(`§aPurchased ${g.name} generator token for ${cost} Credits.`)}
-  catch(err){
-   try{const fresh=profile(p);fresh.credits+=cost;save(p,fresh);p.sendMessage('§cToken delivery failed. Credits refunded.')}
-   catch(fatal){genError('CRITICAL: generator token refund failed '+p.name+' '+fatal,'transaction');p.sendMessage('§cToken delivery error: contact admin for wallet recovery.')}
-  }
+  if(!generatorTokenUseGuardReady)return p.sendMessage('§cGenerator token use guard unavailable. Purchases disabled.');
+  issueGeneratorToken(p,g,cost);
  });
 }
 function eligibleShopItem(it,id){return !!it&&it.typeId===id&&!it.nameTag&&it.lockMode===ItemLockMode.none&&!isTool(it)&&(!it.getLore||it.getLore().length===0)}
@@ -1320,6 +1336,77 @@ function marketPlain(it){
    (!it.getDynamicPropertyIds||it.getDynamicPropertyIds().length===0);
  }catch(e){return false}
 }
+// Seller payout queue: each entry has a unique, increasing sequence number.
+// The paid watermark is saved in the SAME player profile write as the Credits.
+// Clearing the world queue afterward can fail without issuing duplicate Credits.
+function sellerQueueKey(id){return 'sg_proceeds_v2_'+id}
+function sellerSeqKey(id){return 'sg_proceeds_seq_'+id}
+function queueSellerPayout(seller,listingId,price){
+ if(!Number.isSafeInteger(price)||price<=0||price>2000000000)throw Error('Invalid proceeds amount');
+ const key=sellerQueueKey(seller),raw=world.getDynamicProperty(key);
+ let queue=raw===undefined||raw===null?[]:JSON.parse(String(raw));
+ if(!Array.isArray(queue))throw Error('Invalid seller proceeds queue');
+ if(queue.some(x=>x.id===listingId))return true; // retry cannot enqueue twice
+ const seq=Number(world.getDynamicProperty(sellerSeqKey(seller))||0);
+ if(!Number.isSafeInteger(seq)||seq<0||seq>=2000000000)throw Error('Seller settlement sequence exhausted');
+ const entry={id:listingId,seq:seq+1,price};
+ const value=JSON.stringify([...queue,entry]);
+ if(value.length>24000)throw Error('Seller payout queue capacity reached; operator review');
+ world.setDynamicProperty(sellerSeqKey(seller),seq+1);
+ if(world.getDynamicProperty(sellerSeqKey(seller))!==seq+1)throw Error('Payout sequence write failed');
+ world.setDynamicProperty(key,value);
+ if(world.getDynamicProperty(key)!==value)throw Error('Seller payout queue verification failed');
+ return true;
+}
+function settleSellerProceeds(p,d){
+ // v0.9 legacy pending Credits use a separate flag in the same atomic profile write.
+ const legacyKey='sg_proceeds_'+p.id,legacy=Number(world.getDynamicProperty(legacyKey)||0);
+ if(legacy>0){
+  if(!Number.isSafeInteger(legacy)||legacy>2000000000)throw Error('Invalid legacy seller proceeds');
+  if(!d.marketLegacyProceedsApplied){
+   if(!Number.isSafeInteger(d.credits+legacy)||d.credits+legacy>2000000000)throw Error('Legacy seller payout wallet cap');
+   d.credits+=legacy;d.marketLegacyProceedsApplied=true;save(p,d);
+  }
+  world.setDynamicProperty(legacyKey,0);
+  if(world.getDynamicProperty(legacyKey)!==0)throw Error('Legacy proceeds clear not verified');
+ }
+ const key=sellerQueueKey(p.id),raw=world.getDynamicProperty(key);
+ if(raw===undefined||raw===null)return;
+ const entries=JSON.parse(String(raw));
+ if(!Array.isArray(entries))throw Error('Invalid seller payout list');
+ entries.sort((a,b)=>a.seq-b.seq);
+ let watermark=Number(d.marketPayoutSeq||0),paid=0;
+ for(const entry of entries){
+  if(!entry||!Number.isSafeInteger(entry.seq)||entry.seq<1||!Number.isSafeInteger(entry.price)||entry.price<1)throw Error('Invalid seller settlement entry');
+  if(entry.seq<=watermark)continue;
+  if(!Number.isSafeInteger(d.credits+entry.price)||d.credits+entry.price>2000000000)throw Error('Seller payout exceeds wallet cap');
+  d.credits+=entry.price;
+  d.marketPayoutSeq=entry.seq;
+  save(p,d); // balance and replay marker persisted together
+  watermark=entry.seq;paid+=entry.price;
+ }
+ if(paid)p.sendMessage('§aMarketplace sales collected: '+paid+' Credits.');
+ const remaining=entries.filter(x=>x.seq>watermark),value=JSON.stringify(remaining);
+ world.setDynamicProperty(key,value);
+ if(world.getDynamicProperty(key)!==value)throw Error('Seller payout cleanup needs review (safe to retry)');
+}
+function securityReviewCommand(actor){
+ if(!isOperator(actor))return actor.sendMessage('§cOperator permission required.');
+ try{
+  const ids=world.getDynamicPropertyIds();let flagged=0;
+  for(const key of ids){
+   if(key.startsWith('sg_token_')&&key!==TOKEN_SEQ_KEY){
+    let r;try{r=JSON.parse(String(world.getDynamicProperty(key)))}catch{}
+    if(!r||['pending','redeeming','review'].includes(r.status)){
+     flagged++;if(flagged<=20)actor.sendMessage('§eTOKEN '+key+' '+String(r?.status||'corrupt')+' owner='+String(r?.owner||'?')+' '+String(r?.reason||''));
+    }
+   }else if(key.startsWith('sg_trade_review_')){
+    flagged++;if(flagged<=20)actor.sendMessage('§cTRADE '+key+' '+String(world.getDynamicProperty(key)).slice(0,130));
+   }
+  }
+  actor.sendMessage('§eSkyGen security review: '+flagged+' flagged records (showing first 20). Review logs and player inventories before changing them.');
+ }catch(err){actor.sendMessage('§cSecurity records unavailable: '+String(err).slice(0,100))}
+}
 function marketReviewCommand(actor){
  if(!isOperator(actor))return actor.sendMessage('§cOperator permission required.');
  const flagged=marketRead().filter(l=>l.status==='review'||l.status==='reserved'||l.status==='returning'||l.status==='creating'||l.status==='sold');
@@ -1355,7 +1442,8 @@ function marketCreate(p){
    const raw=String(r.formValues?.[0]??'').trim();const price=/^[1-9][0-9]*$/.test(raw)?Number(raw):NaN;
    if(!Number.isSafeInteger(price)||price>2000000000)return p.sendMessage('§cInvalid whole-number listing price.');
    marketLock('market',()=>{
-    let all=marketRead();if(all.length>=MAX_LISTINGS)return p.sendMessage('§cMarket at capacity; ask operator to review stuck listings.');
+    let all=marketRead();if(all.filter(l=>!l.status||l.status==='active').length>=MAX_LISTINGS)return p.sendMessage('§cMarket active listing capacity reached.');
+    if(all.filter(l=>l.seller===p.id&&(!l.status||l.status==='active')).length>=5)return p.sendMessage('§cYou may have at most five active listings.');
     const it=inventory(p)?.getItem(x.slot);
     if(!marketPlain(it)||it.typeId!==x.it.typeId||it.amount!==x.it.amount)return p.sendMessage('§cItem changed. Try again.');
     const stack=it.clone(),id=p.id+':'+system.currentTick+':'+Math.floor(Math.random()*100000);
@@ -1409,19 +1497,15 @@ function marketBrowse(p){
     }
     l.status='sold';
     try{marketSave(all)}catch(e){return p.sendMessage('§cItem delivered; seller settlement requires operator review.')} 
-    const key='sg_proceeds_'+l.seller;
     try{
-     const proceeds=Number(world.getDynamicProperty(key)||0);
-     if(!Number.isSafeInteger(proceeds+l.price)||proceeds+l.price>2000000000)throw Error('Seller credit limit');
-     world.setDynamicProperty(key,proceeds+l.price);
-     if(Number(world.getDynamicProperty(key))!==proceeds+l.price)throw Error('Seller proceeds verification');
-     // Delete the sold listing only after seller's proceeds were persistently stored.
+     queueSellerPayout(l.seller,l.id,l.price);
+     // Delete the sold listing only after the settlement is in the verified queue.
      marketSave(marketRead().filter(x=>x.id!==l.id));
      p.sendMessage('§aPurchase complete!');
      const seller=world.getAllPlayers().find(q=>q.id===l.seller);
      seller?.sendMessage('§aMarket sale: '+l.price+' Credits pending collection.');
-    }catch(e){
-     console.warn('[SkyGen MARKET] SALE REVIEW: '+l.id+' '+e);
+    }catch(err){
+     console.warn('[SkyGen MARKET] SALE REVIEW: '+l.id+' '+err);
      p.sendMessage('§eDelivered. Seller payment needs operator review; do not rebuy this listing.');
     }
    });
@@ -1466,24 +1550,19 @@ function tradeExecute(p,q,t){
   const aInv=inventory(p),bInv=inventory(q);
   const ai=aInv?.getItem(t.aSlot),bi=bInv?.getItem(t.bSlot);
   if(!ai||!bi||!aInv||!bInv||ai.typeId!==t.aType||bi.typeId!==t.bType||ai.amount!==t.aCount||bi.amount!==t.bCount||
-     ai.nameTag||bi.nameTag||ai.lockMode!==ItemLockMode.none||bi.lockMode!==ItemLockMode.none||
+     ai.nameTag||bi.nameTag||ai.keepOnDeath||bi.keepOnDeath||ai.lockMode!==ItemLockMode.none||bi.lockMode!==ItemLockMode.none||
      (ai.getLore&&ai.getLore().length)||(bi.getLore&&bi.getLore().length))return tradeClose(t,'Items changed; trade canceled.');
-  const aStack=ai.clone(),bStack=bi.clone();
-  // Slot-to-slot swap, NOT remove+addItem. Always enough room because both
-  // offered slots already exist, and clone() retains complete ItemStack data.
+  if(typeof aInv.swapItems!=='function')return tradeClose(t,'Trade unavailable: atomic slot swapping not supported by this server.');
   try{
-   aInv.setItem(t.aSlot,bStack);
-   bInv.setItem(t.bSlot,aStack);
+   aInv.swapItems(t.aSlot,t.bSlot,bInv);
+   // Verify post-swap shape, including quantity and type, before reporting success.
+   const aNow=aInv.getItem(t.aSlot),bNow=bInv.getItem(t.bSlot);
+   if(!aNow||!bNow||aNow.typeId!==t.bType||aNow.amount!==t.bCount||bNow.typeId!==t.aType||bNow.amount!==t.aCount)throw Error('Swap verification uncertain');
    return tradeClose(t,'Trade completed successfully!');
   }catch(err){
-   let restored=true;
-   try{aInv.setItem(t.aSlot,aStack)}catch(e){restored=false;console.warn('[SkyGen TRADE] CRITICAL restore A '+t.id+' '+e)}
-   try{bInv.setItem(t.bSlot,bStack)}catch(e){restored=false;console.warn('[SkyGen TRADE] CRITICAL restore B '+t.id+' '+e)}
-   if(!restored){
-    p.sendMessage('§cTrade restoration error. Contact an operator with trade ID '+t.id);
-    q.sendMessage('§cTrade restoration error. Contact an operator with trade ID '+t.id);
-   }
-   return tradeClose(t,restored?'Trade canceled; original items restored.':'Trade failed; operator review needed.');
+   console.warn('[SkyGen TRADE] operator review '+t.id+' '+err);
+   try{world.setDynamicProperty('sg_trade_review_'+t.id,JSON.stringify({a:t.a,b:t.b,at:Date.now(),aSlot:t.aSlot,bSlot:t.bSlot,aType:t.aType,bType:t.bType,reason:String(err).slice(0,100)}))}catch(e){console.warn('[SkyGen TRADE] failed to record review '+e)}
+   return tradeClose(t,'Trade result needs operator review. Do not repeat this trade until inventories are checked.');
   }
  }catch(e){return tradeClose(t,'Trade canceled safely: '+e)}
 }
@@ -1496,15 +1575,8 @@ world.afterEvents.playerSpawn.subscribe(e=>{
  system.runTimeout(()=>{try{
  // Rescue scheduling MUST happen even if a damaged plot/profile prevents claiming.
  if((initial&&!spawnStages.has(p.id)&&!cooldowns.has(p.id))||(p.location.y < -50&&!spawnStages.has(p.id)))safeSpawnTravel(p,true);
- const d=claim(p);const due=Number(world.getDynamicProperty('sg_proceeds_'+p.id)||0);
- if(due>0){
-  try{
-   if(!Number.isSafeInteger(due)||!Number.isSafeInteger(d.credits+due)||d.credits+due>2000000000)throw Error('Wallet cap / invalid proceeds');
-   d.credits+=due;save(p,d);
-   world.setDynamicProperty('sg_proceeds_'+p.id,0);
-   p.sendMessage(`§aMarketplace sales collected: ${due} Credits.`);
-  }catch(err){console.warn('[SkyGen MARKET] Seller proceeds collection requires review '+p.id+' '+err);p.sendMessage('§cMarketplace sale credit settlement needs operator review.')}
- }
+ const d=claim(p);
+ try{settleSellerProceeds(p,d)}catch(err){console.warn('[SkyGen MARKET] Seller proceeds need operator review '+p.id+' '+err);p.sendMessage('§cMarketplace proceeds settlement needs operator review.');}
  rank(p,d);ensure(p);
  // Fresh flat-void worlds start near Y=-63. Put players on the protected platform.
  // Initial join rescue is immediate; subsequent horn/menu teleports use warm-up.
@@ -1512,35 +1584,170 @@ world.afterEvents.playerSpawn.subscribe(e=>{
  p.sendMessage('§bSkyGen: menu compass slot 7, spawn horn slot 8, plot horn slot 9.');
  }catch(err){console.warn('SkyGen join '+err)}},30);
 });
-world.afterEvents.itemUse.subscribe(e=>{const p=e.source,i=e.itemStack;if(adminAxe(i)){system.run(()=>adminMenu(p));return;}if(toolmatch(i,TOOLS[0]))system.run(()=>menu(p));if(toolmatch(i,TOOLS[1]))system.run(()=>{if(p.location.y<-50){const t=pending.get(p.id);pending.delete(p.id);finishPendingTeleport(t);safeSpawnTravel(p,true)}else safeSpawnTravel(p)});if(toolmatch(i,TOOLS[2]))system.run(()=>tpPlot(p));if(i?.typeId==='minecraft:egg'&&i.nameTag?.startsWith('§bSkyGen ')&&i.nameTag.endsWith(' Generator')){const name=i.nameTag.replace('§bSkyGen ','').replace(' Generator',''),g=GENS.find(g=>g.name===name);if(!g)return;const pos=p.location;if(!belongs(p,pos.x,pos.z)||ownerId(profile(p).plot)!==p.id)return p.sendMessage('§cUse generator eggs only on your own plot.');// Target the block the player is looking at, never a fixed world-direction offset.
- const hit=p.getBlockFromViewDirection({maxDistance:6,includeLiquidBlocks:false,includePassableBlocks:false});
- if(!hit?.block)return p.sendMessage('§cLook directly at a block on your plot to place the generator.');
- const target=hit.block.location;
- const loc={x:target.x,y:target.y+1,z:target.z};
- if(plotAt(loc.x,loc.z)!==profile(p).plot)return p.sendMessage('§cTarget a block inside your own plot.');
- // Bedrock is placed above the clicked floor; the permanent platform is untouched.
- if(loc.y<1||loc.y>300)return p.sendMessage('§cInvalid generator height.');
-  const key=`${loc.x},${loc.y},${loc.z}`;
-  if(generators.has(key))return p.sendMessage('§cGenerator already here.');
-  if(!generatorRegistryLoaded)return p.sendMessage('§cGenerator registry not loaded. Placement disabled to protect existing data.');
-  if(generators.size>=GEN_REGISTRY_LIMIT)return p.sendMessage('§cGenerator registry is full; no egg consumed.');
-  if(generatorOwnerCount(p)>=generatorSlots(p))return p.sendMessage('§cGenerator slot limit reached. Skill Tree → Engineering adds more slots.');
-  if(g.block==='minecraft:ancient_debris'&&[...generators.values()].some(x=>x.owner===p.id&&x.type==='Ancient Debris'))return p.sendMessage('§cOnly one Ancient Debris generator per player.');
-  const record={...loc,owner:p.id,type:g.name,period:g.period,block:g.block,last:system.currentTick,elapsed:0};
-  try{if(!buildGenerator(record))return p.sendMessage('§cGenerator needs two empty blocks above the targeted block. Aim at an open floor area.')}
-  catch(err){return p.sendMessage('§cGenerator could not be built: '+err)}
-  generators.set(key,record);
-  if(!genSave()){
-   generators.delete(key);
-   try{
-    const dim=world.getDimension('overworld'),base=dim.getBlock(loc),out=dim.getBlock({x:loc.x,y:loc.y+1,z:loc.z});
-    if(out?.typeId===g.block)out.setType('minecraft:air');
-    if(base?.typeId==='minecraft:bedrock')base.setType('minecraft:air');
-   }catch(err){genError('CRITICAL: failed to rollback unsaved generator '+key+' '+err,'rollback')}
-   return p.sendMessage('§cGenerator storage is full/unavailable. Placement rolled back; egg retained.');
+world.afterEvents.itemUse.subscribe(e=>{
+ const p=e.source,i=e.itemStack;
+ if(adminAxe(i)){system.run(()=>adminMenu(p));return}
+ if(toolmatch(i,TOOLS[0]))system.run(()=>menu(p));
+ if(toolmatch(i,TOOLS[1]))system.run(()=>{if(p.location.y<-50){const t=pending.get(p.id);pending.delete(p.id);finishPendingTeleport(t);safeSpawnTravel(p,true)}else safeSpawnTravel(p)});
+ if(toolmatch(i,TOOLS[2]))system.run(()=>tpPlot(p));
+});
+// Generator tokens must be issued, uniquely identified, and redeemed by the server.
+// The token record is authoritative, not the egg's display name or its lore.
+const TOKEN_SEQ_KEY='sg_token_seq';
+const generatorOutputReady=new Set();
+function tokenKey(id){return 'sg_token_'+id}
+function tokenId(it){try{return String(it?.getDynamicProperty?.('sg_token_id')||'')}catch{return ''}}
+function tokenRead(id){
+ if(!/^[1-9][0-9]*$/.test(String(id)))return null;
+ const raw=world.getDynamicProperty(tokenKey(id));
+ if(typeof raw!=='string')return null;
+ const r=JSON.parse(raw);
+ if(!r||r.v!==1||!['pending','issued','redeeming','spent','review'].includes(r.status)||typeof r.owner!=='string'||typeof r.type!=='string')return null;
+ return r;
+}
+function tokenWrite(id,r){
+ const value=JSON.stringify(r);world.setDynamicProperty(tokenKey(id),value);
+ if(world.getDynamicProperty(tokenKey(id))!==value)throw Error('Generator token ledger write not verified');
+}
+function issueGeneratorToken(p,g,price){
+ if(!generatorTokenUseGuardReady)return p.sendMessage('§cGenerator token use guard is not active; cannot issue tokens.');
+ const latest=profile(p),inv=inventory(p);
+ if(!inv||latest.rank<g.unlock||latest.credits<price)return p.sendMessage('§cNot eligible or Credits changed.');
+ const egg=new ItemStack('minecraft:egg',1);
+ egg.nameTag=`§bSkyGen ${g.name} Generator`;
+ egg.setLore([`Generator type: ${g.name}`,'Server-verified token. Use on your plot.']);
+ const seq=Number(world.getDynamicProperty(TOKEN_SEQ_KEY)||0);
+ if(!Number.isSafeInteger(seq)||seq<0||seq>=2000000000)return p.sendMessage('§cGenerator issuance registry limit.');
+ const id=String(seq+1);
+ try{egg.setDynamicProperty('sg_token_id',id)}catch(err){return p.sendMessage('§cItem token identity unavailable; purchase disabled. '+String(err).slice(0,90))}
+ if(!inventoryCapacity(p,egg))return p.sendMessage('§cInventory full. No charge.');
+ try{
+  world.setDynamicProperty(TOKEN_SEQ_KEY,seq+1);
+  if(world.getDynamicProperty(TOKEN_SEQ_KEY)!==seq+1)throw Error('Token sequence not saved');
+  tokenWrite(id,{v:1,status:'pending',owner:p.id,type:g.name,price});
+ }catch(err){return p.sendMessage('§cToken registry unavailable. No Credits spent. '+String(err).slice(0,90))}
+ try{latest.credits-=price;save(p,latest)}catch(err){return p.sendMessage('§cWallet unavailable. Token issuance reserved but disabled; no item delivered.')}
+ try{tokenWrite(id,{v:1,status:'issued',owner:p.id,type:g.name,price})}catch(err){
+  genError('CRITICAL: paid generator token '+id+' cannot activate '+err,'token');
+  return p.sendMessage('§cToken activation needs operator review: #'+id);
+ }
+ try{
+  if(inv.addItem(egg))throw Error('Inventory full or item delivery uncertain');
+  p.sendMessage(`§aPurchased ${g.name} generator token (#${id}) for ${price} Credits.`);
+ }catch(err){
+  // NO AUTOMATIC REFUND: the item may already be delivered on an ambiguous write.
+  try{tokenWrite(id,{v:1,status:'review',owner:p.id,type:g.name,price,reason:'Delivery uncertain'})}catch{}
+  genError('CRITICAL: generator token delivery review '+id+' '+err,'token');
+  p.sendMessage('§cToken delivery needs operator review #'+id+'. Do not purchase another.');
+ }
+}
+// Operator-reviewed migration path for genuine legacy generator eggs without issued IDs.
+// The operator must verify the customer's older purchase; no name-only automatic redemption.
+function adminTokenRestore(actor,message){
+ if(!isOperator(actor))return actor.sendMessage('§cOnly operators can reissue verified generator tokens.');
+ const match=/^\s*(.+?)\s*\|\s*(.+?)\s*$/.exec(String(message||''));
+ if(!match)return actor.sendMessage('§eUsage: /scriptevent skygen:tokenrestore PlayerName | Generator Name');
+ const target=playerByName(match[1]),g=GENS.find(x=>x.name.toLowerCase()===match[2].toLowerCase());
+ if(!target||!g)return actor.sendMessage('§cOnline player or generator type not found.');
+ try{
+  if(profile(target).rank<g.unlock)return actor.sendMessage('§cTarget player has not unlocked this generator rank.');
+  const before=Number(world.getDynamicProperty(TOKEN_SEQ_KEY)||0);
+  issueGeneratorToken(target,g,0);
+  const after=Number(world.getDynamicProperty(TOKEN_SEQ_KEY)||0);
+  const delivered=after>before&&!![...Array(inventory(target)?.size||0).keys()].some(slot=>tokenId(inventory(target).getItem(slot))===String(after));
+  if(delivered){console.warn('[SkyGen SECURITY] operator '+actor.name+' reissued '+g.name+' token to '+target.name+' #'+after);actor.sendMessage('§aIssued verified replacement token #'+after+'; inspect player inventory and records.');}
+  else actor.sendMessage('§cToken restoration not verified; check player inventory and security records before retrying.');
+ }catch(e){actor.sendMessage('§cToken restoration failed: '+String(e).slice(0,100))}
+}
+function rollbackGeneratorBlocks(dim,loc,spec,baseWasAir){
+ try{const out=dim.getBlock({x:loc.x,y:loc.y+1,z:loc.z});if(out?.typeId===spec.block)out.setType('minecraft:air')}catch(e){genError('Generator output rollback '+e,'rollback')}
+ if(baseWasAir)try{const base=dim.getBlock(loc);if(base?.typeId==='minecraft:bedrock')base.setType('minecraft:air')}catch(e){genError('Generator base rollback '+e,'rollback')}
+}
+function placeGeneratorToken(p,selected,id){
+ let record;
+ try{
+  if(!p?.isValid)return;
+  const inv=inventory(p),stack=inv?.getItem(selected);record=tokenRead(id);
+  if(!record||record.status!=='issued'||record.owner!==p.id||!stack||stack.typeId!=='minecraft:egg'||stack.amount!==1||tokenId(stack)!==id){
+   return p.sendMessage('§cInvalid, already used, or unissued generator token. Ask an operator for help.');
   }
-  const inv=p.getComponent('minecraft:inventory')?.container;const selected=p.selectedSlotIndex,stack=inv?.getItem(selected);if(stack&&stack.nameTag===i.nameTag){if(stack.amount===1)inv.setItem(selected,undefined);else{stack.amount--;inv.setItem(selected,stack)}}try{const pd=profile(p);recordDaily(pd,'placements');save(p,pd)}catch(e){console.warn('[SkyGen DAILY] generator placement tracking '+e)}
-  p.sendMessage(`§aPlaced ${g.name} generator at ${loc.x},${loc.y},${loc.z}. The bedrock base is visible; the first ore appears immediately ON TOP, and regenerates after mining. Mine the ore to produce more.`)}});
+  const g=GENS.find(x=>x.name===record.type);
+  if(!g||stack.nameTag!==`§bSkyGen ${g.name} Generator`)return p.sendMessage('§cGenerator token identity mismatch.');
+  const d=profile(p);
+  if(d.rank<g.unlock||!belongs(p,p.location.x,p.location.z)||ownerId(d.plot)!==p.id||p.dimension?.id!=='minecraft:overworld')return p.sendMessage('§cGenerator requires its unlock rank and your own Overworld plot.');
+  if(!generatorRegistryLoaded||generators.size>=GEN_REGISTRY_LIMIT)return p.sendMessage('§cGenerator registry unavailable or full. Token retained.');
+  if(generatorOwnerCount(p)>=generatorSlots(p))return p.sendMessage('§cGenerator slot limit reached.');
+  if(g.name==='Ancient Debris'&&[...generators.values()].some(x=>x.owner===p.id&&x.type===g.name))return p.sendMessage('§cOnly one Ancient Debris generator per player.');
+  const hit=p.getBlockFromViewDirection({maxDistance:6,includeLiquidBlocks:false,includePassableBlocks:false});
+  if(!hit?.block)return p.sendMessage('§cLook directly at a block inside your plot.');
+  const target=hit.block.location,loc={x:target.x,y:target.y+1,z:target.z};
+  if(plotAt(loc.x,loc.z)!==d.plot||loc.y<1||loc.y>300)return p.sendMessage('§cInvalid generator placement location.');
+  const key=`${loc.x},${loc.y},${loc.z}`;
+  if(generators.has(key))return p.sendMessage('§cGenerator already registered at that location.');
+  const dim=world.getDimension('overworld'),base=dim.getBlock(loc),out=dim.getBlock({x:loc.x,y:loc.y+1,z:loc.z});
+  if(!base||!out||(!base.isAir&&base.typeId!=='minecraft:bedrock')||!out.isAir)return p.sendMessage('§cTwo free spaces required; token retained.');
+  const baseWasAir=base.isAir;
+  // Reserve first, then debit the exact event slot before granting anything.
+  tokenWrite(id,{...record,status:'redeeming'});
+  try{
+   const current=inv.getItem(selected);
+   if(!current||current.amount!==1||tokenId(current)!==id)throw Error('Token changed before debit');
+   inv.setItem(selected,undefined);
+   if(inv.getItem(selected))throw Error('Token debit could not be verified');
+  }catch(e){
+   // The slot may be uncertain. Quarantine the token instead of allowing reuse.
+   try{tokenWrite(id,{...record,status:'review',reason:'Debit uncertain'})}catch{}
+   return p.sendMessage('§cToken debit uncertain. Operator review required #'+id);
+  }
+  const gen={...loc,owner:p.id,type:g.name,period:g.period,block:g.block,last:system.currentTick,elapsed:0};
+  let committed=false;
+  try{
+   if(!buildGenerator(gen))throw Error('Generator placement blocked');
+   generators.set(key,gen);
+   if(!genSave())throw Error('Generator storage commit failed');
+   committed=true;
+  }catch(err){
+   generators.delete(key);generatorOutputReady.delete(key);
+   rollbackGeneratorBlocks(dim,loc,g,baseWasAir);
+   // Do not refund if the registry commit might have reached disk despite a failed verification.
+   // Hold the original token in a review ledger for manual reconciliation.
+   try{tokenWrite(id,{...record,status:'review',reason:'Generator commit/rollback uncertain: '+String(err).slice(0,70)})}catch{}
+   genError('Generator redemption requires review #'+id+' '+err,'redemption');
+   return p.sendMessage('§cGenerator placement failed. Token #'+id+' held for operator recovery; no automatic duplicate item.');
+  }
+  if(committed){
+   generatorOutputReady.add(key);
+   try{tokenWrite(id,{...record,status:'spent'})}catch(err){genError('Token spent marker unavailable #'+id+' '+err,'token')}
+   try{const pd=profile(p);recordDaily(pd,'placements');save(p,pd)}catch(err){console.warn('[SkyGen DAILY] generator placement '+err)}
+   p.sendMessage(`§aPlaced ${g.name} generator at ${loc.x},${loc.y},${loc.z}.`);
+  }
+ }catch(err){
+  genError('CRITICAL generator token redemption #'+id+' '+err,'redemption');
+  p?.sendMessage?.('§cGenerator redemption failed safely; operator review #'+id);
+ }
+}
+let generatorTokenUseGuardReady=false;
+try{
+ if(!world.beforeEvents.itemUse?.subscribe)throw Error('beforeEvents.itemUse is unavailable');
+ world.beforeEvents.itemUse.subscribe(e=>{
+  const i=e.itemStack;
+  if(i?.typeId!=='minecraft:egg'||(!i.nameTag?.startsWith('§bSkyGen ')&&!tokenId(i)))return;
+  e.cancel=true; // Prevent vanilla egg consumption/throw before our validated debit.
+  const player=e.source,selected=player?.selectedSlotIndex,id=tokenId(i);
+  system.run(()=>placeGeneratorToken(player,selected,id));
+ });
+ generatorTokenUseGuardReady=true;
+}catch(err){console.warn('[SkyGen] CRITICAL generator token use guard unavailable; redemption disabled '+err)}
+try{
+ if(!world.beforeEvents.explosion?.subscribe)throw Error('explosion guard unavailable');
+ world.beforeEvents.explosion.subscribe(e=>{
+  try{
+   if(e.dimension?.id!=='minecraft:overworld')return;
+   const blocks=e.getImpactedBlocks();
+   if(blocks.some(b=>{const loc=b.location;return inSpawn(loc.x,loc.z)||plotAt(loc.x,loc.z)>=0}))e.cancel=true;
+  }catch(err){e.cancel=true;console.warn('[SkyGen] explosion filter failed closed '+err)}
+ });
+}catch(err){console.warn('[SkyGen] CRITICAL: explosion guard not installed '+err)}
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
  const {x,y,z}=e.block.location;
  if(e.player.dimension?.id!=='minecraft:overworld')return;
@@ -1570,12 +1777,13 @@ try{
  // Defense in depth for placement actions not routed through interaction.
  // Only removes the newly placed unauthorized block; use a world copy to test boundary cases.
  world.afterEvents.playerPlaceBlock?.subscribe(e=>{
+  if(e.block){const loc=e.block.location;generatorOutputReady.delete(`${loc.x},${loc.y-1},${loc.z}`)}
   if(e.player&&e.block&&protectedAt(e.player,e.block.location.x,e.block.location.z)){
    try{e.block.setType('minecraft:air');e.player.sendMessage('§cCannot build in this protected area.')}catch(err){console.warn('[SkyGen] unauthorized placed block could not be reverted: '+err)}
   }
  });
 }catch(e){console.warn('[SkyGen] post-placement repair unavailable: '+e)}
-const normalXpGate=new Map();
+const normalXpGate=new Map(),normalXpWindow=new Map();
 world.afterEvents.playerBreakBlock.subscribe(e=>{
  try{
   const p=e.player,loc=e.block.location;
@@ -1584,7 +1792,7 @@ world.afterEvents.playerBreakBlock.subscribe(e=>{
   const key=`${loc.x},${loc.y-1},${loc.z}`,g=generators.get(key);
   const type=e.brokenBlockPermutation?.type?.id||e.brokenBlockPermutation?.typeId||'';
   const validHarvest=!!g&&g.owner===p.id&&(loc.y===g.y+1)&&(type===(GENS.find(x=>x.name===g.type)?.block||g.block));
-  if(validHarvest){
+  if(validHarvest&&generatorOutputReady.delete(key)){
    const bonus=perkValue(d,'miningXp');d.xp+=Math.ceil(5*(100+bonus)/100);
    recordDaily(d,'harvests');
    const lucky=perkValue(d,'luck');
@@ -1594,7 +1802,10 @@ world.afterEvents.playerBreakBlock.subscribe(e=>{
    }
   }else{
    const last=normalXpGate.get(p.id)??-99999;
-   if(system.currentTick-last>=5){d.xp+=1;normalXpGate.set(p.id,system.currentTick)}
+   const window=normalXpWindow.get(p.id);
+   const current=(!window||system.currentTick-window.start>=1200)?{start:system.currentTick,count:0}:window;
+   if(system.currentTick-last>=5&&current.count<10){d.xp+=1;current.count++;normalXpGate.set(p.id,system.currentTick)}
+   normalXpWindow.set(p.id,current);
   }
   rank(p,d);
  }catch(err){console.warn('[SkyGen XP] could not record block break: '+err)}
@@ -1621,7 +1832,7 @@ function genWatchdog(){
     const detected=genEmptySeconds.get(key);
     if(!Number.isFinite(detected)){genEmptySeconds.set(key,system.currentTick);continue}
     if(system.currentTick-detected>=effectivePeriod(g)){
-     output.setType(expected);genEmptySeconds.delete(key);
+     output.setType(expected);generatorOutputReady.add(key);genEmptySeconds.delete(key);
     }
    }catch(err){genError(key+' '+err,key)}
   }
@@ -1636,7 +1847,7 @@ try{
   const s=spawnStages.get(id);s?.release?.();
   for(const [plot,session] of plotBuilds){if(session.playerId===id){try{session.cancel?.()}catch(err){console.warn('[SkyGen] plot cleanup on leave '+err)}}}
   const trade=trades.get(id);if(trade)tradeClose(trade,'Trade cancelled: player disconnected.');
-  normalXpGate.delete(id);skillLastEffects.delete(id);skillActiveEffects.delete(id);for(const key of skillCooldowns.keys())if(key.startsWith(id+':'))skillCooldowns.delete(key);
+  normalXpGate.delete(id);normalXpWindow.delete(id);skillLastEffects.delete(id);skillActiveEffects.delete(id);for(const key of skillCooldowns.keys())if(key.startsWith(id+':'))skillCooldowns.delete(key);
  });
 }catch(e){console.warn('[SkyGen] leave cleanup unavailable '+e)}
 system.runInterval(()=>{for(const p of world.getAllPlayers())ensure(p)},200);
@@ -1657,4 +1868,4 @@ function adminCommand(actor,message){
 }
 
 system.runTimeout(()=>{try{ensureSpawn()}catch(e){console.warn('SkyGen spawn init: '+e)}},40);
-console.warn('[SkyGen] 0.9.0 generators and skill tree loaded');
+console.warn('[SkyGen] 0.9.1 security hardening loaded');

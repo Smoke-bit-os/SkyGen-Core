@@ -218,7 +218,7 @@
   {
     "id": "explore_dolphin",
     "name": "Ocean Runner",
-    "desc": "Dolphin Grace while underwater",
+    "desc": "Speed I while underwater",
     "cost": 2,
     "rank": 25,
     "branch": "Exploration",
