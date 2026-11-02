@@ -77,14 +77,15 @@ const genErrors=[];
 // Register commands early so a later optional event subscription cannot disable them.
 try{
  system.afterEvents.scriptEventReceive.subscribe(e=>{
-  if(!['skygen:menu','skygen:adminaxe','skygen:admin','skygen:debug','skygen:marketreview','skygen:security','skygen:tokenrestore'].includes(e.id))return;
+  if(!['skygen:menu','skygen:help','skygen:adminaxe','skygen:admin','skygen:debug','skygen:marketreview','skygen:security','skygen:tokenrestore'].includes(e.id))return;
   const actor=e.sourceEntity;
   console.warn('[SkyGen CMD] received '+e.id+' source='+e.sourceType+' player='+(actor?.name||'none'));
   if(!actor||actor.typeId!=='minecraft:player'){console.warn('[SkyGen CMD] no player source; use command from player chat');return;}
   try{actor.sendMessage('§7SkyGen received '+e.id+(e.message?' '+e.message:''));}catch{}
   system.run(()=>{
    try{
-    if(e.id==='skygen:menu')menu(actor);
+    if(e.id==='skygen:help')helpCommand(actor,e.message);
+    else if(e.id==='skygen:menu')menu(actor);
     else if(e.id==='skygen:adminaxe')issueAdminAxe(actor);
     else if(e.id==='skygen:admin')adminCommand(actor,e.message);
     else if(e.id==='skygen:marketreview')marketReviewCommand(actor);
@@ -1951,6 +1952,52 @@ try{
  });
 }catch(e){console.warn('[SkyGen] leave cleanup unavailable '+e)}
 system.runInterval(()=>{for(const p of world.getAllPlayers())ensure(p)},200);
+// Command help is chat-only and cannot mutate player, plot, or Realm state.
+// Keep examples aligned with the scriptEventReceive IDs at the top of this file.
+function helpCommand(actor,message){
+ const topic=String(message||'').trim().toLowerCase(),operator=isOperator(actor);
+ const common=[
+  '§b§lSKYGEN COMMAND HELP §r§7(v0.9.5)',
+  '§f/scriptevent skygen:help §7— commands you can use',
+  '§f/scriptevent skygen:help generators §7— generator menu tips',
+  '§f/scriptevent skygen:menu §7— open SkyGen menu',
+  '§f/scriptevent skygen:debug §7— check command/permission status',
+  '§f/scriptevent skygen:adminaxe §7— get Admin Axe (granted admins only)',
+  '§7Use the compass in hotbar slot 7 for normal SkyGen features.',
+  '§7Operator commands: /scriptevent skygen:help admin'
+ ];
+ const admin=[
+  '§6§lSKYGEN OPERATOR COMMANDS §r§7(v0.9.5)',
+  '§f/scriptevent skygen:admin grant PlayerName §7— grant SkyGen admin',
+  '§f/scriptevent skygen:admin revoke PlayerName §7— revoke SkyGen admin',
+  '§f/scriptevent skygen:security §7— flagged tokens/trades',
+  '§f/scriptevent skygen:marketreview §7— flagged marketplace listings',
+  '§f/scriptevent skygen:tokenrestore PlayerName | Cobblestone',
+  '§7Tokenrestore: verify original purchase FIRST; target must be online.',
+  '§7Admin Axe: /scriptevent skygen:adminaxe (SkyGen admins and operators).'
+ ];
+ const generatorHelp=[
+  '§b§lSKYGEN GENERATOR HELP',
+  '§7Compass (slot 7) → Generators → Buy / My Generators.',
+  '§7Buy a custom core, then use it on your own Overworld plot.',
+  '§7Mine the resource ABOVE the core; it regenerates automatically.',
+  '§7My Generators: upgrade, diagnose, delete, or operator output test.',
+  '§7Generator purchase/placement is via UI and item use, not chat commands.'
+ ];
+ if(topic===''||topic==='player'||topic==='all'){
+  for(const line of common)actor.sendMessage(line);
+  if(topic==='all'&&operator)for(const line of admin)actor.sendMessage(line);
+  return;
+ }
+ if(topic==='generators'){for(const line of generatorHelp)actor.sendMessage(line);return}
+ if(topic==='admin'||topic==='security'){
+  if(!operator)return actor.sendMessage('§cOperator permission required for this help page.');
+  for(const line of admin)actor.sendMessage(line);
+  return;
+ }
+ actor.sendMessage('§eUnknown help topic: '+topic.slice(0,30));
+ actor.sendMessage('§7Usage: /scriptevent skygen:help [player|generators|admin|all]');
+}
 function adminCommand(actor,message){
  if(!isOperator(actor))return actor.sendMessage('§cOnly Realm operators may grant or revoke SkyGen admin access.');
  const match=/^\s*(grant|revoke)\s+(.+?)\s*$/i.exec(String(message||''));
@@ -1968,4 +2015,4 @@ function adminCommand(actor,message){
 }
 
 system.runTimeout(()=>{try{ensureSpawn()}catch(e){console.warn('SkyGen spawn init: '+e)}},40);
-console.warn('[SkyGen] v0.9.4 custom generator core blocks loaded');
+console.warn('[SkyGen] v0.9.5 custom generator cores and in-game help loaded');

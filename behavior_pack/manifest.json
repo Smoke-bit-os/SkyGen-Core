@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "SkyGen Core BP v0.9.4",
-    "description": "SkyGen Core v0.9.4 - 42 custom items and 42 matching 3D-textured generator bases",
+    "name": "SkyGen Core BP v0.9.5",
+    "description": "SkyGen Core v0.9.5 - 42 custom items and 42 matching 3D-textured generator bases",
     "uuid": "050d268d-d873-4b6c-ad88-71da14ecb845",
     "version": [
       0,
       9,
-      4
+      5
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         9,
-        4
+        5
       ]
     },
     {
@@ -32,7 +32,7 @@
       "version": [
         0,
         9,
-        4
+        5
       ],
       "entry": "scripts/main.js"
     }
@@ -51,7 +51,7 @@
       "version": [
         0,
         9,
-        4
+        5
       ]
     }
   ]

@@ -1,12 +1,9 @@
-# SkyGen Core v0.9.4 — Custom Generator Bases
+# SkyGen Core v0.9.5 — In-Game Command Help
 
-42 unique generator inventory items (v0.9.3) + 42 matching full-cube in-world custom generator blocks.
-Each block uses an original 64×64 top, side and bottom texture: 126 block-face textures, plus the preserved 42 inventory icons.
+Adds `/scriptevent skygen:help` with player, generators, and operator/admin topics to the tested v0.9.4 custom-generator-base release. No game logic, world data, save keys, block/item IDs, textures or pack UUIDs change.
 
-**Install the .mcaddon on a copied world with matching behavior and resource packs. Minimum Minecraft Bedrock 1.21.100.**
+**Command reference**: `docs/COMMAND_HELP_v0.9.5.md`  
+**Release notes**: `docs/RELEASE_NOTES_v0.9.5.md`  
+**Xbox test checklist**: `docs/XBOX_HELP_TEST_v0.9.5.md`
 
-The registered generator base at Y is now `skygen:<name>_generator_core`, generated material remains at Y+1. Previously registered bedrock bases convert only in loaded chunks via the normal heartbeat. User data, pack UUIDs and generator prices remain untouched. Never downgrade without a pre-upgrade world backup.
-
-See `docs/XBOX_REALM_TEST_CHECKLIST_v0.9.4.md`, `docs/RELEASE_NOTES_v0.9.4.md`, and `docs/v0.9.4_42_block_texture_audit.csv`.
-
-141 simulated regression checks passed; Xbox/Realm verification still required.
+Install both v0.9.5 packs on a **backup test world**. Existing generators and player records are retained. Stable GitHub `main` stays unchanged until the user approves. Minimum Bedrock 1.21.100.
