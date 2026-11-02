@@ -2,8 +2,51 @@ import {world,system,ItemStack,ItemLockMode} from '@minecraft/server';
 import {ActionFormData,ModalFormData,MessageFormData} from '@minecraft/server-ui';
 const C={spawn:{x:0.5,y:2,z:0.5},base:{x:512,y:106,z:512},spacing:128,columns:8,radius:24,warmup:100,cooldown:100,exchange:18000000};
 const TOOLS=[{slot:6,type:'minecraft:compass',name:'§bSkyGen Menu'},{slot:7,type:'minecraft:goat_horn',name:'§6Go to Spawn'},{slot:8,type:'minecraft:goat_horn',name:'§aGo to Plot'}];
-const GENS=[{name:'Cobblestone',block:'minecraft:cobblestone',cost:500,period:200},{name:'Coal',block:'minecraft:coal_ore',cost:2500,period:300},{name:'Iron',block:'minecraft:iron_ore',cost:10000,period:400},{name:'Gold',block:'minecraft:gold_ore',cost:40000,period:500},{name:'Diamond',block:'minecraft:diamond_ore',cost:200000,period:600},{name:'Emerald',block:'minecraft:emerald_ore',cost:500000,period:800}];
-const SHOP=[{name:'Cobblestone × 16',id:'minecraft:cobblestone',count:16,buy:80,sell:16},{name:'Oak Logs × 16',id:'minecraft:oak_log',count:16,buy:160,sell:32},{name:'Iron Ingots × 8',id:'minecraft:iron_ingot',count:8,buy:400,sell:80},{name:'Diamond × 1',id:'minecraft:diamond',count:1,buy:500,sell:100}];
+const GENS=[
+ {"name":"Cobblestone","block":"minecraft:cobblestone","cost":500,"period":200,"category":"Starter","unlock":1},
+ {"name":"Coal","block":"minecraft:coal_ore","cost":2500,"period":300,"category":"Mining","unlock":1},
+ {"name":"Iron","block":"minecraft:iron_ore","cost":10000,"period":400,"category":"Mining","unlock":1},
+ {"name":"Gold","block":"minecraft:gold_ore","cost":40000,"period":500,"category":"Mining","unlock":1},
+ {"name":"Diamond","block":"minecraft:diamond_ore","cost":200000,"period":600,"category":"Mining","unlock":1},
+ {"name":"Emerald","block":"minecraft:emerald_ore","cost":500000,"period":800,"category":"Mining","unlock":1},
+ {"name":"Stone","block":"minecraft:stone","cost":700,"period":220,"category":"Starter","unlock":2},
+ {"name":"Deepslate","block":"minecraft:deepslate","cost":1100,"period":220,"category":"Starter","unlock":3},
+ {"name":"Dirt","block":"minecraft:dirt","cost":500,"period":180,"category":"Starter","unlock":1},
+ {"name":"Gravel","block":"minecraft:gravel","cost":900,"period":220,"category":"Starter","unlock":3},
+ {"name":"Sand","block":"minecraft:sand","cost":950,"period":220,"category":"Starter","unlock":3},
+ {"name":"Clay","block":"minecraft:clay","cost":1200,"period":260,"category":"Starter","unlock":4},
+ {"name":"Oak Logs","block":"minecraft:oak_log","cost":1800,"period":240,"category":"Starter","unlock":4},
+ {"name":"Spruce Logs","block":"minecraft:spruce_log","cost":2200,"period":260,"category":"Starter","unlock":5},
+ {"name":"Birch Logs","block":"minecraft:birch_log","cost":2200,"period":260,"category":"Starter","unlock":5},
+ {"name":"Cherry Logs","block":"minecraft:cherry_log","cost":4500,"period":280,"category":"Starter","unlock":8},
+ {"name":"Mangrove Logs","block":"minecraft:mangrove_log","cost":5200,"period":300,"category":"Starter","unlock":10},
+ {"name":"Copper","block":"minecraft:copper_ore","cost":7500,"period":320,"category":"Mining","unlock":8},
+ {"name":"Redstone","block":"minecraft:redstone_ore","cost":18000,"period":380,"category":"Mining","unlock":12},
+ {"name":"Lapis Lazuli","block":"minecraft:lapis_ore","cost":24000,"period":440,"category":"Mining","unlock":16},
+ {"name":"Nether Quartz","block":"minecraft:nether_quartz_ore","cost":30000,"period":500,"category":"Mining","unlock":18},
+ {"name":"Nether Gold","block":"minecraft:nether_gold_ore","cost":60000,"period":560,"category":"Mining","unlock":20},
+ {"name":"Moss","block":"minecraft:moss_block","cost":15000,"period":300,"category":"Nature","unlock":15},
+ {"name":"Netherrack","block":"minecraft:netherrack","cost":17500,"period":300,"category":"Nature","unlock":16},
+ {"name":"Soul Sand","block":"minecraft:soul_sand","cost":21000,"period":360,"category":"Nature","unlock":18},
+ {"name":"Basalt","block":"minecraft:basalt","cost":26000,"period":380,"category":"Nature","unlock":20},
+ {"name":"Blackstone","block":"minecraft:blackstone","cost":32000,"period":400,"category":"Nature","unlock":22},
+ {"name":"Glowstone","block":"minecraft:glowstone","cost":55000,"period":480,"category":"Nature","unlock":25},
+ {"name":"Magma","block":"minecraft:magma","cost":65000,"period":500,"category":"Nature","unlock":27},
+ {"name":"Calcite","block":"minecraft:calcite","cost":72000,"period":520,"category":"Nature","unlock":30},
+ {"name":"Tuff","block":"minecraft:tuff","cost":76000,"period":520,"category":"Nature","unlock":30},
+ {"name":"Amethyst Block","block":"minecraft:amethyst_block","cost":100000,"period":560,"category":"Nature","unlock":35},
+ {"name":"Obsidian","block":"minecraft:obsidian","cost":150000,"period":650,"category":"Endgame","unlock":30},
+ {"name":"Prismarine","block":"minecraft:prismarine","cost":165000,"period":660,"category":"Endgame","unlock":32},
+ {"name":"Sea Lantern","block":"minecraft:sea_lantern","cost":190000,"period":700,"category":"Endgame","unlock":34},
+ {"name":"End Stone","block":"minecraft:end_stone","cost":220000,"period":720,"category":"Endgame","unlock":36},
+ {"name":"Purpur Block","block":"minecraft:purpur_block","cost":260000,"period":740,"category":"Endgame","unlock":38},
+ {"name":"Sculk","block":"minecraft:sculk","cost":330000,"period":760,"category":"Endgame","unlock":40},
+ {"name":"Crying Obsidian","block":"minecraft:crying_obsidian","cost":420000,"period":800,"category":"Endgame","unlock":42},
+ {"name":"Gilded Blackstone","block":"minecraft:gilded_blackstone","cost":520000,"period":840,"category":"Endgame","unlock":44},
+ {"name":"Shroomlight","block":"minecraft:shroomlight","cost":620000,"period":880,"category":"Endgame","unlock":46},
+ {"name":"Ancient Debris","block":"minecraft:ancient_debris","cost":1900000,"period":1600,"category":"Endgame","unlock":48}
+];
+const SHOP=[{name:'Cobblestone × 16',id:'minecraft:cobblestone',count:16,buy:80,sell:16},{name:'Oak Logs × 16',id:'minecraft:oak_log',count:16,buy:160,sell:32},{name:'Iron Ingots × 8',id:'minecraft:iron_ingot',count:8,buy:400,sell:80},{name:'Diamond × 1',id:'minecraft:diamond',count:1,buy:500,sell:100},{"name":"Stone","id":"minecraft:stone","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Dirt","id":"minecraft:dirt","count":16,"buy":64,"sell":16,"category":"Starter"},{"name":"Gravel","id":"minecraft:gravel","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Sand","id":"minecraft:sand","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Clay","id":"minecraft:clay_ball","count":16,"buy":160,"sell":32,"category":"Starter"},{"name":"Spruce Logs","id":"minecraft:spruce_log","count":16,"buy":192,"sell":48,"category":"Starter"},{"name":"Birch Logs","id":"minecraft:birch_log","count":16,"buy":192,"sell":48,"category":"Starter"},{"name":"Cherry Logs","id":"minecraft:cherry_log","count":16,"buy":320,"sell":80,"category":"Starter"},{"name":"Copper Ingots","id":"minecraft:copper_ingot","count":8,"buy":280,"sell":64,"category":"Ores"},{"name":"Coal","id":"minecraft:coal","count":16,"buy":240,"sell":48,"category":"Ores"},{"name":"Gold Ingots","id":"minecraft:gold_ingot","count":8,"buy":800,"sell":160,"category":"Ores"},{"name":"Redstone Dust","id":"minecraft:redstone","count":16,"buy":240,"sell":64,"category":"Ores"},{"name":"Lapis Lazuli","id":"minecraft:lapis_lazuli","count":16,"buy":288,"sell":64,"category":"Ores"},{"name":"Emerald","id":"minecraft:emerald","count":1,"buy":1500,"sell":300,"category":"Ores"},{"name":"Nether Quartz","id":"minecraft:quartz","count":16,"buy":320,"sell":64,"category":"Nether"},{"name":"Netherrack","id":"minecraft:netherrack","count":16,"buy":128,"sell":32,"category":"Nether"},{"name":"Soul Sand","id":"minecraft:soul_sand","count":8,"buy":160,"sell":40,"category":"Nether"},{"name":"Blackstone","id":"minecraft:blackstone","count":16,"buy":480,"sell":128,"category":"Nether"},{"name":"Glowstone Dust","id":"minecraft:glowstone_dust","count":16,"buy":640,"sell":160,"category":"Nether"},{"name":"Magma Cream","id":"minecraft:magma_cream","count":8,"buy":800,"sell":200,"category":"Nether"},{"name":"Obsidian","id":"minecraft:obsidian","count":4,"buy":1200,"sell":320,"category":"Endgame"},{"name":"Prismarine","id":"minecraft:prismarine","count":8,"buy":1600,"sell":400,"category":"Endgame"},{"name":"End Stone","id":"minecraft:end_stone","count":8,"buy":1600,"sell":400,"category":"Endgame"},{"name":"Sculk","id":"minecraft:sculk","count":8,"buy":2400,"sell":640,"category":"Endgame"}];
 const pending=new Map(),cooldowns=new Map(),generators=new Map(),trades=new Map(),visitRequests=new Map();
 const genEmptySeconds=new Map();
 let genWatchdogRuns=0, genLastTick=-1, genLastError="none", genStartupTick=system.currentTick;
@@ -29,7 +72,9 @@ try{
  console.warn('[SkyGen CMD] command listener registered');
 }catch(err){console.warn('[SkyGen CMD] LISTENER REGISTRATION FAILED '+err)}
 
-const GEN_REGISTRY_LIMIT=500, GEN_REGISTRY_BYTES=30000;
+const GEN_REGISTRY_LIMIT=1200, GEN_REGISTRY_BYTES=12000, GEN_REGISTRY_SHARDS=24;
+const GEN_STORAGE_META='sg_generators_v2_commit', GEN_STORAGE_LEGACY='sg_generators';
+const GEN_BASE_SLOTS=20;
 const genErrorTick=new Map();
 function genError(message,key='general'){
  genLastError=String(message);
@@ -104,34 +149,72 @@ function buildGenerator(g){
   throw err;
  }
 }
+// Two-bank / multi-key registry. Never truncate records or overwrite the
+// legacy sg_generators backup. The commit marker is the final atomic write.
+let generatorRegistryLoaded=false;
+function generatorChecksum(raw){
+ let h=2166136261;for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619)}
+ return (h>>>0).toString(16);
+}
+function generatorChunks(raw){
+ const chunks=[];for(let i=0;i<raw.length;i+=GEN_REGISTRY_BYTES)chunks.push(raw.slice(i,i+GEN_REGISTRY_BYTES));
+ return chunks.length?chunks:['[]'];
+}
+function generatorRead(){
+ const metaRaw=world.getDynamicProperty(GEN_STORAGE_META);
+ if(metaRaw===undefined||metaRaw===null){
+  const legacy=world.getDynamicProperty(GEN_STORAGE_LEGACY);
+  return legacy===undefined||legacy===null?[]:JSON.parse(String(legacy));
+ }
+ const meta=JSON.parse(String(metaRaw));
+ if(!meta||meta.v!==2||![0,1].includes(meta.bank)||!Number.isSafeInteger(meta.chunks)||meta.chunks<1||meta.chunks>GEN_REGISTRY_SHARDS||typeof meta.checksum!=='string')throw Error('Invalid generator v2 manifest');
+ let raw='';for(let i=0;i<meta.chunks;i++){
+  const part=world.getDynamicProperty('sg_g2_'+meta.bank+'_'+i);
+  if(typeof part!=='string')throw Error('Missing generator data shard '+i);
+  raw+=part;
+ }
+ if(generatorChecksum(raw)!==meta.checksum)throw Error('Generator registry checksum failed; backup preserved');
+ const records=JSON.parse(raw);
+ if(!Array.isArray(records)||records.length!==meta.records)throw Error('Generator registry record count invalid');
+ return records;
+}
 function genSave(){
  try{
   if(!generatorRegistryLoaded)throw Error('Generator registry has not loaded safely');
   if(generators.size>GEN_REGISTRY_LIMIT)throw Error('Generator registry limit reached');
-  const data=JSON.stringify([...generators]);
-  if(data.length>GEN_REGISTRY_BYTES)throw Error('Generator registry storage capacity reached');
-  world.setDynamicProperty('sg_generators',data);
-  if(world.getDynamicProperty('sg_generators')!==data)throw Error('Generator registry verification failed');
+  const raw=JSON.stringify([...generators]);
+  const chunks=generatorChunks(raw);
+  if(chunks.length>GEN_REGISTRY_SHARDS)throw Error('Generator registry storage full; no records discarded');
+  const previous=world.getDynamicProperty(GEN_STORAGE_META);
+  const previousMeta=previous===undefined||previous===null?null:JSON.parse(String(previous));
+  const bank=previousMeta?.bank===0?1:0;
+  for(let i=0;i<chunks.length;i++){
+   const key='sg_g2_'+bank+'_'+i;
+   world.setDynamicProperty(key,chunks[i]);
+   if(world.getDynamicProperty(key)!==chunks[i])throw Error('Generator shard write not verified '+i);
+  }
+  const meta=JSON.stringify({v:2,bank,chunks:chunks.length,records:generators.size,checksum:generatorChecksum(raw)});
+  world.setDynamicProperty(GEN_STORAGE_META,meta);
+  if(world.getDynamicProperty(GEN_STORAGE_META)!==meta)throw Error('Generator commit marker write failed');
   return true;
  }catch(e){genError('save '+e,'save');return false}
 }
-let generatorRegistryLoaded=false;
 function genLoad(){
  try{
-  const raw=world.getDynamicProperty('sg_generators');
-  const arr=raw===undefined||raw===null?[]:JSON.parse(String(raw));
-  if(!Array.isArray(arr))throw Error('Invalid generator registry');
-  for(const entry of arr){
+  const records=generatorRead();
+  if(!Array.isArray(records))throw Error('Invalid generator registry');
+  const incoming=new Map();
+  for(const entry of records){
    if(!Array.isArray(entry)||entry.length!==2)throw Error('Invalid generator entry');
    const [k,v]=entry;
-   if(typeof k!=='string'||!v||!GENS.some(g=>g.name===v.type))throw Error('Invalid generator '+k);
-   generators.set(k,v);
+   if(typeof k!=='string'||!v||!GENS.some(g=>g.name===v.type)||!Number.isFinite(v.x)||!Number.isFinite(v.y)||!Number.isFinite(v.z))throw Error('Invalid generator '+k);
+   if(incoming.has(k))throw Error('Duplicate generator '+k);
+   incoming.set(k,v);
   }
+  if(incoming.size>GEN_REGISTRY_LIMIT)throw Error('Generator registry exceeds maximum; data preserved');
+  generators.clear();for(const [k,v] of incoming)generators.set(k,v);
   generatorRegistryLoaded=true;
- }catch(e){
-  generatorRegistryLoaded=false;
-  genError('CRITICAL registry load failed; persistence disabled: '+e,'load');
- }
+ }catch(e){generatorRegistryLoaded=false;genError('CRITICAL registry load failed; persistence disabled: '+e,'load')}
 }
 function playerByName(name){return world.getAllPlayers().find(q=>q.name.toLowerCase()===String(name).toLowerCase())}
 
@@ -201,7 +284,7 @@ function safeSpawnTravel(p,immediate=false){
     try{
      if(typeof p.tryTeleport==='function'){if(!p.tryTeleport(target,{dimension:dim,checkForBlocks:false}))throw Error('Spawn chunk not ready')}
      else p.teleport(target,{dimension:dim,checkForBlocks:false});
-     cooldowns.set(id,system.currentTick+C.cooldown);
+     cooldowns.set(id,system.currentTick+teleportCooldown(p));
      p.sendMessage('§aSafe SkyGen spawn reached.');
     }catch(e){p.sendMessage('§cSpawn rescue unavailable; your world needs spawn chunks loaded: '+e)}
     release();
@@ -231,6 +314,185 @@ function save(p,d){
  const json=JSON.stringify(d);
  p.setDynamicProperty('sg_profile',json);
  if(p.getDynamicProperty('sg_profile')!==json)throw Error('Player profile did not persist');
+}
+const SKILL_BRANCHES=["Mining", "Mobility", "Survival", "Exploration", "Economy", "Engineering"];
+const SKILLS=[{"id":"miner_haste_1","name":"Quick Hands I","desc":"Haste I on your plot","cost":1,"rank":2,"branch":"Mining","prev":null},{"id":"miner_haste_2","name":"Quick Hands II","desc":"Haste II on your plot","cost":2,"rank":10,"branch":"Mining","prev":"miner_haste_1"},{"id":"miner_xp_1","name":"Prospector I","desc":"+10% generator mining XP","cost":1,"rank":12,"branch":"Mining","prev":"miner_haste_2"},{"id":"miner_xp_2","name":"Prospector II","desc":"+25% generator mining XP","cost":2,"rank":20,"branch":"Mining","prev":"miner_xp_1"},{"id":"miner_luck_1","name":"Lucky Strikes I","desc":"2% chance of a bonus material","cost":2,"rank":25,"branch":"Mining","prev":"miner_xp_2"},{"id":"miner_luck_2","name":"Lucky Strikes II","desc":"4% chance of a bonus material","cost":3,"rank":35,"branch":"Mining","prev":"miner_luck_1"},{"id":"miner_master","name":"Master Miner","desc":"+50% generator mining XP total","cost":4,"rank":45,"branch":"Mining","prev":"miner_luck_2"},{"id":"move_speed_1","name":"Swift Steps I","desc":"Speed I on your plot","cost":1,"rank":2,"branch":"Mobility","prev":null},{"id":"move_speed_2","name":"Swift Steps II","desc":"Speed II on your plot","cost":2,"rank":12,"branch":"Mobility","prev":"move_speed_1"},{"id":"move_jump_1","name":"High Jumper I","desc":"Jump Boost I, toggleable","cost":1,"rank":8,"branch":"Mobility","prev":"move_speed_2"},{"id":"move_jump_2","name":"High Jumper II","desc":"Jump Boost II, toggleable","cost":2,"rank":18,"branch":"Mobility","prev":"move_jump_1"},{"id":"move_fall","name":"Feather Foot","desc":"Slow Falling, toggleable","cost":2,"rank":25,"branch":"Mobility","prev":"move_jump_2"},{"id":"move_tp_1","name":"Fast Traveler","desc":"Teleport cooldown 20% shorter","cost":3,"rank":35,"branch":"Mobility","prev":"move_fall"},{"id":"move_tp_2","name":"Wayfinder","desc":"Teleport cooldown 40% shorter","cost":4,"rank":45,"branch":"Mobility","prev":"move_tp_1"},{"id":"surv_resist","name":"Stone Skin","desc":"Resistance I on your plot","cost":1,"rank":5,"branch":"Survival","prev":null},{"id":"surv_regen","name":"Vitality","desc":"Regeneration I on your plot","cost":2,"rank":15,"branch":"Survival","prev":"surv_resist"},{"id":"surv_health","name":"Fortified","desc":"Health Boost I on your plot","cost":2,"rank":20,"branch":"Survival","prev":"surv_regen"},{"id":"surv_fire","name":"Flameproof","desc":"Fire Resistance on your plot","cost":2,"rank":25,"branch":"Survival","prev":"surv_health"},{"id":"surv_absorb","name":"Second Wind","desc":"Active Absorption, 2-minute cooldown","cost":2,"rank":30,"branch":"Survival","prev":"surv_fire"},{"id":"surv_regen2","name":"Greater Vitality","desc":"Regeneration II on your plot","cost":3,"rank":40,"branch":"Survival","prev":"surv_absorb"},{"id":"surv_saturate","name":"Survival Feast","desc":"Active Saturation, 5-minute cooldown","cost":4,"rank":48,"branch":"Survival","prev":"surv_regen2"},{"id":"explore_night","name":"Night Owl","desc":"Night Vision on your plot","cost":1,"rank":2,"branch":"Exploration","prev":null},{"id":"explore_water","name":"Deep Diver","desc":"Water Breathing on your plot","cost":1,"rank":10,"branch":"Exploration","prev":"explore_night"},{"id":"explore_conduit","name":"Tidal Power","desc":"Conduit Power while underwater","cost":2,"rank":18,"branch":"Exploration","prev":"explore_water"},{"id":"explore_dolphin","name":"Ocean Runner","desc":"Dolphin Grace while underwater","cost":2,"rank":25,"branch":"Exploration","prev":"explore_conduit"},{"id":"explore_invisible","name":"Shadow Step","desc":"Active invisibility, 4-minute cooldown","cost":2,"rank":30,"branch":"Exploration","prev":"explore_dolphin"},{"id":"explore_reward","name":"Expedition Rewards","desc":"+20% Daily Quest Credits","cost":2,"rank":35,"branch":"Exploration","prev":"explore_invisible"},{"id":"explore_master","name":"Expedition Master","desc":"All exploration passives work across your plot, even on land","cost":4,"rank":45,"branch":"Exploration","prev":"explore_reward"},{"id":"econ_sell_1","name":"Merchant I","desc":"+2% ordinary shop sale price","cost":1,"rank":2,"branch":"Economy","prev":null},{"id":"econ_buy_1","name":"Bargain Hunter I","desc":"2% off ordinary shop purchases","cost":1,"rank":8,"branch":"Economy","prev":"econ_sell_1"},{"id":"econ_sell_2","name":"Merchant II","desc":"+5% ordinary shop sale price","cost":2,"rank":15,"branch":"Economy","prev":"econ_buy_1"},{"id":"econ_buy_2","name":"Bargain Hunter II","desc":"5% off ordinary shop purchases","cost":2,"rank":22,"branch":"Economy","prev":"econ_sell_2"},{"id":"econ_rank","name":"Rank Rewards","desc":"+10% future rank Credits","cost":2,"rank":28,"branch":"Economy","prev":"econ_buy_2"},{"id":"econ_sell_3","name":"Master Merchant","desc":"+10% shop sale prices","cost":3,"rank":36,"branch":"Economy","prev":"econ_rank"},{"id":"econ_buy_3","name":"Master Negotiator","desc":"10% off shop purchases","cost":4,"rank":45,"branch":"Economy","prev":"econ_sell_3"},{"id":"eng_speed_1","name":"Tuned Pistons I","desc":"5% quicker generator recovery","cost":1,"rank":3,"branch":"Engineering","prev":null},{"id":"eng_speed_2","name":"Tuned Pistons II","desc":"10% quicker generator recovery","cost":2,"rank":12,"branch":"Engineering","prev":"eng_speed_1"},{"id":"eng_slots_1","name":"Builder Permit I","desc":"5 additional generator slots","cost":1,"rank":15,"branch":"Engineering","prev":"eng_speed_2"},{"id":"eng_speed_3","name":"Tuned Pistons III","desc":"15% quicker generator recovery","cost":2,"rank":25,"branch":"Engineering","prev":"eng_slots_1"},{"id":"eng_slots_2","name":"Builder Permit II","desc":"10 additional generator slots","cost":2,"rank":30,"branch":"Engineering","prev":"eng_speed_3"},{"id":"eng_price_1","name":"Factory Contracts I","desc":"5% off generator purchases and upgrades","cost":3,"rank":38,"branch":"Engineering","prev":"eng_slots_2"},{"id":"eng_price_2","name":"Factory Contracts II","desc":"10% off generator purchases and upgrades","cost":4,"rank":47,"branch":"Engineering","prev":"eng_price_1"}];
+
+// v0.9.0: skill point entitlement derives from rank: old players automatically
+// receive points without a one-time grant that could duplicate on reinstall.
+function teleportCooldown(p){
+ try{const d=profile(p);return Math.max(40,Math.floor(C.cooldown*(hasSkill(d,'move_tp_2')?0.6:hasSkill(d,'move_tp_1')?0.8:1)))}
+ catch{return C.cooldown}
+}
+function skillEntitlement(rank){return Math.max(0,Math.min(50,rank)-1)+2*Math.floor(Math.min(50,rank)/10)}
+function purchasedSkills(d){return Array.isArray(d.skills)?d.skills:[]}
+function hasSkill(d,id){return purchasedSkills(d).includes(id)}
+function skillSpent(d){return purchasedSkills(d).reduce((sum,id)=>sum+(SKILLS.find(s=>s.id===id)?.cost||0),0)}
+function skillAvailable(d){return Math.max(0,skillEntitlement(d.rank)-skillSpent(d))}
+function perkValue(d,kind){
+ const values={
+  sell:[['econ_sell_3',10],['econ_sell_2',5],['econ_sell_1',2]],
+  buy:[['econ_buy_3',10],['econ_buy_2',5],['econ_buy_1',2]],
+  generatorPrice:[['eng_price_2',10],['eng_price_1',5]],
+  generatorSpeed:[['eng_speed_3',15],['eng_speed_2',10],['eng_speed_1',5]],
+  miningXp:[['miner_master',50],['miner_xp_2',25],['miner_xp_1',10]],
+  luck:[['miner_luck_2',4],['miner_luck_1',2]]
+ };
+ return values[kind]?.find(([id])=>hasSkill(d,id))?.[1]||0;
+}
+function discountedPrice(price,percent){return Math.max(1,Math.floor(price*(100-percent)/100))}
+function generatorSlots(p){const d=profile(p);return GEN_BASE_SLOTS+(hasSkill(d,'eng_slots_2')?10:hasSkill(d,'eng_slots_1')?5:0)}
+function generatorOwnerCount(p){let count=0;for(const g of generators.values())if(g.owner===p.id)count++;return count}
+function effectivePeriod(g){
+ // A fixed denominator prevents NaN and very short high-tier generation times.
+ const d=world.getAllPlayers().find(p=>p.id===g.owner);
+ let bonus=0;try{if(d)bonus=perkValue(profile(d),'generatorSpeed')}catch{}
+ return Math.max(40,Math.floor((Number(g.period)||200)*(100-bonus)/100));
+}
+function affordableSkill(d,s){
+ return !hasSkill(d,s.id)&&d.rank>=s.rank&&(!s.prev||hasSkill(d,s.prev))&&skillAvailable(d)>=s.cost;
+}
+function skillTree(p){
+ const d=profile(p),spent=skillSpent(d),total=skillEntitlement(d.rank);
+ form(p,'§dSKILL TREE',`Rank ${d.rank}/50  §ePoints: ${total-spent}/${total}\n§7Permanent on-plot buffs, toggles and abilities. Combat buffs are restricted to your own plot.`,
+ [...SKILL_BRANCHES.map(b=>b+' — '+purchasedSkills(d).filter(id=>SKILLS.some(s=>s.id===id&&s.branch===b)).length+'/7'),'Active Abilities / Toggles','Reset Skills','Back'],i=>{
+  if(i<SKILL_BRANCHES.length)return skillBranchMenu(p,SKILL_BRANCHES[i]);
+  if(i===SKILL_BRANCHES.length)return skillAbilities(p);
+  if(i===SKILL_BRANCHES.length+1)return skillReset(p);
+  back(p);
+ });
+}
+function skillBranchMenu(p,branch){
+ const d=profile(p),nodes=SKILLS.filter(s=>s.branch===branch);
+ const status=s=>hasSkill(d,s.id)?'§aOWNED':affordableSkill(d,s)?'§eBUY':'§8LOCKED';
+ form(p,'§d'+branch+' Skills',`Available points: ${skillAvailable(d)}\nUnlock skills in order. Rank and point requirements apply.`,
+ [...nodes.map(s=>`${status(s)} §f${s.name} (${s.cost} SP, R${s.rank})`),'Back'],i=>{
+  if(i>=nodes.length)return skillTree(p);
+  const skill=nodes[i],current=profile(p);
+  if(!affordableSkill(current,skill))return p.sendMessage('§cSkill locked: need prerequisite, rank and available Skill Points.');
+  showUI(p,new MessageFormData().title('§dLEARN '+skill.name).body(`${skill.desc}\nCost: ${skill.cost} Skill Point(s)\nRemaining: ${skillAvailable(current)-skill.cost}`).button1('Cancel').button2('Learn Skill')).then(r=>{
+   if(r.canceled||r.selection!==1)return;
+   try{
+    const latest=profile(p);if(!affordableSkill(latest,skill))return p.sendMessage('§cSkill requirements have changed.');
+    latest.skills=[...purchasedSkills(latest),skill.id];save(p,latest);
+    p.sendMessage(`§aUnlocked ${skill.name}. ${skillAvailable(latest)} Skill Points remain.`);
+   }catch(e){p.sendMessage('§cSkill could not save: '+String(e).slice(0,100))}
+  }).catch(e=>p.sendMessage('§cSkill menu error '+e));
+ });
+}
+function skillReset(p){
+ const d=profile(p);if(skillSpent(d)===0)return p.sendMessage('§eNo purchased skills to reset.');
+ const cost=10000+d.rank*200;
+ showUI(p,new MessageFormData().title('§cRESET ALL SKILLS').body(`Refund all spent Skill Points for ${cost} Credits? Rank and earned points are retained.\nCurrent Skill Points spent: ${skillSpent(d)}`).button1('Keep Skills').button2('Reset')).then(r=>{
+  if(r.canceled||r.selection!==1)return;
+  try{const fresh=profile(p);if(fresh.credits<cost)return p.sendMessage('§cNot enough Credits.');
+   fresh.credits-=cost;fresh.skills=[];save(p,fresh);p.sendMessage('§aSkill points refunded. Your rank stays unchanged.');
+  }catch(e){p.sendMessage('§cReset could not save: '+e)}
+ });
+}
+const skillCooldowns=new Map(),skillLastEffects=new Map(),skillActiveEffects=new Map();
+function skillToggles(d){return d.skillToggles&&typeof d.skillToggles==='object'&&!Array.isArray(d.skillToggles)?d.skillToggles:{}}
+function onOwnPlot(p){try{return p.dimension?.id==='minecraft:overworld'&&belongs(p,p.location.x,p.location.z)}catch{return false}}
+function useAbility(p,id,effect,duration,cooldown){
+ const d=profile(p);if(!hasSkill(d,id))return p.sendMessage('§cUnlock this ability in the skill tree first.');
+ if(!onOwnPlot(p))return p.sendMessage('§cSkill abilities are only available on your own plot (not in PvP).');
+ const key=p.id+':'+id,now=system.currentTick,until=skillCooldowns.get(key)||0;
+ const timestamp=Date.now(),persistent=Number(d.skillCooldownUntil?.[id])||0;
+ if(now<until||timestamp<persistent)return p.sendMessage('§eAbility cooldown: '+Math.ceil(Math.max((until-now)/20,(persistent-timestamp)/1000))+' seconds.');
+ try{
+  p.addEffect(effect,duration,{amplifier:0,showParticles:false});
+  d.skillCooldownUntil={...(d.skillCooldownUntil||{}),[id]:timestamp+cooldown*50};
+  save(p,d);
+  if(!skillActiveEffects.has(p.id))skillActiveEffects.set(p.id,new Set());
+  skillActiveEffects.get(p.id).add(effect);skillCooldowns.set(key,now+cooldown);
+  p.sendMessage('§aAbility activated!');
+ }catch(e){try{p.removeEffect?.(effect)}catch{}p.sendMessage('§cAbility could not activate or save: '+String(e).slice(0,90))}
+}
+function skillAbilities(p){
+ const d=profile(p),toggles=skillToggles(d);
+ const list=[['move_jump_1','Jump Boost',true],['move_fall','Slow Falling',true],['explore_night','Exploration Effects',true],['surv_absorb','Second Wind',false],['surv_saturate','Survival Feast',false],['explore_invisible','Shadow Step',false]];
+ form(p,'§bSKILL ABILITIES','On-plot passives refresh automatically. Active skills have cooldowns.',
+ [...list.map(([id,label,toggle])=>`${hasSkill(d,id)?'§a':'§8'}${label}${toggle?' ['+(toggles[id]===false?'OFF':'ON')+']':' [ACTIVATE]'}`),'Back'],i=>{
+  if(i>=list.length)return skillTree(p);
+  const [id,label,toggle]=list[i];if(!hasSkill(profile(p),id))return p.sendMessage('§cSkill not unlocked.');
+  if(toggle){try{const fresh=profile(p);fresh.skillToggles={...skillToggles(fresh),[id]:skillToggles(fresh)[id]===false};save(p,fresh);p.sendMessage('§a'+label+' toggled '+(fresh.skillToggles[id]?'ON':'OFF'))}catch(e){p.sendMessage('§cToggle save failed '+e)}return;}
+  if(id==='surv_absorb')return useAbility(p,id,'minecraft:absorption',200,2400);
+  if(id==='surv_saturate')return useAbility(p,id,'minecraft:saturation',100,6000);
+  if(id==='explore_invisible')return useAbility(p,id,'minecraft:invisibility',200,4800);
+ });
+}
+const PASSIVE_SKILLS=[
+ ['miner_haste_1','minecraft:haste',0,'miner_haste_2'],
+ ['move_speed_1','minecraft:speed',0,'move_speed_2'],
+ ['move_jump_1','minecraft:jump_boost',0,'move_jump_2'],
+ ['move_fall','minecraft:slow_falling',0],
+ ['surv_resist','minecraft:resistance',0],
+ ['surv_regen','minecraft:regeneration',0,'surv_regen2'],
+ ['surv_health','minecraft:health_boost',0],
+ ['surv_fire','minecraft:fire_resistance',0],
+ ['explore_night','minecraft:night_vision',0],
+ ['explore_water','minecraft:water_breathing',0],
+ ['explore_conduit','minecraft:conduit_power',0],
+ ['explore_dolphin','minecraft:dolphins_grace',0]
+];
+function skillPulse(){
+ for(const p of world.getAllPlayers()){
+  try{
+   const own=onOwnPlot(p),d=profile(p),toggles=skillToggles(d);
+   const applied=skillLastEffects.get(p.id)||new Set();
+   const desired=new Set();
+   if(own){
+    for(const [skill,effect,amp,upgraded] of PASSIVE_SKILLS){
+     if(!hasSkill(d,skill))continue;
+     if(skill==='move_jump_1'&&toggles.move_jump_1===false)continue;
+     if(skill==='move_fall'&&toggles.move_fall===false)continue;
+     if(skill.startsWith('explore_')&&toggles.explore_night===false&&!hasSkill(d,'explore_master'))continue;
+     if((skill==='explore_conduit'||skill==='explore_dolphin')&&!p.isInWater&&!hasSkill(d,'explore_master'))continue;
+     const strength=upgraded&&hasSkill(d,upgraded)?1:amp;
+     try{const current=p.getEffect?.(effect);
+      if(!current||current.duration<35||current.amplifier!==strength)p.addEffect(effect,80,{amplifier:strength,showParticles:false});
+      desired.add(effect);
+     }catch(e){if(!skillEffectWarnings.has(effect)){skillEffectWarnings.add(effect);console.warn('[SkyGen SKILLS] Effect '+effect+' unavailable: '+e)}}
+    }
+   }
+   // On leaving one's own plot, prevent persistent potions from spilling into PvP.
+   // Only remove known effects we applied and not another stronger effect.
+   for(const effect of applied)if(!desired.has(effect)){
+    try{const current=p.getEffect?.(effect);if(current&&current.duration<=90)p.removeEffect?.(effect)}catch{}
+   }
+   if(!own&&skillActiveEffects.has(p.id)){
+    for(const effect of skillActiveEffects.get(p.id))try{p.removeEffect?.(effect)}catch{}
+    skillActiveEffects.delete(p.id);
+   }
+   skillLastEffects.set(p.id,desired);
+  }catch(e){console.warn('[SkyGen SKILLS] pulse '+e)}
+ }
+ system.runTimeout(skillPulse,40);
+}
+const skillEffectWarnings=new Set();
+system.runTimeout(skillPulse,100);
+function dailyDate(){return new Date().toISOString().slice(0,10)}
+function todayQuests(d){
+ const day=dailyDate();if(d.daily&&d.daily.day===day)return d.daily;
+ return {day,blocks:0,harvests:0,placements:0,claimed:[]};
+}
+function recordDaily(d,field){const daily=todayQuests(d);daily[field]=Math.min(10000,(daily[field]||0)+1);d.daily=daily}
+const DAILY_QUESTS=[{key:'blocks',need:50,credits:1500,xp:100,label:'Mine 50 plot blocks'},
+ {key:'harvests',need:10,credits:3500,xp:250,label:'Harvest 10 generator blocks'},
+ {key:'placements',need:1,credits:2000,xp:250,label:'Place a new generator'}];
+function dailyQuests(p){
+ const d=profile(p),daily=todayQuests(d);
+ form(p,'§eDAILY QUESTS',`UTC day: ${daily.day}\nProgress resets each UTC day. Claim completed rewards below.`,
+ [...DAILY_QUESTS.map(q=>`${(daily.claimed||[]).includes(q.key)?'§aCLAIMED':(daily[q.key]||0)>=q.need?'§eREADY':'§7IN PROGRESS'} ${q.label} (${Math.min(q.need,daily[q.key]||0)}/${q.need})`),'Back'],i=>{
+  if(i>=DAILY_QUESTS.length)return menu(p);
+  const q=DAILY_QUESTS[i];try{
+   const fresh=profile(p),today=todayQuests(fresh);
+   if(today.day!==dailyDate()||(today[q.key]||0)<q.need||(today.claimed||[]).includes(q.key))return p.sendMessage('§eQuest not ready or already claimed.');
+   today.claimed=[...today.claimed,q.key];fresh.daily=today;
+   const reward=hasSkill(fresh,'explore_reward')?Math.floor(q.credits*1.2):q.credits;fresh.credits+=reward;fresh.xp+=q.xp;
+   rank(p,fresh);p.sendMessage(`§aDaily quest reward: ${reward} Credits + ${q.xp} XP.`);
+  }catch(e){p.sendMessage('§cCould not claim quest: '+e)}
+ });
 }
 function coords(id){return {x:C.base.x+(id%C.columns)*C.spacing,y:C.base.y,z:C.base.z+Math.floor(id/C.columns)*C.spacing}}
 function belongs(p,x,z){if(p.dimension?.id!=='minecraft:overworld')return false;const d=profile(p);if(d.plot<0)return false;const c=coords(d.plot);return Math.abs(x-c.x)<=C.radius&&Math.abs(z-c.z)<=C.radius}
@@ -449,7 +711,7 @@ function teleportWatchdog(p,id,token){
    if(typeof p.tryTeleport==='function'){
     if(!p.tryTeleport(t.target,{dimension:destination,checkForBlocks:false}))throw new Error('Destination chunk is not ready');
    }else p.teleport(t.target,{dimension:destination,checkForBlocks:false});
-   cooldowns.set(id,system.currentTick+C.cooldown);
+   cooldowns.set(id,system.currentTick+teleportCooldown(p));
    finishPendingTeleport(t,true);
    showTeleportText(p,'§aTELEPORTED!');p.sendMessage('§aTeleport successful.');
   }catch(err){finishPendingTeleport(t);showTeleportText(p,'§cTELEPORT FAILED');p.sendMessage('§cTeleport failed safely: '+String(err));}
@@ -475,7 +737,7 @@ function tpPlot(p){
 }
 function rank(p,d){
  const old=d.rank||1;d.rank=Math.min(50,1+Math.floor(d.xp/1000));
- if(d.rank>old){for(let n=old+1;n<=d.rank;n++){d.credits+=n*100;if(n%10===0)d.orbits+=1}p.sendMessage(`§dRank up! ${old} → ${d.rank}. Credits rewarded${Math.floor(d.rank/10)>Math.floor(old/10)?' + milestone Orbits':''}.`)}
+ if(d.rank>old){for(let n=old+1;n<=d.rank;n++){d.credits+=Math.floor(n*100*(100+(hasSkill(d,'econ_rank')?10:0))/100);if(n%10===0)d.orbits+=1}p.sendMessage(`§dRank up! ${old} → ${d.rank}. §e+${skillEntitlement(d.rank)-skillEntitlement(old)} Skill Points! Credits rewarded${Math.floor(d.rank/10)>Math.floor(old/10)?' + milestone Orbits':''}.`)}
  save(p,d);p.nameTag=`§b[Rank ${d.rank}] §r${p.name}`}
 
 function showUI(p,ui,attempt=0){
@@ -684,7 +946,7 @@ function adminAccess(p,target){
  });
 }
 function back(p){menu(p)}
-function menu(p){const d=profile(p);form(p,'§l§bSKYGEN CORE',`§eCredits: ${d.credits}  §bOrbits: ${d.orbits}\n§dRank: ${d.rank}/50  XP: ${d.xp}\n§aPlot: ${d.plot+1}`,['My Plot','Visit Other Plots','Generators','Server Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Help'],i=>[()=>plotMenu(p),()=>visitMenu(p),()=>genMenu(p),()=>shop(p),()=>market(p),()=>trade(p),()=>ranks(p),()=>wallet(p),()=>teleports(p),()=>form(p,'Help','SkyGen v0.8.3. Marketplace, direct trades, 50 ranks and generator upgrades. Test on a world copy first.',['Back'],()=>back(p))][i]())}
+function menu(p){const d=profile(p);form(p,'§l§bSKYGEN CORE',`§eCredits: ${d.credits}  §bOrbits: ${d.orbits}\n§dRank: ${d.rank}/50  XP: ${d.xp}  §eSP: ${skillAvailable(d)}\n§aPlot: ${d.plot+1}`,['My Plot','Visit Other Plots','Generators','Server Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Skill Tree','Daily Quests','Help'],i=>[()=>plotMenu(p),()=>visitMenu(p),()=>genMenu(p),()=>shop(p),()=>market(p),()=>trade(p),()=>ranks(p),()=>wallet(p),()=>teleports(p),()=>skillTree(p),()=>dailyQuests(p),()=>form(p,'Help','SkyGen v0.9.0. 42 generators, six-branch Skill Tree, Daily Quests, marketplace, trades, and 50 ranks. Test on a world copy first.',['Back'],()=>back(p))][i]())}
 function plotMenu(p){
  const d=profile(p);
  if(d.plot<0)return p.sendMessage('§cYour plot is not assigned. Rejoin to retry.');
@@ -769,19 +1031,38 @@ You can revoke access any time.`).button1('Deny').button2('Allow')).then(res=>{
  });
 }
 
-function genMenu(p){form(p,'§bGENERATORS','Buy tokens, place on your own plot, and upgrade production speed. Look at a floor block on your plot and use the egg. The bedrock base appears directly above the block you target, with ore on top. Mine the ore to collect it.',['Buy Generator','My Generators / Upgrade','Back'],i=>{if(i===0)buyGen(p);if(i===1)myGenerators(p);if(i===2)back(p)})}
-function myGenerators(p){
- const a=[...generators.entries()].filter(([key,g])=>g.owner===p.id);
- form(p,'§bMY GENERATORS',a.map(([key,g])=>`${g.type} Lv${g.level||1} @ ${g.x},${g.y},${g.z}`).join('\n')||'No generators.',[...a.map(([key,g])=>`${g.type} Lv${g.level||1} — Manage`),'Back'],i=>{
-  if(i>=a.length)return genMenu(p);
-  const [key,g]=a[i];manageGenerator(p,key,g);
+function genMenu(p){
+ const count=generatorOwnerCount(p),cap=generatorSlots(p);
+ form(p,'§bGENERATORS',`42 generator types across four categories.\nOwned: ${count}/${cap} slots. Upgrade production to Level 5.\n§7Aim the purchased egg at an open plot floor block to place it.`,
+ ['Buy Generator','My Generators / Upgrade','Back'],i=>{if(i===0)return genCategories(p);if(i===1)return myGenerators(p);back(p)});
+}
+function genCategories(p){
+ const categories=['Starter','Mining','Nature','Endgame'];
+ form(p,'§bGENERATOR TYPES',`42 types. Original generator purchases and tokens remain valid. Unlock new tiers as you rank up.`,
+ [...categories.map(c=>`${c} (${GENS.filter(g=>g.category===c).length})`),'Back'],i=>{
+  if(i>=categories.length)return genMenu(p);
+  buyGen(p,categories[i],0);
+ });
+}
+function myGenerators(p,page=0){
+ const all=[...generators.entries()].filter(([key,g])=>g.owner===p.id);
+ const pageSize=8,pages=Math.max(1,Math.ceil(all.length/pageSize)),current=Math.max(0,Math.min(page,pages-1));
+ const a=all.slice(current*pageSize,current*pageSize+pageSize);
+ form(p,'§bMY GENERATORS',`Owned: ${all.length}/${generatorSlots(p)} • Page ${current+1}/${pages}`,
+ [...a.map(([key,g])=>`${g.type} Lv${g.level||1} @ ${g.x},${g.y},${g.z}`),
+ ...(current>0?['Previous Page']:[]),...(current<pages-1?['Next Page']:[]),'Back'],i=>{
+  if(i<a.length){const [key,g]=a[i];return manageGenerator(p,key,g)}
+  let j=a.length;if(current>0){if(i===j)return myGenerators(p,current-1);j++}
+  if(current<pages-1){if(i===j)return myGenerators(p,current+1)}
+  genMenu(p);
  });
 }
 function manageGenerator(p,key,g){
  if(g.owner!==p.id||generators.get(key)!==g)return myGenerators(p);
  const lv=g.level||1;
  const spec=GENS.find(x=>x.name===g.type);
- const cost=spec?spec.cost*lv*2:0;
+ const rawCost=spec?spec.cost*lv*2:0;
+ const cost=discountedPrice(rawCost,perkValue(profile(p),'generatorPrice'));
  form(p,'§bMANAGE GENERATOR',`${g.type} • Level ${lv}/5\nLocation: ${g.x}, ${g.y}, ${g.z}\nUpgrade cost: ${lv>=5?'MAX LEVEL':cost+' Credits'}\nDeletion permanently removes the generator; no refund.`,['Upgrade','Delete Generator','Diagnose Generator','Admin: Force Output Test','Back'],i=>{
   if(i===2){
    const dim=world.getDimension('overworld');
@@ -789,7 +1070,7 @@ function manageGenerator(p,key,g){
    try{base=dim.getBlock({x:g.x,y:g.y,z:g.z})?.typeId||'unloaded';output=dim.getBlock({x:g.x,y:g.y+1,z:g.z})?.typeId||'unloaded'}catch(e){genError('inspect '+e)}
    const interval=Math.max(1,Math.ceil((Number(g.period)||spec?.period||200)/20));
    const age=genLastTick<0?'never':String(system.currentTick-genLastTick)+' ticks ago';
-   const lines=[`§bSkyGen Generator Deep Diagnostics v0.8.3`,`Generator: ${g.type} level ${lv} at ${g.x},${g.y},${g.z}`,`Registered: ${generators.get(key)===g} | Registry size: ${generators.size}`,`Base: ${base} | Output: ${output} | Expected: ${spec?.block||g.block}`,`Interval: ${interval}s | Empty: ${genEmptySeconds.get(key)||0}s`,`Watchdog runs: ${genWatchdogRuns} | Last heartbeat: ${age}`,`Script uptime: ${system.currentTick-genStartupTick} ticks | Current tick: ${system.currentTick}`,`Last error: ${genLastError}`,`Recent errors: ${genErrors.slice(-3).join(' ; ')||'none'}`];
+   const lines=[`§bSkyGen Generator Deep Diagnostics v0.9.0`,`Generator: ${g.type} level ${lv} at ${g.x},${g.y},${g.z}`,`Registered: ${generators.get(key)===g} | Registry size: ${generators.size}`,`Base: ${base} | Output: ${output} | Expected: ${spec?.block||g.block}`,`Interval: ${interval}s | Empty: ${genEmptySeconds.get(key)||0}s`,`Watchdog runs: ${genWatchdogRuns} | Last heartbeat: ${age}`,`Script uptime: ${system.currentTick-genStartupTick} ticks | Current tick: ${system.currentTick}`,`Last error: ${genLastError}`,`Recent errors: ${genErrors.slice(-3).join(' ; ')||'none'}`];
    for(const line of lines)p.sendMessage(line);
    return;
   }
@@ -824,7 +1105,7 @@ function manageGenerator(p,key,g){
      if(!base||!output)return p.sendMessage('§cGenerator chunk is not loaded. Stand near it and try again.');
      if(base.typeId!=='minecraft:bedrock')return p.sendMessage('§cGenerator base missing. Deletion cancelled to protect nearby blocks.');
      // Remove the registry first and verify. If block removal fails, restore registry.
-     generators.delete(key);
+     generators.delete(key);genEmptySeconds.delete(key);
      if(!genSave()){generators.set(key,g);return p.sendMessage('§cCannot save registry; nothing deleted.')}
      try{
       if(output.typeId===g.block)output.setType('minecraft:air');
@@ -836,19 +1117,31 @@ function manageGenerator(p,key,g){
   }else myGenerators(p);
  });
 }
-function buyGen(p){
- form(p,'BUY GENERATOR',GENS.map((g,i)=>`${i+1}. ${g.name}: ${g.cost} Credits`).join('\n'),[...GENS.map(g=>g.name),'Back'],i=>{
-  if(i>=GENS.length)return genMenu(p);
+function buyGen(p,category='Starter',page=0){
+ const d=profile(p),list=GENS.filter(g=>g.category===category);
+ const pages=Math.ceil(list.length/8),current=Math.max(0,Math.min(page,pages-1));
+ const slice=list.slice(current*8,current*8+8);
+ const heading=`${category} • Page ${current+1}/${pages}\nRank ${d.rank} / 50\nCredits ${d.credits}`;
+ form(p,'§bBUY '+category.toUpperCase(),heading,
+ [...slice.map(g=>`${d.rank<g.unlock?'§8LOCKED ':'§a'}${g.name} — ${discountedPrice(g.cost,perkValue(d,'generatorPrice'))} Credits (Rank ${g.unlock})`),
+ ...(current>0?['Previous Page']:[]),...(current<pages-1?['Next Page']:[]),'Back'],i=>{
+  if(i>=slice.length){let idx=slice.length;
+   if(current>0){if(i===idx)return buyGen(p,category,current-1);idx++}
+   if(current<pages-1){if(i===idx)return buyGen(p,category,current+1)}
+   return genCategories(p);
+  }
   if(!generatorRegistryLoaded)return p.sendMessage('§cGenerators still loading or registry corrupt. Purchases disabled.');
-  const d=profile(p),g=GENS[i];if(d.credits<g.cost)return p.sendMessage('§cNot enough Credits.');
+  const g=slice[i],latest=profile(p),cost=discountedPrice(g.cost,perkValue(latest,'generatorPrice'));
+  if(latest.rank<g.unlock)return p.sendMessage(`§c${g.name} requires Rank ${g.unlock}.`);
+  if(latest.credits<cost)return p.sendMessage('§cNot enough Credits.');
   const inv=inventory(p);if(!inv)return;
   const egg=new ItemStack('minecraft:egg',1);egg.nameTag=`§bSkyGen ${g.name} Generator`;
   egg.setLore([`Generator type: ${g.name}`,'Use on your plot to place']);
   if(!inventoryCapacity(p,egg))return p.sendMessage('§cInventory full. No charge.');
-  try{d.credits-=g.cost;save(p,d)}catch(err){return p.sendMessage('§cWallet storage unavailable. No token delivered.')} 
-  try{if(inv.addItem(egg))throw Error('Inventory changed');p.sendMessage(`§aPurchased ${g.name} generator token.`)}
+  try{latest.credits-=cost;save(p,latest)}catch(err){return p.sendMessage('§cWallet storage unavailable. No token delivered.')} 
+  try{if(inv.addItem(egg))throw Error('Inventory changed');p.sendMessage(`§aPurchased ${g.name} generator token for ${cost} Credits.`)}
   catch(err){
-   try{const fresh=profile(p);fresh.credits+=g.cost;save(p,fresh);p.sendMessage('§cToken delivery failed. Credits refunded.')} 
+   try{const fresh=profile(p);fresh.credits+=cost;save(p,fresh);p.sendMessage('§cToken delivery failed. Credits refunded.')}
    catch(fatal){genError('CRITICAL: generator token refund failed '+p.name+' '+fatal,'transaction');p.sendMessage('§cToken delivery error: contact admin for wallet recovery.')}
   }
  });
@@ -878,12 +1171,28 @@ function shop(p){
  showShop(first,'main',r=>{
   if(r.selection===2)return back(p);
   const buying=r.selection===0;
-  const select=new ActionFormData().title(buying?'BUY ITEMS':'SELL ITEMS').body('Choose an item.');
-  for(const item of SHOP)select.button(item.id+' ('+(buying?item.buy:item.sell)+' / '+item.count+')');
-  select.button('Back');
-  showShop(select,'item selection',chosen=>{
-   if(chosen.selection>=SHOP.length)return shop(p);
-   const item=SHOP[chosen.selection];
+  const categories=['Starter','Ores','Nether','Endgame'];
+  const groupMap={Starter:[...SHOP.slice(0,2),...SHOP.filter(s=>s.category==='Starter')],Ores:[...SHOP.slice(2,4),...SHOP.filter(s=>s.category==='Ores')],Nether:SHOP.filter(s=>s.category==='Nether'),Endgame:SHOP.filter(s=>s.category==='Endgame')};
+  const chooseCategory=new ActionFormData().title(buying?'BUY — CATEGORY':'SELL — CATEGORY').body('Choose a category.');
+  for(const c of categories)chooseCategory.button(`${c} (${groupMap[c].length})`);
+  chooseCategory.button('Back');
+  showShop(chooseCategory,'shop category',c=>{
+   if(c.selection>=categories.length)return shop(p);
+   const items=groupMap[categories[c.selection]];
+   const choosePage=(page)=>{
+    const pageSize=8,slice=items.slice(page*pageSize,page*pageSize+pageSize);
+    const select=new ActionFormData().title(buying?'BUY ITEMS':'SELL ITEMS').body(`${categories[c.selection]} — Page ${page+1}/${Math.ceil(items.length/pageSize)}`);
+    for(const item of slice)select.button(`${item.id} (${buying?item.buy:item.sell} / ${item.count})`);
+    if(page>0)select.button('Previous Page');
+    if((page+1)*pageSize<items.length)select.button('Next Page');
+    select.button('Back');
+    showShop(select,'item selection',chosen=>{
+     if(chosen.selection>=slice.length){let offset=slice.length;
+      if(page>0){if(chosen.selection===offset)return choosePage(page-1);offset++}
+      if((page+1)*pageSize<items.length){if(chosen.selection===offset)return choosePage(page+1)}
+      return shop(p);
+     }
+     const item=slice[chosen.selection];
    const amountForm=new ModalFormData().title(buying?'Buy Quantity':'Sell Quantity').textField('How many items? (1–2304)','16',{defaultValue:'16'});
    showShop(amountForm,'quantity',r=>{
     const raw=String(r.formValues?.[0]??'').trim();
@@ -891,7 +1200,9 @@ function shop(p){
     if(!Number.isSafeInteger(count)||count>2304)return p.sendMessage('§cEnter a whole number from 1 to 2304.');
     // All shop bundles have integral per-item prices. Do not force buyers
     // to purchase in bundle multiples (1, 16, 64, max must all work).
-    const unitPrice=shopUnitPrice(item,buying);
+    const baseUnit=shopUnitPrice(item,buying);
+    const dForPrice=profile(p);
+    const unitPrice=buying?discountedPrice(baseUnit,perkValue(dForPrice,'buy')):Math.min(baseUnit*2-1,baseUnit+Math.floor(baseUnit*perkValue(dForPrice,'sell')/100));
     const total=count*unitPrice;
     if(!Number.isSafeInteger(total)||total<=0)return p.sendMessage('§cInvalid price calculation.');
     const confirmation=new MessageFormData().title('Confirm Shop Transaction').body((buying?'Buy ':'Sell ')+count+' × '+item.id+'\n'+(buying?'Cost: ':'Payment: ')+total+' Credits').button1('Cancel').button2('Confirm');
@@ -918,7 +1229,7 @@ function shop(p){
         if(remainder)break;
        }
        if(delivered!==count){
-        const actualCost=Math.ceil(delivered*item.buy/item.count),refund=total-actualCost;
+        const actualCost=delivered*unitPrice,refund=total-actualCost;
         try{const latest=profile(p);latest.credits+=refund;save(p,latest)}catch(err){console.warn('[SkyGen SHOP] CRITICAL partial refund failed '+p.name+' '+err);return p.sendMessage('§cPartial shop delivery; contact admin for refund. Items delivered: '+delivered)}
         return p.sendMessage('§eOnly '+delivered+' items delivered. Charged '+actualCost+' Credits; '+refund+' refunded.');
        }
@@ -927,6 +1238,9 @@ function shop(p){
      p.sendMessage('§a'+(buying?'Purchased ':'Sold ')+count+' '+item.id+' for '+total+' Credits.');
     });
    });
+  });
+   };
+   choosePage(0);
   });
  });
 }
@@ -969,7 +1283,7 @@ function wallet(p){
  });
 }
 const RANK_NAMES=['Rookie','Miner','Builder','Explorer','Crafter','Prospector','Stoneworker','Harvester','Merchant','Apprentice','Scout','Forger','Excavator','Smith','Artisan','Engineer','Trader','Guardian','Specialist','Veteran','Challenger','Pathfinder','Master Miner','Architect','Gem Hunter','Industrialist','Champion','Commander','Warden','Elite','Baron','Overseer','Titan','Virtuoso','Conqueror','Vanguard','Oracle','Paragon','Sovereign','Legend','Ascendant','Celestial','Mythic','Immortal','Eternal','Overlord','Starborn','Cosmic','Infinity','SkyGen Master'];
-function ranks(p){const d=profile(p);form(p,'§d50 RANKS',`Current: ${d.rank}/50 — ${RANK_NAMES[d.rank-1]}\nXP: ${d.xp} / 49000\nNext rank: ${d.rank>=50?'MAX':1000-(d.xp%1000)+' XP'}\nEvery rank gives Rank × 100 Credits. Every 10 ranks also gives 1 Orbit.`,['Browse ranks 1–25','Browse ranks 26–50','Back'],i=>{if(i===2)return back(p);const lo=i===0?0:25;form(p,'§dRANK PROGRESSION',RANK_NAMES.slice(lo,lo+25).map((name,j)=>`${lo+j+1}. ${name} — ${1000*(lo+j)} XP`).join('\n'),['Back'],()=>ranks(p))})}
+function ranks(p){const d=profile(p);form(p,'§d50 RANKS',`Current: ${d.rank}/50 — ${RANK_NAMES[d.rank-1]}\nXP: ${d.xp} / 49000\nNext rank: ${d.rank>=50?'MAX':1000-(d.xp%1000)+' XP'}\nEvery rank gives skill points and Rank × 100 Credits. Every 10 ranks gives 1 Orbit and 2 bonus Skill Points.`,['Browse ranks 1–25','Browse ranks 26–50','Back'],i=>{if(i===2)return back(p);const lo=i===0?0:25;form(p,'§dRANK PROGRESSION',RANK_NAMES.slice(lo,lo+25).map((name,j)=>`${lo+j+1}. ${name} — ${1000*(lo+j)} XP`).join('\n'),['Back'],()=>ranks(p))})}
 function teleports(p){form(p,'§bTELEPORTS','All teleports have a 5-second stand-still warmup and 5-second cooldown.',['Go to Spawn','Go to Plot','Back'],i=>{if(i===0)safeSpawnTravel(p);if(i===1)tpPlot(p);if(i===2)back(p)})}
 // Only these ordinary materials can be reconstructed by type without losing
 // enchantments, damage, or other complex item data. Legacy unknown items are
@@ -984,6 +1298,8 @@ const MARKET_COMMODITIES=new Set([
  'minecraft:diamond_ore','minecraft:emerald_ore',
  'minecraft:obsidian','minecraft:deepslate','minecraft:gravel','minecraft:sand'
 ]);
+for(const item of SHOP)MARKET_COMMODITIES.add(item.id);
+for(const g of GENS)MARKET_COMMODITIES.add(g.block);
 const MARKET_LOCK=new Set();
 function marketLock(id,fn){
  if(MARKET_LOCK.has(id))return false;
@@ -1208,6 +1524,8 @@ world.afterEvents.itemUse.subscribe(e=>{const p=e.source,i=e.itemStack;if(adminA
   if(generators.has(key))return p.sendMessage('§cGenerator already here.');
   if(!generatorRegistryLoaded)return p.sendMessage('§cGenerator registry not loaded. Placement disabled to protect existing data.');
   if(generators.size>=GEN_REGISTRY_LIMIT)return p.sendMessage('§cGenerator registry is full; no egg consumed.');
+  if(generatorOwnerCount(p)>=generatorSlots(p))return p.sendMessage('§cGenerator slot limit reached. Skill Tree → Engineering adds more slots.');
+  if(g.block==='minecraft:ancient_debris'&&[...generators.values()].some(x=>x.owner===p.id&&x.type==='Ancient Debris'))return p.sendMessage('§cOnly one Ancient Debris generator per player.');
   const record={...loc,owner:p.id,type:g.name,period:g.period,block:g.block,last:system.currentTick,elapsed:0};
   try{if(!buildGenerator(record))return p.sendMessage('§cGenerator needs two empty blocks above the targeted block. Aim at an open floor area.')}
   catch(err){return p.sendMessage('§cGenerator could not be built: '+err)}
@@ -1221,7 +1539,8 @@ world.afterEvents.itemUse.subscribe(e=>{const p=e.source,i=e.itemStack;if(adminA
    }catch(err){genError('CRITICAL: failed to rollback unsaved generator '+key+' '+err,'rollback')}
    return p.sendMessage('§cGenerator storage is full/unavailable. Placement rolled back; egg retained.');
   }
-  const inv=p.getComponent('minecraft:inventory')?.container;const selected=p.selectedSlotIndex,stack=inv?.getItem(selected);if(stack&&stack.nameTag===i.nameTag){if(stack.amount===1)inv.setItem(selected,undefined);else{stack.amount--;inv.setItem(selected,stack)}}p.sendMessage(`§aPlaced ${g.name} generator at ${loc.x},${loc.y},${loc.z}. The bedrock base is visible; the first ore appears immediately ON TOP, and regenerates after mining. Mine the ore to produce more.`)}});
+  const inv=p.getComponent('minecraft:inventory')?.container;const selected=p.selectedSlotIndex,stack=inv?.getItem(selected);if(stack&&stack.nameTag===i.nameTag){if(stack.amount===1)inv.setItem(selected,undefined);else{stack.amount--;inv.setItem(selected,stack)}}try{const pd=profile(p);recordDaily(pd,'placements');save(p,pd)}catch(e){console.warn('[SkyGen DAILY] generator placement tracking '+e)}
+  p.sendMessage(`§aPlaced ${g.name} generator at ${loc.x},${loc.y},${loc.z}. The bedrock base is visible; the first ore appears immediately ON TOP, and regenerates after mining. Mine the ore to produce more.`)}});
 world.beforeEvents.playerBreakBlock.subscribe(e=>{
  const {x,y,z}=e.block.location;
  if(e.player.dimension?.id!=='minecraft:overworld')return;
@@ -1256,30 +1575,58 @@ try{
   }
  });
 }catch(e){console.warn('[SkyGen] post-placement repair unavailable: '+e)}
-world.afterEvents.playerBreakBlock.subscribe(e=>{if(!belongs(e.player,e.block.location.x,e.block.location.z))return;const d=profile(e.player);d.xp+=1;rank(e.player,d)});
+const normalXpGate=new Map();
+world.afterEvents.playerBreakBlock.subscribe(e=>{
+ try{
+  const p=e.player,loc=e.block.location;
+  if(!belongs(p,loc.x,loc.z))return;
+  const d=profile(p);recordDaily(d,'blocks');
+  const key=`${loc.x},${loc.y-1},${loc.z}`,g=generators.get(key);
+  const type=e.brokenBlockPermutation?.type?.id||e.brokenBlockPermutation?.typeId||'';
+  const validHarvest=!!g&&g.owner===p.id&&(loc.y===g.y+1)&&(type===(GENS.find(x=>x.name===g.type)?.block||g.block));
+  if(validHarvest){
+   const bonus=perkValue(d,'miningXp');d.xp+=Math.ceil(5*(100+bonus)/100);
+   recordDaily(d,'harvests');
+   const lucky=perkValue(d,'luck');
+   if(lucky>0&&Math.random()*100<lucky){
+    const prize=new ItemStack(g.block,1);
+    if(inventoryCapacity(p,prize)){try{inventory(p)?.addItem(prize);p.sendMessage('§aLucky Strikes! +1 bonus block.')}catch{}}
+   }
+  }else{
+   const last=normalXpGate.get(p.id)??-99999;
+   if(system.currentTick-last>=5){d.xp+=1;normalXpGate.set(p.id,system.currentTick)}
+  }
+  rank(p,d);
+ }catch(err){console.warn('[SkyGen XP] could not record block break: '+err)}
+});
 // Self-rescheduling generator watchdog. A generator's empty state is tracked in
 // memory and is reset when an output block is present. No stale saved ticks.
+let genRotation=0;
 function genWatchdog(){
  genWatchdogRuns++;genLastTick=system.currentTick;
  try{
-  const dim=world.getDimension('overworld');
-  for(const [key,g] of generators){
+  const dim=world.getDimension('overworld'),records=[...generators.entries()];
+  if(!records.length)return;
+  // Never perform 1200 block reads every second. Process at most 100 generators
+  // per heartbeat with absolute tick-based regeneration timing.
+  const count=Math.min(100,records.length);
+  for(let n=0;n<count;n++){
+   const [key,g]=records[(genRotation+n)%records.length];
    try{
-    const base=dim.getBlock({x:g.x,y:g.y,z:g.z});
-    const output=dim.getBlock({x:g.x,y:g.y+1,z:g.z});
-    if(!base||!output||base.typeId!=='minecraft:bedrock'){genEmptySeconds.delete(key);continue;}
-    const spec=GENS.find(x=>x.name===g.type);
-    const expected=spec?.block||g.block;
-    if(!expected){genEmptySeconds.delete(key);continue;}
-    if(output.typeId!=='minecraft:air'){genEmptySeconds.delete(key);continue;}
-    const elapsed=(genEmptySeconds.get(key)||0)+1;
-    const wait=Math.max(1,Math.ceil((Number(g.period)||spec?.period||200)/20));
-    if(elapsed>=wait){output.setType(expected);genEmptySeconds.delete(key);}
-    else genEmptySeconds.set(key,elapsed);
+    const base=dim.getBlock({x:g.x,y:g.y,z:g.z}),output=dim.getBlock({x:g.x,y:g.y+1,z:g.z});
+    if(!base||!output||base.typeId!=='minecraft:bedrock'){genEmptySeconds.delete(key);continue}
+    const spec=GENS.find(x=>x.name===g.type),expected=spec?.block||g.block;
+    if(!expected){genEmptySeconds.delete(key);continue}
+    if(output.typeId!=='minecraft:air'){genEmptySeconds.delete(key);continue}
+    const detected=genEmptySeconds.get(key);
+    if(!Number.isFinite(detected)){genEmptySeconds.set(key,system.currentTick);continue}
+    if(system.currentTick-detected>=effectivePeriod(g)){
+     output.setType(expected);genEmptySeconds.delete(key);
+    }
    }catch(err){genError(key+' '+err,key)}
   }
+  genRotation=(genRotation+count)%records.length;
  }catch(err){genError('watchdog '+err)}
-
 }
 
 try{
@@ -1289,6 +1636,7 @@ try{
   const s=spawnStages.get(id);s?.release?.();
   for(const [plot,session] of plotBuilds){if(session.playerId===id){try{session.cancel?.()}catch(err){console.warn('[SkyGen] plot cleanup on leave '+err)}}}
   const trade=trades.get(id);if(trade)tradeClose(trade,'Trade cancelled: player disconnected.');
+  normalXpGate.delete(id);skillLastEffects.delete(id);skillActiveEffects.delete(id);for(const key of skillCooldowns.keys())if(key.startsWith(id+':'))skillCooldowns.delete(key);
  });
 }catch(e){console.warn('[SkyGen] leave cleanup unavailable '+e)}
 system.runInterval(()=>{for(const p of world.getAllPlayers())ensure(p)},200);
@@ -1309,4 +1657,4 @@ function adminCommand(actor,message){
 }
 
 system.runTimeout(()=>{try{ensureSpawn()}catch(e){console.warn('SkyGen spawn init: '+e)}},40);
-console.warn('[SkyGen] 0.8.3 pre-install checks and repairs loaded');
+console.warn('[SkyGen] 0.9.0 generators and skill tree loaded');

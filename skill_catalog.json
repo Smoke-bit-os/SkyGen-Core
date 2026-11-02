@@ -1,0 +1,380 @@
+[
+  {
+    "id": "miner_haste_1",
+    "name": "Quick Hands I",
+    "desc": "Haste I on your plot",
+    "cost": 1,
+    "rank": 2,
+    "branch": "Mining",
+    "prev": null
+  },
+  {
+    "id": "miner_haste_2",
+    "name": "Quick Hands II",
+    "desc": "Haste II on your plot",
+    "cost": 2,
+    "rank": 10,
+    "branch": "Mining",
+    "prev": "miner_haste_1"
+  },
+  {
+    "id": "miner_xp_1",
+    "name": "Prospector I",
+    "desc": "+10% generator mining XP",
+    "cost": 1,
+    "rank": 12,
+    "branch": "Mining",
+    "prev": "miner_haste_2"
+  },
+  {
+    "id": "miner_xp_2",
+    "name": "Prospector II",
+    "desc": "+25% generator mining XP",
+    "cost": 2,
+    "rank": 20,
+    "branch": "Mining",
+    "prev": "miner_xp_1"
+  },
+  {
+    "id": "miner_luck_1",
+    "name": "Lucky Strikes I",
+    "desc": "2% chance of a bonus material",
+    "cost": 2,
+    "rank": 25,
+    "branch": "Mining",
+    "prev": "miner_xp_2"
+  },
+  {
+    "id": "miner_luck_2",
+    "name": "Lucky Strikes II",
+    "desc": "4% chance of a bonus material",
+    "cost": 3,
+    "rank": 35,
+    "branch": "Mining",
+    "prev": "miner_luck_1"
+  },
+  {
+    "id": "miner_master",
+    "name": "Master Miner",
+    "desc": "+50% generator mining XP total",
+    "cost": 4,
+    "rank": 45,
+    "branch": "Mining",
+    "prev": "miner_luck_2"
+  },
+  {
+    "id": "move_speed_1",
+    "name": "Swift Steps I",
+    "desc": "Speed I on your plot",
+    "cost": 1,
+    "rank": 2,
+    "branch": "Mobility",
+    "prev": null
+  },
+  {
+    "id": "move_speed_2",
+    "name": "Swift Steps II",
+    "desc": "Speed II on your plot",
+    "cost": 2,
+    "rank": 12,
+    "branch": "Mobility",
+    "prev": "move_speed_1"
+  },
+  {
+    "id": "move_jump_1",
+    "name": "High Jumper I",
+    "desc": "Jump Boost I, toggleable",
+    "cost": 1,
+    "rank": 8,
+    "branch": "Mobility",
+    "prev": "move_speed_2"
+  },
+  {
+    "id": "move_jump_2",
+    "name": "High Jumper II",
+    "desc": "Jump Boost II, toggleable",
+    "cost": 2,
+    "rank": 18,
+    "branch": "Mobility",
+    "prev": "move_jump_1"
+  },
+  {
+    "id": "move_fall",
+    "name": "Feather Foot",
+    "desc": "Slow Falling, toggleable",
+    "cost": 2,
+    "rank": 25,
+    "branch": "Mobility",
+    "prev": "move_jump_2"
+  },
+  {
+    "id": "move_tp_1",
+    "name": "Fast Traveler",
+    "desc": "Teleport cooldown 20% shorter",
+    "cost": 3,
+    "rank": 35,
+    "branch": "Mobility",
+    "prev": "move_fall"
+  },
+  {
+    "id": "move_tp_2",
+    "name": "Wayfinder",
+    "desc": "Teleport cooldown 40% shorter",
+    "cost": 4,
+    "rank": 45,
+    "branch": "Mobility",
+    "prev": "move_tp_1"
+  },
+  {
+    "id": "surv_resist",
+    "name": "Stone Skin",
+    "desc": "Resistance I on your plot",
+    "cost": 1,
+    "rank": 5,
+    "branch": "Survival",
+    "prev": null
+  },
+  {
+    "id": "surv_regen",
+    "name": "Vitality",
+    "desc": "Regeneration I on your plot",
+    "cost": 2,
+    "rank": 15,
+    "branch": "Survival",
+    "prev": "surv_resist"
+  },
+  {
+    "id": "surv_health",
+    "name": "Fortified",
+    "desc": "Health Boost I on your plot",
+    "cost": 2,
+    "rank": 20,
+    "branch": "Survival",
+    "prev": "surv_regen"
+  },
+  {
+    "id": "surv_fire",
+    "name": "Flameproof",
+    "desc": "Fire Resistance on your plot",
+    "cost": 2,
+    "rank": 25,
+    "branch": "Survival",
+    "prev": "surv_health"
+  },
+  {
+    "id": "surv_absorb",
+    "name": "Second Wind",
+    "desc": "Active Absorption, 2-minute cooldown",
+    "cost": 2,
+    "rank": 30,
+    "branch": "Survival",
+    "prev": "surv_fire"
+  },
+  {
+    "id": "surv_regen2",
+    "name": "Greater Vitality",
+    "desc": "Regeneration II on your plot",
+    "cost": 3,
+    "rank": 40,
+    "branch": "Survival",
+    "prev": "surv_absorb"
+  },
+  {
+    "id": "surv_saturate",
+    "name": "Survival Feast",
+    "desc": "Active Saturation, 5-minute cooldown",
+    "cost": 4,
+    "rank": 48,
+    "branch": "Survival",
+    "prev": "surv_regen2"
+  },
+  {
+    "id": "explore_night",
+    "name": "Night Owl",
+    "desc": "Night Vision on your plot",
+    "cost": 1,
+    "rank": 2,
+    "branch": "Exploration",
+    "prev": null
+  },
+  {
+    "id": "explore_water",
+    "name": "Deep Diver",
+    "desc": "Water Breathing on your plot",
+    "cost": 1,
+    "rank": 10,
+    "branch": "Exploration",
+    "prev": "explore_night"
+  },
+  {
+    "id": "explore_conduit",
+    "name": "Tidal Power",
+    "desc": "Conduit Power while underwater",
+    "cost": 2,
+    "rank": 18,
+    "branch": "Exploration",
+    "prev": "explore_water"
+  },
+  {
+    "id": "explore_dolphin",
+    "name": "Ocean Runner",
+    "desc": "Dolphin Grace while underwater",
+    "cost": 2,
+    "rank": 25,
+    "branch": "Exploration",
+    "prev": "explore_conduit"
+  },
+  {
+    "id": "explore_invisible",
+    "name": "Shadow Step",
+    "desc": "Active invisibility, 4-minute cooldown",
+    "cost": 2,
+    "rank": 30,
+    "branch": "Exploration",
+    "prev": "explore_dolphin"
+  },
+  {
+    "id": "explore_toggle",
+    "name": "Careful Explorer",
+    "desc": "Toggle passive exploration effects",
+    "cost": 2,
+    "rank": 35,
+    "branch": "Exploration",
+    "prev": "explore_invisible"
+  },
+  {
+    "id": "explore_master",
+    "name": "Expedition Master",
+    "desc": "Passive exploration benefits require no extra consumables",
+    "cost": 4,
+    "rank": 45,
+    "branch": "Exploration",
+    "prev": "explore_toggle"
+  },
+  {
+    "id": "econ_sell_1",
+    "name": "Merchant I",
+    "desc": "+2% ordinary shop sale price",
+    "cost": 1,
+    "rank": 2,
+    "branch": "Economy",
+    "prev": null
+  },
+  {
+    "id": "econ_buy_1",
+    "name": "Bargain Hunter I",
+    "desc": "2% off ordinary shop purchases",
+    "cost": 1,
+    "rank": 8,
+    "branch": "Economy",
+    "prev": "econ_sell_1"
+  },
+  {
+    "id": "econ_sell_2",
+    "name": "Merchant II",
+    "desc": "+5% ordinary shop sale price",
+    "cost": 2,
+    "rank": 15,
+    "branch": "Economy",
+    "prev": "econ_buy_1"
+  },
+  {
+    "id": "econ_buy_2",
+    "name": "Bargain Hunter II",
+    "desc": "5% off ordinary shop purchases",
+    "cost": 2,
+    "rank": 22,
+    "branch": "Economy",
+    "prev": "econ_sell_2"
+  },
+  {
+    "id": "econ_rank",
+    "name": "Rank Rewards",
+    "desc": "+10% future rank Credits",
+    "cost": 2,
+    "rank": 28,
+    "branch": "Economy",
+    "prev": "econ_buy_2"
+  },
+  {
+    "id": "econ_sell_3",
+    "name": "Master Merchant",
+    "desc": "+10% shop sale prices",
+    "cost": 3,
+    "rank": 36,
+    "branch": "Economy",
+    "prev": "econ_rank"
+  },
+  {
+    "id": "econ_buy_3",
+    "name": "Master Negotiator",
+    "desc": "10% off shop purchases",
+    "cost": 4,
+    "rank": 45,
+    "branch": "Economy",
+    "prev": "econ_sell_3"
+  },
+  {
+    "id": "eng_speed_1",
+    "name": "Tuned Pistons I",
+    "desc": "5% quicker generator recovery",
+    "cost": 1,
+    "rank": 3,
+    "branch": "Engineering",
+    "prev": null
+  },
+  {
+    "id": "eng_speed_2",
+    "name": "Tuned Pistons II",
+    "desc": "10% quicker generator recovery",
+    "cost": 2,
+    "rank": 12,
+    "branch": "Engineering",
+    "prev": "eng_speed_1"
+  },
+  {
+    "id": "eng_slots_1",
+    "name": "Builder Permit I",
+    "desc": "5 additional generator slots",
+    "cost": 1,
+    "rank": 15,
+    "branch": "Engineering",
+    "prev": "eng_speed_2"
+  },
+  {
+    "id": "eng_speed_3",
+    "name": "Tuned Pistons III",
+    "desc": "15% quicker generator recovery",
+    "cost": 2,
+    "rank": 25,
+    "branch": "Engineering",
+    "prev": "eng_slots_1"
+  },
+  {
+    "id": "eng_slots_2",
+    "name": "Builder Permit II",
+    "desc": "10 additional generator slots",
+    "cost": 2,
+    "rank": 30,
+    "branch": "Engineering",
+    "prev": "eng_speed_3"
+  },
+  {
+    "id": "eng_price_1",
+    "name": "Factory Contracts I",
+    "desc": "5% off generator purchases and upgrades",
+    "cost": 3,
+    "rank": 38,
+    "branch": "Engineering",
+    "prev": "eng_slots_2"
+  },
+  {
+    "id": "eng_price_2",
+    "name": "Factory Contracts II",
+    "desc": "10% off generator purchases and upgrades",
+    "cost": 4,
+    "rank": 47,
+    "branch": "Engineering",
+    "prev": "eng_price_1"
+  }
+]

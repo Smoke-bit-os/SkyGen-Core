@@ -1,23 +1,48 @@
-# SkyGen Core v0.8.3 — Pre-Install Verification Build
+# SkyGen Core v0.9.0 — Progression Expansion (TESTING)
 
-Minecraft Bedrock / Xbox Realms behavior and resource pack. This is a single installable `.mcaddon` containing the tested code-level revisions of v0.8.2 plus focused final fixes.
+**Minecraft Bedrock (Xbox / Realms)** — based on the user-tested v0.8.3 release.
 
-## One-file install
-Download `releases/SkyGen_Core_v0.8.3_Preinstall_Verified.mcaddon` and import it once using your normal Bedrock pack-install process. In world settings, deactivate old SkyGen packs and select v0.8.3 BP and RP. Make a Realm backup first; test a copy before altering the live world. Cheats must be enabled for script-run `/tickingarea` operations. The world must have an appropriate void/skyblock-style layout; this behavior pack does not replace the world generator.
+## What's new
 
-## Preserved
-- Original 10-button main menu, locked hotbar items, 50 ranks, plot ownership, credits, Orbits, admin manager, generators, shop, trading, and commodity marketplace
-- Behavior and resource pack UUIDs and script module UUIDs identical to v0.8.2/v0.7.6; existing player data keys remain unchanged
-- `@minecraft/server` and `@minecraft/server-ui` stable 2.0.0 dependencies (minimum Minecraft Bedrock 1.21.90)
+- **42 generators** across Starter (12), Mining (10), Nature & Nether (10), Endgame (10). Old six generators retain their exact names, output blocks, prices, and default periods.
+- **42 unlockable skills**, seven each in Mining, Mobility, Survival, Exploration, Economy, and Engineering. Every rank-up awards one Skill Point; Ranks 10/20/30/40/50 award two bonus points each. A Rank 50 player is entitled to 59 total points, even on existing worlds.
+- **Passive / toggleable / active effects** with skill prerequisites, rank gates, paid respec, on-plot-only effects and persistent ability cooldowns.
+- **28 Server Shop items**, organized into categories and pages, with exact per-item quantities and optional economy bonuses.
+- **Three daily quests** refreshed on UTC date change, rewarding Credits and XP.
+- **Generator persistence migration:** transactional two-bank, verified, sharded world dynamic properties. Capacity is now 1,200 registry records (rather than 500); the preexisting `sg_generators` world property is preserved as a backup.
+- **Performance management:** generator heartbeat processes at most 100 generators per second; regeneration delays use tick elapsed time. Player caps: 20 / 25 / 30 based on Engineering skills. Only one Ancient Debris generator per player.
+- **Mining progression:** generator harvests award bonus XP; ordinary block XP is rate limited to reduce XP spam.
 
-## Changes since v0.8.2
-- Shop quantities 1–2304 now use exact per-item Credits pricing (no mistaken bundle-multiple restriction)
-- Pre-existing bedrock is not removed by a failed generator build; newly created bedrock is rolled back
-- First-use Plot Horn can finish initial assignment without forcing a rejoin
-- Initial spawn rescue starts earlier and avoids duplicate teleports
-- Marketplace rejects keep-on-death or adventure-restricted/dynamic-property commodity stacks that would lose metadata on a type-only listing
+## Compatibility / preservation
 
-## Verification
-44 simulated checks passed (9 plot, 26 stability, 9 final pre-install). JavaScript syntax, MCADDON and nested MCPACK ZIP CRC, pack dependency graph, UUID stability, and header/module versions checked. This is not an in-game test, and real Xbox/Realm behavior is not guaranteed.
+Pack header and module UUIDs are **unchanged** from v0.8.3. Existing player profiles, Credits, Orbits, 50 ranks, plot assignments, token names, marketplace/trades, hotbar tools, and original menu options are preserved. The two new main-menu entries are **Skill Tree** and **Daily Quests**. The original ten entries remain in order.
 
-**Support:** If an older v0.8.2 copy has not yet been installed, do not install it first. Install v0.8.3 instead. Keep `main` stable until Bedrock testing.
+**IMPORTANT:** After a v0.9.0 registry migration, do not downgrade to v0.8.3 on the same live world without restoring the pre-upgrade world backup: old code cannot read the newer generator sharded data. v0.8.3 remains the stable production release until you test this package in a COPY of your Realm.
+
+## Installation
+
+1. Make a backup / Realm world copy. Never test a new development release directly on the live world.
+2. Import `SkyGen_Core_v0.9.0_Generators_Skill_Tree.mcaddon` (it includes both packs).
+3. Deactivate old SkyGen versions, enable v0.9.0 Behavior + Resource Packs, enable cheats for ticking areas.
+4. Enter a test world and check plot generation / both horns; then verify existing plot ownership, balances and generators.
+5. Open **SkyGen Menu → Generators** or **Skill Tree** and test purchases / rank points. If a test fails, restore the world copy backup.
+
+## Tests
+
+`node tests/test_skygen_v081.cjs behavior_pack/scripts/main.js`
+
+`node tests/test_skygen_v090_legacy.cjs behavior_pack/scripts/main.js`
+
+`node tests/test_skygen_v090_preinstall.cjs behavior_pack/scripts/main.js`
+
+`node tests/test_skygen_v090.cjs behavior_pack/scripts/main.js`
+
+**69 mocked regression tests passing**, Node JavaScript syntax check, nested ZIP integrity, manifest dependency verification. Mock tests do not substitute for real Xbox/Realm testing.
+
+## Source tree
+
+- `behavior_pack/` and `resource_pack/` — standalone pack source files
+- `generator_catalog.json` — all 42 generator types/prices/unlock ranks
+- `skill_catalog.json` — all 42 skill nodes, prerequisites and costs
+- `tests/` — Node simulated regression suites
+- `docs/` — release notes, migration details, install checklist and checksums

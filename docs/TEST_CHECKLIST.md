@@ -1,0 +1,21 @@
+# v0.9.0 Test World / Xbox Realm checklist
+
+- [ ] Back up the live Realm and import v0.9.0 into a TEST COPY only.
+- [ ] Import both packs with the SAME version v0.9.0; verify no content-log startup errors.
+- [ ] Confirm the original menu options, Spawn Horn, Plot Horn, Admin Axe and command events still work.
+- [ ] Claim a first plot and verify complete 17×17 flooring and safe teleport.
+- [ ] Return to a previously generated plot after moving away and loading other chunks.
+- [ ] Confirm trusted visitors and unauthorized block protections.
+- [ ] Confirm all six legacy generator tokens work and their purchase prices haven't changed.
+- [ ] Buy/position/mine a new low-tier generator; confirm rank-locked ones refuse sale.
+- [ ] Check a generator regenerates after mining and after a restart; buy/upgrade/delete while preserving existing builds.
+- [ ] Verify an existing Rank 50 player displays 59 earned points (or lower amount based on rank).
+- [ ] Buy first Mining, Mobility, Survival, Exploration, Economy, Engineering skill nodes; verify actual benefits on your own plot.
+- [ ] Verify skill prerequisites, low-point blocks, ability cooldown persistence, point refunds after paid reset.
+- [ ] Verify passive effects turn off after leaving your plot and are not granted at spawn or other players' plots.
+- [ ] Confirm 28 Server Shop SKUs, category pages, quantities 1 / 16 / 64 and exact balances.
+- [ ] Confirm 18,000,000 Credits → 1 Orbit exchange still works for multiple Orbits.
+- [ ] Verify daily mining / generator / placement goals, claim once, and date rollover behavior.
+- [ ] Test marketplace trades, cancelled listings, full inventories, and admin permissions.
+- [ ] Leave and rejoin; restart the world; confirm rank/skills/credits/orbits/plots/generators persist.
+- [ ] Only after passing the above, consider upgrading the live Realm, keeping the old backup.
