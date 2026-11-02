@@ -95,20 +95,150 @@ function save(p,d){p.setDynamicProperty('sg_profile',JSON.stringify(d))}
 function coords(id){return {x:C.base.x+(id%C.columns)*C.spacing,y:C.base.y,z:C.base.z+Math.floor(id/C.columns)*C.spacing}}
 function belongs(p,x,z){const d=profile(p);if(d.plot<0)return false;const c=coords(d.plot);return Math.abs(x-c.x)<=C.radius&&Math.abs(z-c.z)<=C.radius}
 function plotAt(x,z){const dx=x-C.base.x,dz=z-C.base.z;if(dx< -C.radius||dz< -C.radius)return -1;const col=Math.round(dx/C.spacing),row=Math.round(dz/C.spacing);if(col<0||col>=C.columns||row<0)return -1;const id=row*C.columns+col,c=coords(id);return Math.abs(x-c.x)<=C.radius&&Math.abs(z-c.z)<=C.radius?id:-1}
-function island(p,id){const c=coords(id),dim=world.getDimension('overworld');try{for(let x=-8;x<=8;x++)for(let z=-8;z<=8;z++){for(let y=-3;y<=-1;y++)dim.getBlock({x:c.x+x,y:c.y+y,z:c.z+z})?.setType(y===-1?'minecraft:grass_block':'minecraft:dirt')}dim.getBlock({x:c.x,y:c.y-1,z:c.z})?.setType('minecraft:gold_block');return true}catch(e){console.warn('SkyGen island: '+e);return false}}
-function claim(p){const d=profile(p);if(d.plot>=0){if(!ownerId(d.plot))world.setDynamicProperty(keyForPlot(d.plot),p.id);return d;}const id=Number(world.getDynamicProperty('sg_next_plot')??0);d.plot=id;save(p,d);world.setDynamicProperty(keyForPlot(id),p.id);world.setDynamicProperty('sg_next_plot',id+1);p.sendMessage(`§aSkyGen: Plot #${id+1} assigned. Building starter island...`);system.runTimeout(()=>{if(island(p,id))p.sendMessage('§aYour starter island is ready! Use the Plot Horn.');else p.sendMessage('§eIsland generation failed (possibly unloaded chunks). Retry from the plot menu.')},10);return d}
+// v0.8.1: Load the destination, generate/verify its floor, and KEEP that
+// chunk loaded until the teleport completes (or the request is cancelled).
+// In v0.8.0 the ticking area was removed before the Plot Horn teleport,
+// making previously created islands appear to be missing while unloaded.
+const plotBuilds=new Map(),plotRepairNotice=new Map();
+const PLOT_RETRY_TICKS=10,PLOT_MAX_TRIES=40;
+function plotNotice(p,msg){
+ const last=plotRepairNotice.get(p.id)??-99999;
+ if(system.currentTick-last>200){plotRepairNotice.set(p.id,system.currentTick);p.sendMessage(msg)}
+}
+function loadedPlotBlock(dim,x,y,z){
+ try{return dim.getBlock({x,y,z})}catch{return undefined}
+}
+function solidPlotFloor(b){return !!b&&!b.isAir&&!['minecraft:water','minecraft:lava'].includes(b.typeId)}
+function plotFloorReady(id){
+ const c=coords(id),dim=world.getDimension('overworld');
+ // Sample the middle, four sides, and four corners. One stray block is not an island.
+ for(const [dx,dz] of [[0,0],[8,0],[-8,0],[0,8],[0,-8],[8,8],[8,-8],[-8,8],[-8,-8]]){
+  if(!solidPlotFloor(loadedPlotBlock(dim,c.x+dx,c.y-1,c.z+dz)))return false;
+ }
+ return true;
+}
+function findPlotLanding(id){
+ const c=coords(id),dim=world.getDimension('overworld');
+ // Do not alter structures built by the owner. Find a clear 3-block-tall
+ // arrival space over the permanent starter floor instead.
+ for(const [dx,dz] of [[0,0],[3,0],[-3,0],[0,3],[0,-3],[3,3],[-3,3],[3,-3],[-3,-3],[6,0],[-6,0],[0,6],[0,-6]]){
+  if(!solidPlotFloor(loadedPlotBlock(dim,c.x+dx,c.y-1,c.z+dz)))continue;
+  if([0,1,2].every(dy=>loadedPlotBlock(dim,c.x+dx,c.y+dy,c.z+dz)?.isAir))
+   return {x:c.x+dx+0.5,y:c.y+1,z:c.z+dz+0.5};
+ }
+ return undefined;
+}
+function buildPlotInLoadedChunk(id){
+ const c=coords(id),dim=world.getDimension('overworld');
+ // Do not run fill against chunks that have not loaded yet.
+ if(!loadedPlotBlock(dim,c.x,c.y-1,c.z))return false;
+ if(plotFloorReady(id))return true;
+ // 'keep' fills AIR ONLY. Existing buildings / chests / custom plot flooring
+ // are not overwritten. A no-blocks-filled command may fail harmlessly.
+ for(const [offset,block] of [[-3,'minecraft:dirt'],[-2,'minecraft:dirt'],[-1,'minecraft:grass_block']]){
+  const y=c.y+offset;
+  try{dim.runCommand(`fill ${c.x-8} ${y} ${c.z-8} ${c.x+8} ${y} ${c.z+8} ${block} keep`)}
+  catch(e){if(!plotFloorReady(id))console.warn('[SkyGen] plot '+id+' floor layer '+offset+': '+e)}
+ }
+ return plotFloorReady(id);
+}
+function stageAndBuildPlot(p,id,teleportAfter=true){
+ if(!p?.isValid)return;
+ if(!canVisit(p,id))return p.sendMessage('§cYou do not have permission to use this plot.');
+ if(teleportAfter){
+  const now=system.currentTick,until=cooldowns.get(p.id)||0;
+  if(now<until)return p.sendMessage('§cTeleport cooldown: '+Math.ceil((until-now)/20)+'s');
+  if(pending.has(p.id))return p.sendMessage('§eTeleport already counting down.');
+ }
+ const active=plotBuilds.get(id);
+ if(active){
+  // Claim-time pre-generation can be upgraded into a Plot Horn teleport.
+  if(active.playerId===p.id&&teleportAfter){active.teleportAfter=true;p.sendMessage('§eSkyGen: Your plot is loading. Teleport will start when ready.');}
+  else if(teleportAfter)plotNotice(p,'§eSkyGen: That plot is currently loading. Try again shortly.');
+  return;
+ }
+ const dim=world.getDimension('overworld'),c=coords(id),name='sg_p'+id;
+ const session={playerId:p.id,teleportAfter,finished:false};
+ plotBuilds.set(id,session);
+ let areaActive=false,tries=0,lastError='Plot chunk not loaded';
+ function cleanup(){
+  if(session.finished)return;
+  session.finished=true;
+  if(plotBuilds.get(id)===session)plotBuilds.delete(id);
+  if(areaActive){try{dim.runCommand(`tickingarea remove ${name}`)}catch(e){console.warn('[SkyGen] plot tickingarea cleanup '+id+': '+e)}}
+ }
+ session.cancel=cleanup;
+ try{
+  // Clear only a stale area from a previous interrupted SkyGen run.
+  try{dim.runCommand(`tickingarea remove ${name}`)}catch{}
+  // A radius of 1 chunk is enough for the 17x17 starter island.
+  // false avoids permanent preload overhead on Realm restarts.
+  dim.runCommand(`tickingarea add circle ${c.x} ${c.y} ${c.z} 1 ${name} false`);
+  areaActive=true;
+  if(teleportAfter)p.sendMessage('§eSkyGen: Preparing plot #'+(id+1)+' safely. Stay where you are.');
+ }catch(e){
+  lastError=String(e);cleanup();
+  console.warn('[SkyGen] cannot load plot '+id+': '+lastError);
+  p.sendMessage('§cSkyGen cannot load plot chunks. Check that cheats are enabled and there is a free ticking-area slot. '+lastError.slice(0,120));
+  return;
+ }
+ function check(){
+  if(session.finished)return;
+  if(!p.isValid){cleanup();return}
+  if(!canVisit(p,id)){cleanup();p.sendMessage('§cPlot access was revoked.');return}
+  try{
+   if(buildPlotInLoadedChunk(id)){
+    const target=findPlotLanding(id);
+    if(!target){cleanup();p.sendMessage('§cPlot floor is present, but the landing area is blocked. Clear some space at the plot center.');return}
+    if(!session.teleportAfter){cleanup();p.sendMessage('§aSkyGen: Plot #'+(id+1)+' is ready. Use the Plot Horn to teleport.');return}
+    // IMPORTANT: keep the ticking area alive throughout the 5-second
+    // countdown. tpRequest releases it on success, failure or cancellation.
+    if(!tpRequest(p,target,id===profile(p).plot?'your plot':'plot #'+(id+1),id,cleanup))cleanup();
+    return;
+   }
+  }catch(e){lastError=String(e);if(tries===0||tries===PLOT_MAX_TRIES-1)console.warn('[SkyGen] plot '+id+' build error: '+lastError)}
+  tries++;
+  if(tries>=PLOT_MAX_TRIES){
+   cleanup();p.sendMessage('§cSkyGen: Plot chunks could not be prepared. No teleport attempted. '+lastError.slice(0,120));return;
+  }
+  system.runTimeout(check,PLOT_RETRY_TICKS);
+ }
+ system.runTimeout(check,10);
+}
+function claim(p){
+ const d=profile(p);
+ if(d.plot>=0){if(!ownerId(d.plot))world.setDynamicProperty(keyForPlot(d.plot),p.id);return d}
+ const id=Number(world.getDynamicProperty('sg_next_plot')??0);
+ d.plot=id;save(p,d);world.setDynamicProperty(keyForPlot(id),p.id);
+ world.setDynamicProperty('sg_next_plot',id+1);
+ p.sendMessage(`§aSkyGen: Plot #${id+1} assigned. Building starter island...`);
+ // Fresh plot assignment now starts generation automatically at spawn.
+ // An early Plot Horn press upgrades this task into a safe teleport.
+ system.runTimeout(()=>{if(p.isValid&&!plotBuilds.has(id))stageAndBuildPlot(p,id,false)},10);
+ return d;
+}
 function toolmatch(i,t){return i?.typeId===t.type&&i?.nameTag===t.name}
 function isTool(i){return !!i&&TOOLS.some(t=>toolmatch(i,t))}
 function ensure(p){try{const inv=p.getComponent('minecraft:inventory')?.container;if(!inv)return;for(const t of TOOLS){const old=inv.getItem(t.slot);if(toolmatch(old,t)&&old.lockMode===ItemLockMode.slot&&old.keepOnDeath)continue;if(old&&!isTool(old)){let free=-1;for(let i=9;i<inv.size;i++)if(!inv.getItem(i)){free=i;break}if(free<0)for(let i=0;i<6;i++)if(!inv.getItem(i)){free=i;break}if(free<0)continue;inv.setItem(free,old)}const item=new ItemStack(t.type,1);item.nameTag=t.name;item.lockMode=ItemLockMode.slot;item.keepOnDeath=true;inv.setItem(t.slot,item)}for(let i=0;i<inv.size;i++)if((i<6||i>8)&&isTool(inv.getItem(i)))inv.setItem(i,undefined)}catch(e){console.warn('SkyGen tools: '+e)}}
+function finishPendingTeleport(t,success=false){
+ if(!t||t.finished)return;
+ t.finished=true;
+ if(typeof t.onFinish==='function'){
+  // After success keep the destination loaded briefly for client chunk handoff.
+  if(success)system.runTimeout(()=>{try{t.onFinish()}catch(e){console.warn('[SkyGen] plot release '+e)}},40);
+  else try{t.onFinish()}catch(e){console.warn('[SkyGen] plot release '+e)}
+ }
+}
 function teleportWatchdog(p,id,token){
  const t=pending.get(id);
  if(!t||t.token!==token)return;
  try{
+  if(!p.isValid){pending.delete(id);finishPendingTeleport(t);return}
   const now=system.currentTick,loc=p.location;
   if(p.dimension.id!==t.dim||Math.abs(loc.x-t.start.x)>0.15||Math.abs(loc.y-t.start.y)>0.15||Math.abs(loc.z-t.start.z)>0.15){
-   pending.delete(id);showTeleportText(p,'§cTELEPORT CANCELLED');p.sendMessage('§cTeleport cancelled: you moved.');return;
+   pending.delete(id);finishPendingTeleport(t);showTeleportText(p,'§cTELEPORT CANCELLED');p.sendMessage('§cTeleport cancelled: you moved.');return;
   }
-  if(now-t.created>160){pending.delete(id);showTeleportText(p,'§cTELEPORT TIMED OUT');return;}
+  if(now-t.created>160){pending.delete(id);finishPendingTeleport(t);showTeleportText(p,'§cTELEPORT TIMED OUT');return;}
   if(now<t.end){
    const n=Math.max(1,Math.ceil((t.end-now)/20));
    try{p.onScreenDisplay.setTitle('§e'+n,{fadeInDuration:0,stayDuration:5,fadeOutDuration:0})}catch{}
@@ -117,31 +247,44 @@ function teleportWatchdog(p,id,token){
    system.runTimeout(()=>teleportWatchdog(p,id,token),1);return;
   }
   pending.delete(id);
-  if(t.visitPlot!==undefined&&!canVisit(p,t.visitPlot)){showTeleportText(p,'§cACCESS REVOKED');p.sendMessage('§cPlot access was revoked.');return}
+  if(t.visitPlot!==undefined&&!canVisit(p,t.visitPlot)){
+   finishPendingTeleport(t);showTeleportText(p,'§cACCESS REVOKED');p.sendMessage('§cPlot access was revoked.');return;
+  }
+  if(t.visitPlot!==undefined){
+   // Re-select a landing just before teleport. Someone could have built in
+   // the original arrival spot while the countdown was running.
+   const safe=plotFloorReady(t.visitPlot)?findPlotLanding(t.visitPlot):undefined;
+   if(!safe){finishPendingTeleport(t);showTeleportText(p,'§cPLOT NOT READY');p.sendMessage('§cPlot landing is not safe; teleport cancelled. Try the Plot Horn again.');return;}
+   t.target=safe;
+  }
   try{
-   // The spawn landing is already solid. Do not modify the destination chunk during teleport.
-   p.teleport(t.target,{dimension:world.getDimension('overworld'),checkForBlocks:false});
+   const destination=world.getDimension('overworld');
+   // tryTeleport reports false if Bedrock still cannot load the destination.
+   // NEVER fall back to a blind /tp into a void chunk.
+   if(typeof p.tryTeleport==='function'){
+    if(!p.tryTeleport(t.target,{dimension:destination,checkForBlocks:false}))throw new Error('Destination chunk is not ready');
+   }else p.teleport(t.target,{dimension:destination,checkForBlocks:false});
    cooldowns.set(id,system.currentTick+C.cooldown);
+   finishPendingTeleport(t,true);
    showTeleportText(p,'§aTELEPORTED!');p.sendMessage('§aTeleport successful.');
-   // Never rebuild a claimed plot during teleport: doing so would erase player builds.
-  }catch(err){showTeleportText(p,'§cTELEPORT FAILED');p.sendMessage('§cTeleport failed: '+String(err));}
- }catch(err){pending.delete(id);try{p.sendMessage('§cTeleport timer error: '+String(err))}catch{};console.warn('SkyGen watchdog '+err)}
+  }catch(err){finishPendingTeleport(t);showTeleportText(p,'§cTELEPORT FAILED');p.sendMessage('§cTeleport failed safely: '+String(err));}
+ }catch(err){pending.delete(id);finishPendingTeleport(t);try{p.sendMessage('§cTeleport timer error: '+String(err))}catch{};console.warn('SkyGen watchdog '+err)}
 }
-function tpRequest(p,target,label,visitPlot){
+function tpRequest(p,target,label,visitPlot,onFinish){
  const now=system.currentTick,id=p.id,until=cooldowns.get(id)||0;
- if(now<until){p.sendMessage('§cTeleport cooldown: '+Math.ceil((until-now)/20)+'s');return}
- if(pending.has(id)){p.sendMessage('§eTeleport already counting down.');return}
+ if(now<until){p.sendMessage('§cTeleport cooldown: '+Math.ceil((until-now)/20)+'s');return false}
+ if(pending.has(id)){p.sendMessage('§eTeleport already counting down.');return false}
  const start={x:p.location.x,y:p.location.y,z:p.location.z};
  const token=now+'-'+id;
- pending.set(id,{start,dim:p.dimension.id,target,label,visitPlot,created:now,end:now+C.warmup,token,lastShown:5});
+ pending.set(id,{start,dim:p.dimension.id,target,label,visitPlot,onFinish,created:now,end:now+C.warmup,token,lastShown:5});
  p.sendMessage('§eTeleport to '+label+' in 5 seconds. Stand still!');
  showTeleportText(p,'§e5');
  system.runTimeout(()=>teleportWatchdog(p,id,token),1);
+ return true;
 }
 function tpPlot(p){
- const d=profile(p);if(d.plot<0)return p.sendMessage('§cYou have no plot.');
- const c=coords(d.plot);
- tpRequest(p,{x:c.x+0.5,y:c.y+1,z:c.z+0.5},'your plot');
+ const d=profile(p);if(d.plot<0)return p.sendMessage('§cYou have no plot. Rejoin to retry assignment.');
+ stageAndBuildPlot(p,d.plot,true);
 }
 function rank(p,d){
  const old=d.rank||1;d.rank=Math.min(50,1+Math.floor(d.xp/1000));
@@ -336,7 +479,7 @@ function adminAccess(p,target){
  });
 }
 function back(p){menu(p)}
-function menu(p){const d=profile(p);form(p,'§l§bSKYGEN CORE',`§eCredits: ${d.credits}  §bOrbits: ${d.orbits}\n§dRank: ${d.rank}/50  XP: ${d.xp}\n§aPlot: ${d.plot+1}`,['My Plot','Visit Other Plots','Generators','Server Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Help'],i=>[()=>plotMenu(p),()=>visitMenu(p),()=>genMenu(p),()=>shop(p),()=>market(p),()=>trade(p),()=>ranks(p),()=>wallet(p),()=>teleports(p),()=>form(p,'Help','SkyGen v0.7.5. Marketplace, direct trades, 50 ranks and generator upgrades. Test on a world copy first.',['Back'],()=>back(p))][i]())}
+function menu(p){const d=profile(p);form(p,'§l§bSKYGEN CORE',`§eCredits: ${d.credits}  §bOrbits: ${d.orbits}\n§dRank: ${d.rank}/50  XP: ${d.xp}\n§aPlot: ${d.plot+1}`,['My Plot','Visit Other Plots','Generators','Server Shop','Player Marketplace','Player Trading','Ranks','Wallet / Exchange','Teleport','Help'],i=>[()=>plotMenu(p),()=>visitMenu(p),()=>genMenu(p),()=>shop(p),()=>market(p),()=>trade(p),()=>ranks(p),()=>wallet(p),()=>teleports(p),()=>form(p,'Help','SkyGen v0.7.7. Marketplace, direct trades, 50 ranks and generator upgrades. Test on a world copy first.',['Back'],()=>back(p))][i]())}
 function plotMenu(p){
  const d=profile(p);
  if(d.plot<0)return p.sendMessage('§cYour plot is not assigned. Rejoin to retry.');
@@ -359,7 +502,7 @@ function trustMenu(p){const d=profile(p),id=d.plot;if(id<0)return;const list=tru
 // stored in world dynamic properties so they persist after restart and logout.
 function visitTeleport(p,id){
  if(!canVisit(p,id))return p.sendMessage('§cYou do not have permission to visit this plot.');
- const c=coords(id);tpRequest(p,{x:c.x+0.5,y:c.y+1,z:c.z+0.5},`plot #${id+1}`,id);
+ stageAndBuildPlot(p,id,true);
 }
 function visitorOwnerMenu(p){
  const id=profile(p).plot;if(id<0||ownerId(id)!==p.id)return p.sendMessage('§cOnly the plot owner can manage visitors.');
@@ -623,7 +766,7 @@ world.afterEvents.playerSpawn.subscribe(e=>system.runTimeout(()=>{try{
  }
  p.sendMessage('§bSkyGen: menu compass slot 7, spawn horn slot 8, plot horn slot 9.');
  }catch(err){console.warn('SkyGen join '+err)}},30));
-world.afterEvents.itemUse.subscribe(e=>{const p=e.source,i=e.itemStack;if(adminAxe(i)){system.run(()=>adminMenu(p));return;}if(toolmatch(i,TOOLS[0]))system.run(()=>menu(p));if(toolmatch(i,TOOLS[1]))system.run(()=>{ensureSpawn();if(p.location.y<-50){pending.delete(p.id);try{p.teleport(C.spawn,{dimension:world.getDimension('overworld'),checkForBlocks:false});cooldowns.set(p.id,system.currentTick+C.cooldown);p.sendMessage('§aEmergency void rescue to spawn.')}catch(e){p.sendMessage('§cRescue failed: '+e)}}else tpRequest(p,C.spawn,'spawn')});if(toolmatch(i,TOOLS[2]))system.run(()=>tpPlot(p));if(i?.typeId==='minecraft:egg'&&i.nameTag?.startsWith('§bSkyGen ')&&i.nameTag.endsWith(' Generator')){const name=i.nameTag.replace('§bSkyGen ','').replace(' Generator',''),g=GENS.find(g=>g.name===name);if(!g)return;const pos=p.location;if(!belongs(p,pos.x,pos.z)||ownerId(profile(p).plot)!==p.id)return p.sendMessage('§cUse generator eggs only on your own plot.');// Target the block the player is looking at, never a fixed world-direction offset.
+world.afterEvents.itemUse.subscribe(e=>{const p=e.source,i=e.itemStack;if(adminAxe(i)){system.run(()=>adminMenu(p));return;}if(toolmatch(i,TOOLS[0]))system.run(()=>menu(p));if(toolmatch(i,TOOLS[1]))system.run(()=>{ensureSpawn();if(p.location.y<-50){const t=pending.get(p.id);pending.delete(p.id);finishPendingTeleport(t);try{p.teleport(C.spawn,{dimension:world.getDimension('overworld'),checkForBlocks:false});cooldowns.set(p.id,system.currentTick+C.cooldown);p.sendMessage('§aEmergency void rescue to spawn.')}catch(e){p.sendMessage('§cRescue failed: '+e)}}else tpRequest(p,C.spawn,'spawn')});if(toolmatch(i,TOOLS[2]))system.run(()=>tpPlot(p));if(i?.typeId==='minecraft:egg'&&i.nameTag?.startsWith('§bSkyGen ')&&i.nameTag.endsWith(' Generator')){const name=i.nameTag.replace('§bSkyGen ','').replace(' Generator',''),g=GENS.find(g=>g.name===name);if(!g)return;const pos=p.location;if(!belongs(p,pos.x,pos.z)||ownerId(profile(p).plot)!==p.id)return p.sendMessage('§cUse generator eggs only on your own plot.');// Target the block the player is looking at, never a fixed world-direction offset.
  const hit=p.getBlockFromViewDirection({maxDistance:6,includeLiquidBlocks:false,includePassableBlocks:false});
  if(!hit?.block)return p.sendMessage('§cLook directly at a block on your plot to place the generator.');
  const target=hit.block.location;
@@ -684,4 +827,4 @@ function adminCommand(actor,message){
 }
 
 system.runTimeout(()=>{try{ensureSpawn()}catch(e){console.warn("SkyGen spawn init: "+e)}},40);
-console.warn('[SkyGen] 0.7.2 market, trading, generators and ranks loaded');
+console.warn('[SkyGen] 0.8.1 plot load and teleport repair loaded');
