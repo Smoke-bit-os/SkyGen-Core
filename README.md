@@ -1,24 +1,11 @@
-# SkyGen Core v0.9.2 — Generator Token Compatibility Fix
+# SkyGen Core v0.9.3 — Custom Generator Items (Xbox Test Build)
 
-**Minecraft Bedrock/Xbox testing build**, based on v0.9.1 Security & Stability Hardening.
+All **42** generators now have individually named, non-stackable Bedrock custom items and distinct **64×64 transparent PNG** item icons. Players receive named custom generator cores instead of goat horns when purchasing. The existing secure per-token dynamic property ID and server-side issuance/redeem ledger remain mandatory.
 
-Includes all 42 generators, 42 skills, 50 ranks, daily quests, plots, safe teleports, shop and 18,000,000-Credits-per-Orbit exchange, plus the v0.9.1 security protections.
+**Previously issued v0.9.2 generator goat horns still work** through their existing verified-use handler. The original locked Spawn Horn and Plot Horn are unchanged. Old unverifiable name-only eggs remain blocked and require operator verification.
 
-## Why v0.9.2?
+Using these new items relies on a Bedrock 2.0 custom item component (`skygen:generator_token_use`) registered via `system.beforeEvents.startup`. It handles `onUse` and `onUseOn` and routes both into the original token validation and placement path. If registration fails, new purchases fail closed rather than charge players for unusable items. Actual Xbox testing is essential.
 
-In-game Xbox testing uncovered a real v0.9.1 error: Bedrock does not support `ItemStack.setDynamicProperty` on stackable items, but generator tokens used ordinary eggs. Purchases failed before a Credit debit. v0.9.2 issues **non-stackable goat-horn generator tokens** so their server-issued identities can be written and read back. This preserves token replay protection.
+See `docs/RELEASE_NOTES_v0.9.3.md` and `docs/REALM_CUSTOM_ITEM_TEST_v0.9.3.md`.
 
-See `docs/RELEASE_NOTES_v0.9.2.md` for details and `docs/REALM_TOKEN_TEST_v0.9.2.md` for an in-game checklist. The two existing teleport horns still function and use distinct names; generator tokens are separately named and ID-verified.
-
-## Installing and rolling back
-
-Back up your world and test in a copy. Import `SkyGen_Core_v0.9.2_Generator_Token_Compatibility_Fix.mcaddon`, disable previous SkyGen pack versions, and activate its behavior and resource packs. All pack UUIDs remain unchanged. Do not merge to GitHub stable `main` until tested.
-
-Returning from the v0.9 generator bank to older v0.8.3 requires **restoring the world backup**, not just swapping packs.
-
-## Source and tests
-
-- Behavior pack: `behavior_pack/`, Resource pack: `resource_pack/`
-- `tests/` contains automated simulated tests: **104 passed** including Bedrock stackability emulation; **not** Xbox live tests.
-- `docs/` contains release notes, security testing and migration guidance.
-- `releases/` includes the installable `.mcaddon`.
+Do not install in the live Realm or merge the stable GitHub branch before the Xbox test-world checklist passes. Back up world data first. Downgrading v0.9.x to v0.8.3 requires a pre-upgrade world backup because generator storage is banked.

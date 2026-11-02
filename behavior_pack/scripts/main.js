@@ -46,6 +46,13 @@ const GENS=[
  {"name":"Shroomlight","block":"minecraft:shroomlight","cost":620000,"period":880,"category":"Endgame","unlock":46},
  {"name":"Ancient Debris","block":"minecraft:ancient_debris","cost":1900000,"period":1600,"category":"Endgame","unlock":48}
 ];
+
+// Stable namespaced item IDs. Keep these unchanged across future versions so
+// previously purchased unused custom tokens remain valid.
+const GENERATOR_ITEM_BY_NAME=new Map(GENS.map(g=>[g.name,'skygen:generator_'+g.name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')]));
+const GENERATOR_ITEM_TYPE_IDS=new Set(GENERATOR_ITEM_BY_NAME.values());
+function generatorItemId(g){return GENERATOR_ITEM_BY_NAME.get(g.name)}
+function validTokenItemType(type,name){return type==='minecraft:goat_horn'||type===GENERATOR_ITEM_BY_NAME.get(name)}
 const SHOP=[{name:'Cobblestone × 16',id:'minecraft:cobblestone',count:16,buy:80,sell:16},{name:'Oak Logs × 16',id:'minecraft:oak_log',count:16,buy:160,sell:32},{name:'Iron Ingots × 8',id:'minecraft:iron_ingot',count:8,buy:400,sell:80},{name:'Diamond × 1',id:'minecraft:diamond',count:1,buy:500,sell:100},{"name":"Stone","id":"minecraft:stone","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Dirt","id":"minecraft:dirt","count":16,"buy":64,"sell":16,"category":"Starter"},{"name":"Gravel","id":"minecraft:gravel","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Sand","id":"minecraft:sand","count":16,"buy":128,"sell":32,"category":"Starter"},{"name":"Clay","id":"minecraft:clay_ball","count":16,"buy":160,"sell":32,"category":"Starter"},{"name":"Spruce Logs","id":"minecraft:spruce_log","count":16,"buy":192,"sell":48,"category":"Starter"},{"name":"Birch Logs","id":"minecraft:birch_log","count":16,"buy":192,"sell":48,"category":"Starter"},{"name":"Cherry Logs","id":"minecraft:cherry_log","count":16,"buy":320,"sell":80,"category":"Starter"},{"name":"Copper Ingots","id":"minecraft:copper_ingot","count":8,"buy":280,"sell":64,"category":"Ores"},{"name":"Coal","id":"minecraft:coal","count":16,"buy":240,"sell":48,"category":"Ores"},{"name":"Gold Ingots","id":"minecraft:gold_ingot","count":8,"buy":800,"sell":160,"category":"Ores"},{"name":"Redstone Dust","id":"minecraft:redstone","count":16,"buy":240,"sell":64,"category":"Ores"},{"name":"Lapis Lazuli","id":"minecraft:lapis_lazuli","count":16,"buy":288,"sell":64,"category":"Ores"},{"name":"Emerald","id":"minecraft:emerald","count":1,"buy":1500,"sell":300,"category":"Ores"},{"name":"Nether Quartz","id":"minecraft:quartz","count":16,"buy":320,"sell":64,"category":"Nether"},{"name":"Netherrack","id":"minecraft:netherrack","count":16,"buy":128,"sell":32,"category":"Nether"},{"name":"Soul Sand","id":"minecraft:soul_sand","count":8,"buy":160,"sell":40,"category":"Nether"},{"name":"Blackstone","id":"minecraft:blackstone","count":16,"buy":480,"sell":128,"category":"Nether"},{"name":"Glowstone Dust","id":"minecraft:glowstone_dust","count":16,"buy":640,"sell":160,"category":"Nether"},{"name":"Magma Cream","id":"minecraft:magma_cream","count":8,"buy":800,"sell":200,"category":"Nether"},{"name":"Obsidian","id":"minecraft:obsidian","count":4,"buy":1200,"sell":320,"category":"Endgame"},{"name":"Prismarine","id":"minecraft:prismarine","count":8,"buy":1600,"sell":400,"category":"Endgame"},{"name":"End Stone","id":"minecraft:end_stone","count":8,"buy":1600,"sell":400,"category":"Endgame"},{"name":"Sculk","id":"minecraft:sculk","count":8,"buy":2400,"sell":640,"category":"Endgame"}];
 const pending=new Map(),cooldowns=new Map(),generators=new Map(),trades=new Map(),visitRequests=new Map();
 const genEmptySeconds=new Map();
@@ -1158,7 +1165,7 @@ function buyGen(p,category='Starter',page=0){
   const g=slice[i],latest=profile(p),cost=discountedPrice(g.cost,perkValue(latest,'generatorPrice'));
   if(latest.rank<g.unlock)return p.sendMessage(`§c${g.name} requires Rank ${g.unlock}.`);
   if(latest.credits<cost)return p.sendMessage('§cNot enough Credits.');
-  if(!generatorTokenUseGuardReady)return p.sendMessage('§cGenerator token use guard unavailable. Purchases disabled.');
+  if(!generatorTokenCustomReady)return p.sendMessage('§cGenerator custom-item use handler unavailable. Purchases disabled.');
   issueGeneratorToken(p,g,cost);
  });
 }
@@ -1595,7 +1602,9 @@ world.afterEvents.itemUse.subscribe(e=>{
 // The token record is authoritative, not the egg's display name or its lore.
 // ItemStack dynamic properties require non-stackable items in Bedrock stable.
 // Goat horns are non-stackable and reliably fire the existing itemUse event on Xbox.
+// Legacy v0.9.2 goat horns remain redeemable; v0.9.3 purchases use custom items.
 const GENERATOR_TOKEN_ITEM='minecraft:goat_horn';
+let generatorTokenCustomReady=false;
 const TOKEN_SEQ_KEY='sg_token_seq';
 const generatorOutputReady=new Set();
 function tokenKey(id){return 'sg_token_'+id}
@@ -1613,10 +1622,10 @@ function tokenWrite(id,r){
  if(world.getDynamicProperty(tokenKey(id))!==value)throw Error('Generator token ledger write not verified');
 }
 function issueGeneratorToken(p,g,price){
- if(!generatorTokenUseGuardReady)return p.sendMessage('§cGenerator token use guard is not active; cannot issue tokens.');
+ if(!generatorTokenCustomReady)return p.sendMessage('§cGenerator custom-item use handler is not active; cannot issue tokens.');
  const latest=profile(p),inv=inventory(p);
  if(!inv||latest.rank<g.unlock||latest.credits<price)return p.sendMessage('§cNot eligible or Credits changed.');
- const egg=new ItemStack(GENERATOR_TOKEN_ITEM,1);
+ const egg=new ItemStack(generatorItemId(g),1);
  if(egg.maxAmount!==1)return p.sendMessage('§cSecure generator token item is not non-stackable; purchase blocked without charge.');
  egg.nameTag=`§bSkyGen ${g.name} Generator`;
  egg.setLore([`Generator type: ${g.name}`,'Server-verified token. Use on your plot.']);
@@ -1672,7 +1681,7 @@ function placeGeneratorToken(p,selected,id){
  try{
   if(!p?.isValid)return;
   const inv=inventory(p),stack=inv?.getItem(selected);record=tokenRead(id);
-  if(!record||record.status!=='issued'||record.owner!==p.id||!stack||stack.typeId!==GENERATOR_TOKEN_ITEM||stack.amount!==1||tokenId(stack)!==id){
+  if(!record||record.status!=='issued'||record.owner!==p.id||!stack||!validTokenItemType(stack.typeId,record.type)||stack.amount!==1||tokenId(stack)!==id){
    return p.sendMessage('§cInvalid, already used, or unissued generator token. Ask an operator for help.');
   }
   const g=GENS.find(x=>x.name===record.type);
@@ -1730,6 +1739,35 @@ function placeGeneratorToken(p,selected,id){
   p?.sendMessage?.('§cGenerator redemption failed safely; operator review #'+id);
  }
 }
+// Namespaced component shared by 42 distinct non-stackable custom items.
+// Handler registration occurs in Bedrock's early startup event, not on a join.
+// Both controller 'use in air' and 'use on block' enter the same secured path.
+const customTokenUsePending=new Set();
+function queueCustomGeneratorUse(event){
+ const p=event.source,item=event.itemStack;
+ if(!p||!item||!GENERATOR_ITEM_TYPE_IDS.has(item.typeId))return;
+ const id=tokenId(item),slot=p.selectedSlotIndex;
+ const dedupe=p.id+':'+slot+':'+id;
+ if(customTokenUsePending.has(dedupe))return;
+ customTokenUsePending.add(dedupe);
+ system.run(()=>{
+  try{placeGeneratorToken(p,slot,id)}
+  finally{customTokenUsePending.delete(dedupe)}
+ });
+}
+try {
+ if(!system.beforeEvents?.startup?.subscribe)throw Error('Script API startup registry unavailable');
+ system.beforeEvents.startup.subscribe(ev=>{
+  try{
+   ev.itemComponentRegistry.registerCustomComponent('skygen:generator_token_use',{
+    onUse:queueCustomGeneratorUse,
+    onUseOn:queueCustomGeneratorUse
+   });
+   generatorTokenCustomReady=true;
+  }catch(err){generatorTokenCustomReady=false;console.warn('[SkyGen] CRITICAL custom generator item registration failed '+err)}
+ });
+}catch(err){console.warn('[SkyGen] CRITICAL custom item startup unavailable '+err)}
+// Keep the v0.9.2 horn event subscribed so outstanding valid horns still redeem.
 let generatorTokenUseGuardReady=false;
 try{
  if(!world.beforeEvents.itemUse?.subscribe)throw Error('beforeEvents.itemUse is unavailable');
@@ -1739,6 +1777,13 @@ try{
   if(i?.typeId==='minecraft:egg'&&i.nameTag?.startsWith('§bSkyGen ')){
    e.cancel=true;
    system.run(()=>e.source?.sendMessage?.('§cOld generator egg cannot be verified. Ask an operator to inspect and replace it.'));
+   return;
+  }
+  // Controller compatibility fallback: if Bedrock emits a normal use event
+  // for a custom item, cancel vanilla behavior and use the same deduplicated path.
+  if(i&&GENERATOR_ITEM_TYPE_IDS.has(i.typeId)){
+   e.cancel=true;
+   queueCustomGeneratorUse({source:e.source,itemStack:i});
    return;
   }
   if(i?.typeId!==GENERATOR_TOKEN_ITEM||(!i.nameTag?.startsWith('§bSkyGen ')&&!tokenId(i)))return;
@@ -1878,4 +1923,4 @@ function adminCommand(actor,message){
 }
 
 system.runTimeout(()=>{try{ensureSpawn()}catch(e){console.warn('SkyGen spawn init: '+e)}},40);
-console.warn('[SkyGen] 0.9.2 generator token compatibility fix loaded');
+console.warn('[SkyGen] v0.9.3 custom generator items loaded');

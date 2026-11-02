@@ -1,0 +1,132 @@
+{
+  "resource_pack_name": "SkyGen Core",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "skygen_generator_cobblestone": {
+      "textures": "textures/items/cobblestone_generator"
+    },
+    "skygen_generator_coal": {
+      "textures": "textures/items/coal_generator"
+    },
+    "skygen_generator_iron": {
+      "textures": "textures/items/iron_generator"
+    },
+    "skygen_generator_gold": {
+      "textures": "textures/items/gold_generator"
+    },
+    "skygen_generator_diamond": {
+      "textures": "textures/items/diamond_generator"
+    },
+    "skygen_generator_emerald": {
+      "textures": "textures/items/emerald_generator"
+    },
+    "skygen_generator_stone": {
+      "textures": "textures/items/stone_generator"
+    },
+    "skygen_generator_deepslate": {
+      "textures": "textures/items/deepslate_generator"
+    },
+    "skygen_generator_dirt": {
+      "textures": "textures/items/dirt_generator"
+    },
+    "skygen_generator_gravel": {
+      "textures": "textures/items/gravel_generator"
+    },
+    "skygen_generator_sand": {
+      "textures": "textures/items/sand_generator"
+    },
+    "skygen_generator_clay": {
+      "textures": "textures/items/clay_generator"
+    },
+    "skygen_generator_oak_logs": {
+      "textures": "textures/items/oak_logs_generator"
+    },
+    "skygen_generator_spruce_logs": {
+      "textures": "textures/items/spruce_logs_generator"
+    },
+    "skygen_generator_birch_logs": {
+      "textures": "textures/items/birch_logs_generator"
+    },
+    "skygen_generator_cherry_logs": {
+      "textures": "textures/items/cherry_logs_generator"
+    },
+    "skygen_generator_mangrove_logs": {
+      "textures": "textures/items/mangrove_logs_generator"
+    },
+    "skygen_generator_copper": {
+      "textures": "textures/items/copper_generator"
+    },
+    "skygen_generator_redstone": {
+      "textures": "textures/items/redstone_generator"
+    },
+    "skygen_generator_lapis_lazuli": {
+      "textures": "textures/items/lapis_lazuli_generator"
+    },
+    "skygen_generator_nether_quartz": {
+      "textures": "textures/items/nether_quartz_generator"
+    },
+    "skygen_generator_nether_gold": {
+      "textures": "textures/items/nether_gold_generator"
+    },
+    "skygen_generator_moss": {
+      "textures": "textures/items/moss_generator"
+    },
+    "skygen_generator_netherrack": {
+      "textures": "textures/items/netherrack_generator"
+    },
+    "skygen_generator_soul_sand": {
+      "textures": "textures/items/soul_sand_generator"
+    },
+    "skygen_generator_basalt": {
+      "textures": "textures/items/basalt_generator"
+    },
+    "skygen_generator_blackstone": {
+      "textures": "textures/items/blackstone_generator"
+    },
+    "skygen_generator_glowstone": {
+      "textures": "textures/items/glowstone_generator"
+    },
+    "skygen_generator_magma": {
+      "textures": "textures/items/magma_generator"
+    },
+    "skygen_generator_calcite": {
+      "textures": "textures/items/calcite_generator"
+    },
+    "skygen_generator_tuff": {
+      "textures": "textures/items/tuff_generator"
+    },
+    "skygen_generator_amethyst_block": {
+      "textures": "textures/items/amethyst_block_generator"
+    },
+    "skygen_generator_obsidian": {
+      "textures": "textures/items/obsidian_generator"
+    },
+    "skygen_generator_prismarine": {
+      "textures": "textures/items/prismarine_generator"
+    },
+    "skygen_generator_sea_lantern": {
+      "textures": "textures/items/sea_lantern_generator"
+    },
+    "skygen_generator_end_stone": {
+      "textures": "textures/items/end_stone_generator"
+    },
+    "skygen_generator_purpur_block": {
+      "textures": "textures/items/purpur_block_generator"
+    },
+    "skygen_generator_sculk": {
+      "textures": "textures/items/sculk_generator"
+    },
+    "skygen_generator_crying_obsidian": {
+      "textures": "textures/items/crying_obsidian_generator"
+    },
+    "skygen_generator_gilded_blackstone": {
+      "textures": "textures/items/gilded_blackstone_generator"
+    },
+    "skygen_generator_shroomlight": {
+      "textures": "textures/items/shroomlight_generator"
+    },
+    "skygen_generator_ancient_debris": {
+      "textures": "textures/items/ancient_debris_generator"
+    }
+  }
+}

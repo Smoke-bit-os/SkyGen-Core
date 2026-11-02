@@ -3,7 +3,7 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const src=fs.readFileSync(process.argv[2]||'/mnt/data/skygen_v091_work/behavior_pack/scripts/main.js','utf8').replace(/^import .*?;\n/gm,'');
 class Stack{
- constructor(type,amount=1){this.typeId=type;this.amount=amount;this.maxAmount=type==='minecraft:goat_horn'?1:type==='minecraft:egg'?16:64;this.lockMode=0;this.nameTag='';this.keepOnDeath=false;this.lore=[];this.props={}}
+ constructor(type,amount=1){this.typeId=type;this.amount=amount;this.maxAmount=(type==='minecraft:goat_horn'||type.startsWith('skygen:generator_'))?1:type==='minecraft:egg'?16:64;this.lockMode=0;this.nameTag='';this.keepOnDeath=false;this.lore=[];this.props={}}
  getLore(){return this.lore}
  setLore(l){this.lore=l}
  setDynamicProperty(k,v){if(this.maxAmount!==1)throw Error('UnsupportedFunctionalityError: item dynamic properties require non-stackable items');this.props[k]=v}
@@ -52,9 +52,9 @@ function setup(opts={}){
  const world={getDimension(){return dim},getAllPlayers(){return[p,q]},getDynamicProperty(k){return props.get(k)},getDynamicPropertyIds(){return [...props.keys()]},setDynamicProperty(k,v){if(k===throwSaveKey)throw Error('Simulated persistence failure');props.set(k,v)},
   beforeEvents:{itemUse:{subscribe(f){events.itemUseBefore=f}},explosion:{subscribe(f){events.explosionBefore=f}},playerBreakBlock:{subscribe(f){events.breakBefore=f}},...(opts.noBeforePlace?{}:{playerPlaceBlock:{subscribe(f){events.placeBefore=f}}}),...(opts.noInteract?{}:{playerInteractWithBlock:{subscribe(f){events.interactBefore=f}}})},
   afterEvents:{playerSpawn:{subscribe(f){events.spawn=f}},itemUse:{subscribe(f){events.use=f}},playerBreakBlock:{subscribe(f){events.breakAfter=f}},playerPlaceBlock:{subscribe(f){events.placeAfter=f}},playerLeave:{subscribe(f){events.leave=f}}}};
- const system={currentTick:0,afterEvents:{scriptEventReceive:{subscribe(f){events.command=f}}},runTimeout(f,n=1){jobs.push({f,at:this.currentTick+n})},runInterval(f,n){events.interval=f},run(f){this.runTimeout(f,1)}};
+ const system={currentTick:0,beforeEvents:{startup:{subscribe(f){events.startup=f}}},afterEvents:{scriptEventReceive:{subscribe(f){events.command=f}}},runTimeout(f,n=1){jobs.push({f,at:this.currentTick+n})},runInterval(f,n){events.interval=f},run(f){this.runTimeout(f,1)}};
  const ctx=vm.createContext({world,system,ItemStack:Stack,ItemLockMode:{none:0,slot:1,inventory:2},ActionFormData:class{},ModalFormData:class{},MessageFormData:class{},console:{warn(...msg){logs.push(msg.join(' '))},log(...msg){logs.push(msg.join(' '))}}});
- let loadError;try{vm.runInContext(src,ctx)}catch(e){loadError=e}
+ let loadError;try{vm.runInContext(src,ctx);if(events.startup){events.customItems={};events.startup({itemComponentRegistry:{registerCustomComponent(id,handlers){events.customItems[id]=handlers}}})}}catch(e){loadError=e}
  function call(code){ctx.p=p;ctx.q=q;return vm.runInContext(code,ctx)}
  function advance(n){for(let i=0;i<n;i++){system.currentTick++;for(const job of jobs.filter(j=>j.at<=system.currentTick)){jobs.splice(jobs.indexOf(job),1);job.f()}}}
  return {props,blocks,events,commands,areas,jobs,logs,p,q,world,dim,system,call,advance,at,loadError,Stack};
@@ -80,8 +80,8 @@ test('server issuance decrements wallet and attaches unique identity',()=>{
  assert.equal(t.call(`tokenRead('${id}').status`),'issued');assert.equal(item.amount,1);
 });
 test('valid generator token is consumed before generator and record are granted',()=>{
- const t=setup(),{item,id}=purchase(t);const e={source:t.p,itemStack:item,cancel:false};t.events.itemUseBefore(e);t.advance(1);
- assert(e.cancel);assert.equal(t.p.inv.getItem(0),undefined);assert.equal(t.call('generators.size'),1);assert.equal(t.call(`tokenRead('${id}').status`),'spent');
+ const t=setup(),{item,id}=purchase(t);const e={source:t.p,itemStack:item};t.events.customItems['skygen:generator_token_use'].onUse(e);t.advance(1);
+assert.equal(t.p.inv.getItem(0),undefined);assert.equal(t.call('generators.size'),1);assert.equal(t.call(`tokenRead('${id}').status`),'spent');
  assert.equal(t.blocks.get(t.at(512,107,512)),'minecraft:bedrock');
 });
 test('a spent or duplicated token cannot register a second generator',()=>{
@@ -226,7 +226,7 @@ test('Bedrock stackable eggs reject item identity and the new non-stackable toke
  const t=setup();owned(t);
  const egg=new Stack('minecraft:egg');assert.throws(()=>egg.setDynamicProperty('sg_token_id','123'),/UnsupportedFunctionalityError/);
  t.call("issueGeneratorToken(p,GENS.find(g=>g.name==='Cobblestone'),500)");
- const token=t.p.inv.getItem(0);assert(token);assert.equal(token.typeId,'minecraft:goat_horn');assert.equal(token.maxAmount,1);
+ const token=t.p.inv.getItem(0);assert(token);assert.equal(token.typeId,'skygen:generator_cobblestone');assert.equal(token.maxAmount,1);
  assert(/^[1-9]\d*$/.test(token.getDynamicProperty('sg_token_id')));
  assert.equal(JSON.parse(t.p.data.get('sg_profile')).credits,49500);
 });
@@ -245,4 +245,58 @@ test('old name-only generator eggs are blocked with operator recovery guidance',
  assert.equal(e.cancel,true);assert(t.p.messages.some(s=>s.includes('Old generator egg')));
 });
 
-console.log(`SkyGen v0.9.2 focused security tests: ${n-failed} passed, ${failed} failed`);if(failed)process.exitCode=1;
+test('custom item component registered for onUse and onUseOn',()=>{
+ const t=setup();assert(!t.loadError);const c=t.events.customItems?.['skygen:generator_token_use'];
+ assert(c);assert.equal(typeof c.onUse,'function');assert.equal(typeof c.onUseOn,'function');
+ assert.equal(t.call('generatorTokenCustomReady'),true);
+});
+test('both duplicate use callbacks consume only one custom token',()=>{
+ const t=setup(),{item,id}=purchase(t),c=t.events.customItems['skygen:generator_token_use'];
+ c.onUse({source:t.p,itemStack:item});c.onUseOn({source:t.p,itemStack:item});
+ assert.equal(t.jobs.filter(j=>j.at===1).length,1);
+ t.advance(1);assert.equal(t.call('generators.size'),1);assert.equal(t.call(`tokenRead('${id}').status`),'spent');
+});
+test('new generator items use distinct matching identifiers',()=>{
+ const t=setup();owned(t);
+ t.call(`issueGeneratorToken(p,GENS.find(g=>g.name==='Coal'),500)`);
+ t.call(`issueGeneratorToken(p,GENS.find(g=>g.name==='Stone'),500)`);
+ assert.equal(t.p.inv.getItem(0).typeId,'skygen:generator_coal');
+ assert.equal(t.p.inv.getItem(1).typeId,'skygen:generator_stone');
+ assert.notEqual(t.p.inv.getItem(0).getDynamicProperty('sg_token_id'),t.p.inv.getItem(1).getDynamicProperty('sg_token_id'));
+});
+test('type-swapped token cannot redeem as the original resource',()=>{
+ const t=setup(),{item,id}=purchase(t);const counterfeit=item.clone();counterfeit.typeId='skygen:generator_diamond';t.p.inv.setItem(0,counterfeit);
+ t.call(`placeGeneratorToken(p,0,'${id}')`);assert.equal(t.call('generators.size'),0);
+ assert.equal(t.call(`tokenRead('${id}').status`),'issued');
+});
+test('valid v0.9.2 issued generator horn redeems after upgrading to v0.9.3',()=>{
+ const t=setup(),{item,id}=purchase(t);const legacy=item.clone();legacy.typeId='minecraft:goat_horn';
+ t.p.inv.setItem(0,legacy);const e={source:t.p,itemStack:legacy,cancel:false};
+ t.events.itemUseBefore(e);assert(e.cancel);t.advance(1);assert.equal(t.call('generators.size'),1);
+});
+test('forged custom resource item without server-issued ID cannot place',()=>{
+ const t=setup();owned(t);const fake=new Stack('skygen:generator_diamond');fake.nameTag='§bSkyGen Diamond Generator';t.p.inv.setItem(0,fake);
+ const c=t.events.customItems['skygen:generator_token_use'];c.onUseOn({source:t.p,itemStack:fake});t.advance(1);
+ assert.equal(t.call('generators.size'),0);assert.equal(t.p.inv.getItem(0),fake);
+});
+test('a wrong custom item cannot spoof an existing generator token by its name',()=>{
+ const t=setup(),{item,id}=purchase(t);const fake=item.clone();fake.typeId='skygen:generator_coal';
+ t.p.inv.setItem(0,fake);t.call(`placeGeneratorToken(p,0,'${id}')`);
+ assert.equal(t.call('generators.size'),0);assert.equal(t.call(`tokenRead('${id}').status`),'issued');
+});
+test('the two locked teleport horns do not activate custom generator component',()=>{
+ const t=setup();const c=t.events.customItems['skygen:generator_token_use'];
+ c.onUse({source:t.p,itemStack:new Stack('minecraft:goat_horn')});assert.equal(t.jobs.filter(j=>j.at===1).length,0);
+});
+test('global Bedrock itemUse fallback triggers custom token securely',()=>{
+ const t=setup(),{item,id}=purchase(t);const e={source:t.p,itemStack:item,cancel:false};
+ t.events.itemUseBefore(e);assert(e.cancel);t.advance(1);
+ assert.equal(t.call('generators.size'),1);assert.equal(t.call(`tokenRead('${id}').status`),'spent');
+});
+test('custom component and global itemUse both fire only one queued redemption',()=>{
+ const t=setup(),{item,id}=purchase(t),c=t.events.customItems['skygen:generator_token_use'];
+ const e={source:t.p,itemStack:item,cancel:false};t.events.itemUseBefore(e);c.onUseOn({source:t.p,itemStack:item});
+ assert(e.cancel);assert.equal(t.jobs.filter(j=>j.at===1).length,1);
+ t.advance(1);assert.equal(t.call('generators.size'),1);assert.equal(t.call(`tokenRead('${id}').status`),'spent');
+});
+console.log(`SkyGen v0.9.3 focused security tests: ${n-failed} passed, ${failed} failed`);if(failed)process.exitCode=1;
