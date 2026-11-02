@@ -1,21 +1,19 @@
-# SkyGen Core
+# SkyGen Core v0.7.6
 
-Minecraft Bedrock SkyGen add-on for Xbox and Realms.
+Minecraft Bedrock / Xbox Realm add-on. This archive contains the exact behavior and resource pack files extracted from the user-tested v0.7.6 MCADDON.
 
-## First milestone: safe void-world navigation
+## Features
+Plots and permissions, generators, server shop and quantity purchases, marketplace and trading, ranks, Credits and Orbits, admin manager, and custom-quantity Credits-to-Orbits exchange.
 
-- 25×25 stone-brick spawn platform at Y=0, centered at X=0, Z=0
-- Safe spawn destination: (0.5, 2, 0.5)
-- Locked hotbar tools: slot 7 menu compass, slot 8 spawn horn, slot 9 plot horn
-- Visible teleport countdown 5, 4, 3, 2, 1
-- Movement cancellation, cleanup, and five-second cooldown after success
-- Plot platform generated before player teleport
+Exchange rate: **18,000,000 Credits = 1 Orbit**.
 
-## Documentation
+## Installation
+Import the release `.mcaddon` into Minecraft Bedrock and activate both behavior and resource packs on the world. Back up the world first and disable older active versions to prevent pack conflicts.
 
-- [Roadmap](docs/ROADMAP.md)
-- [Teleport specification](docs/TELEPORT_SPEC.md)
+## Source layout
+- `behavior_pack/manifest.json` and `behavior_pack/scripts/main.js`
+- `resource_pack/manifest.json`
+- `releases/SkyGen_Core_v0.7.6.mcaddon` — exact tested add-on
 
-## Status
-
-Early alpha. Bedrock in-game validation is required. The packaged v0.2.4 add-on source still needs to be committed and reviewed before release.
+## Validation
+User reports all prior functionality and the v0.7.6 exchange tested successfully in-game.
