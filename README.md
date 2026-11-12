@@ -1,4 +1,20 @@
-# SkyGen Core v0.8.3 — Pre-Install Verification Build
+# Aether Nexus SkyGen — Project Repository
+
+## Latest owner-approved stable build: v0.10.60
+
+**v0.10.60 STABLE** was approved following a three-player Bedrock test with no noticeable lag and all tested features working, as reported by the project owner. The released package is frozen and identified by SHA-256:
+
+`b8a031ac0e1727676f56fd7f22376d0176a6e2caa05ffbca777b08ec328ba6b6`
+
+**[Read the v0.10.60 release record](docs/releases/Aether_Nexus_SkyGen_v0.10.60_STABLE.md).**
+
+> **Download status:** The v0.10.60 `.mcaddon` has **not yet been uploaded to GitHub**. The repository's currently downloadable `releases/` files and source directories represent an older v0.8.3-era snapshot. Do not install one of them expecting v0.10.60.
+
+The original v0.10.47 baseline remains protected; new development should branch from a copy of the owner-approved v0.10.60 package, not overwrite it.
+
+---
+
+## Historical repository snapshot (v0.8.3)
 
 Minecraft Bedrock / Xbox Realms behavior and resource pack. This is a single installable `.mcaddon` containing the tested code-level revisions of v0.8.2 plus focused final fixes.
 
