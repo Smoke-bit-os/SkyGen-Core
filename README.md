@@ -1,5 +1,11 @@
 # Aether Nexus SkyGen — Project Repository
 
+## Latest test build — v0.10.91
+
+The Player Head Trophy Fix keeps placed heads at their anchors and blocks damage attributed to trophy displays. The trophy checks passed on Bedrock Dedicated Server. Xbox and Realms testing is pending.
+
+[Download the Bedrock add-on](releases/Aether_Nexus_SkyGen_v0.10.91_Player_Head_Trophy_Fix_Test.mcaddon) · [Download the matching source ZIP](releases/Aether_Nexus_SkyGen_v0.10.91_Source.zip) · [Read the test notes](docs/releases/Aether_Nexus_SkyGen_v0.10.91_Player_Head_Trophy_Fix_Test.md)
+
 ## Latest owner-approved stable build: v0.10.60
 
 **v0.10.60 STABLE** was approved following a three-player Bedrock test with no noticeable lag and all tested features working, as reported by the project owner. The released package is frozen and identified by SHA-256:
@@ -8,13 +14,15 @@
 
 **[Read the v0.10.60 release record](docs/releases/Aether_Nexus_SkyGen_v0.10.60_STABLE.md).**
 
-> **Download status:** The v0.10.60 `.mcaddon` has **not yet been uploaded to GitHub**. The repository's currently downloadable `releases/` files and source directories represent an older v0.8.3-era snapshot. Do not install one of them expecting v0.10.60.
+> The v0.10.60 `.mcaddon` is pending upload to GitHub.
 
 The original v0.10.47 baseline remains protected; new development should branch from a copy of the owner-approved v0.10.60 package, not overwrite it.
 
 ---
 
 ## Historical repository snapshot (v0.8.3)
+
+The checked-in `behavior_pack/` and `resource_pack/` directories and the installer described in this section are from the v0.8.3 snapshot.
 
 Minecraft Bedrock / Xbox Realms behavior and resource pack. This is a single installable `.mcaddon` containing the tested code-level revisions of v0.8.2 plus focused final fixes.
 
