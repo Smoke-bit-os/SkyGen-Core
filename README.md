@@ -1,12 +1,12 @@
 # Aether Nexus SkyGen — Project Repository
 
-## Latest test build — v0.10.91
+## Latest stable build — v0.10.91
 
-The Player Head Trophy Fix keeps placed heads at their anchors and blocks damage attributed to trophy displays. The trophy checks passed on Bedrock Dedicated Server. Xbox and Realms testing is pending.
+The project owner cleared this build after gameplay testing. The Player Head Trophy Fix keeps placed heads at their anchors and blocks damage attributed to trophy displays.
 
-[Download the Bedrock add-on](https://github.com/Smoke-bit-os/SkyGen-Core/raw/1322c8b516957f5fa2043748f52734a86ffa4a14/releases/Aether_Nexus_SkyGen_v0.10.91_Player_Head_Trophy_Fix_Test.mcaddon) · [Download the matching source ZIP](https://github.com/Smoke-bit-os/SkyGen-Core/raw/1322c8b516957f5fa2043748f52734a86ffa4a14/releases/Aether_Nexus_SkyGen_v0.10.91_Source.zip) · [Read the test notes](https://github.com/Smoke-bit-os/SkyGen-Core/blob/1322c8b516957f5fa2043748f52734a86ffa4a14/docs/releases/Aether_Nexus_SkyGen_v0.10.91_Player_Head_Trophy_Fix_Test.md)
+[Download the Bedrock add-on](releases/Aether_Nexus_SkyGen_v0.10.91_STABLE.mcaddon) · [Download the matching source ZIP](releases/Aether_Nexus_SkyGen_v0.10.91_Source.zip) · [Read the v0.10.91 release notes](docs/releases/Aether_Nexus_SkyGen_v0.10.91_STABLE.md)
 
-## Latest owner-approved stable build: v0.10.60
+## Previous stable build — v0.10.60
 
 **v0.10.60 STABLE** was approved following a three-player Bedrock test with no noticeable lag and all tested features working, as reported by the project owner. The released package is frozen and identified by SHA-256:
 
@@ -16,7 +16,7 @@ The Player Head Trophy Fix keeps placed heads at their anchors and blocks damage
 
 > The v0.10.60 `.mcaddon` is pending upload to GitHub.
 
-The original v0.10.47 baseline remains protected; new development should branch from a copy of the owner-approved v0.10.60 package, not overwrite it.
+The original v0.10.47 baseline is protected.
 
 ---
 
