@@ -18,7 +18,9 @@ This is not a claim that every quest, security scenario, rank, hardware configur
 - Behavior pack / resource pack: `0.10.60` / `0.10.60`
 - This package was copied byte-for-byte from the previously tested v0.10.60 compact-scoreboard candidate and its archives passed CRC checks.
 
-> **Distribution note:** The binary add-on has not been uploaded to this GitHub repository yet. Do **not** mistake the older `releases/` files or the legacy `behavior_pack/` and `resource_pack/` trees on `main` for v0.10.60. The stable package is retained separately and must be uploaded and checked against the SHA-256 above before this repository advertises a downloadable v0.10.60 build.
+[Download the verified v0.10.60 add-on](../../releases/Aether_Nexus_SkyGen_v0.10.60_STABLE.mcaddon) · [Download its full source ZIP](../../releases/Aether_Nexus_SkyGen_v0.10.60_Source.zip) · [Check SHA-256 hashes](../../releases/SHA256SUMS_v0.10.60.txt)
+
+The source ZIP contains all 550 files from the stable package under `behavior_pack/` and `resource_pack/`. The package matches the SHA-256 recorded above.
 
 ## Major features included in the reported stable build
 

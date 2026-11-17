@@ -1,0 +1,2 @@
+b8a031ac0e1727676f56fd7f22376d0176a6e2caa05ffbca777b08ec328ba6b6  Aether_Nexus_SkyGen_v0.10.60_STABLE.mcaddon
+1477bb05832bb281b6ced3e5254abc63e2d9c1ef0f429483ac65f41d5bc77e94  Aether_Nexus_SkyGen_v0.10.60_Source.zip

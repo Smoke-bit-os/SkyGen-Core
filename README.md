@@ -1,5 +1,19 @@
 # Aether Nexus SkyGen — Project Repository
 
+## Website
+
+Explore the gameplay and setup guides on the Aether Nexus SkyGen website. Website access is currently private.
+
+[Open the SkyGen website](https://aether-nexus-skygen.piledegret32.chatgpt.site)
+
+## Latest test build — v0.10.101
+
+The latest test package includes the captured spawn and Nine Islands, Capture the Flag, King of the Hill, Generator Rush, 45-second queue windows, arena chunk loading, and the new Pro Shop utility items.
+
+[Download the v0.10.101 add-on](releases/Aether_Nexus_SkyGen_v0.10.101_Pro_Shop_Items_Test.mcaddon) · [Download its full source ZIP](releases/Aether_Nexus_SkyGen_v0.10.101_Source.zip) · [Read the setup and release notes](docs/releases/Aether_Nexus_SkyGen_v0.10.101_Pro_Shop_Items_Test.md) · [Check SHA-256 hashes](releases/SHA256SUMS_v0.10.101.txt)
+
+The source ZIP contains all 798 files from the package under `behavior_pack/` and `resource_pack/`. The package imports as v0.10.101 with its original test-build names.
+
 ## Latest stable build — v0.10.91
 
 The project owner cleared this build after gameplay testing. The Player Head Trophy Fix keeps placed heads at their anchors and blocks damage attributed to trophy displays.
@@ -14,7 +28,7 @@ The project owner cleared this build after gameplay testing. The Player Head Tro
 
 **[Read the v0.10.60 release record](docs/releases/Aether_Nexus_SkyGen_v0.10.60_STABLE.md).**
 
-> The v0.10.60 `.mcaddon` is pending upload to GitHub.
+[Download v0.10.60 STABLE](releases/Aether_Nexus_SkyGen_v0.10.60_STABLE.mcaddon) · [Download its full source ZIP](releases/Aether_Nexus_SkyGen_v0.10.60_Source.zip) · [Check SHA-256 hashes](releases/SHA256SUMS_v0.10.60.txt)
 
 The original v0.10.47 baseline is protected.
 
